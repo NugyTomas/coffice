@@ -1,0 +1,77 @@
+/* =========================================
+   CONSTANTS
+========================================= */
+:root {
+    --WHITE_COLOR: #FFF8F0;
+    --LIGHT_BROWN_COLOR: #C08552;
+    --BROWN_COLOR: #8C5A3C;
+    --DARK_BROWN_COLOR: #4B2E2B;
+}
+
+/* =========================================
+   GENERAL
+========================================= */
+body{
+    font-family: "DM Sans", Arial, sans-serif;
+    color: var(--BROWN_COLOR);
+    background-color: var(--WHITE_COLOR);
+}
+
+.cafe-brand,
+h1,
+h2 {
+    font-family: "Playfair Display", Georgia, serif;
+    letter-spacing: 1px
+}
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+nav {
+    font-size: 1.1rem;
+    background-color: var(--DARK_BROWN_COLOR);
+    color: var(--WHITE_COLOR)
+}
+
+.cafe-brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.nav-add-cafe{
+    font-weight: 600;
+}
+
+.auth-links {
+    display: flex;
+    border: 1px solid var(--WHITE_COLOR);
+    border-radius: 0.4rem;
+}
+
+.auth-links .nav-link {
+    padding: 0.4rem 0.75rem;
+}
+
+.auth-links .nav-link + .nav-link {
+    border-left: 1px solid var(--WHITE_COLOR);
+    font-weight: 500;
+}
+
+.cafe-brand:hover, .nav-add-cafe:hover, .nav-login:hover, .nav-register:hover {
+    color: var(--LIGHT_BROWN_COLOR);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+h1{
+    font-size:3rem;
+    font-weight: 700;
+}
+
+.slogan {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
