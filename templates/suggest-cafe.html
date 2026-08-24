@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+Coffice
+{% endblock %}
+
+{% block content %}
+<form>
+    <section class="suggest_new_cafe">
+        <div class="container pt-4">
+            <a href="{{url_for('home')}}" class="text-decoration-none anchor-back "><span>&larr;</span> Back</a>
+            <div class="row justify-content-center">
+                <div class="col-lg-9 col-md-10 text-center">
+                    <h1 class="mb-4">Help us expand Coffice ☕💻</h1>
+                    <div class="cafe-search">
+
+                        <label for="cafe-search-input" class="form-label">Find a café</label>
+
+                        <div class="search-wrapper">
+                            <input type="text" id="cafe-search-input" placeholder="Start typing a café name"
+                                   autocomplete="off">
+                            <div class="cafe-suggestions">
+                                <!-- JavaScript will add suggestions here -->
+                            </div>
+                        </div>
+
+                        <div class="manual-cafe">
+                            <span>Can't find the café you're looking for?</span>
+                            <button type="button" class="manual-cafe-button">Add it manually</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/suggest-cafe.js') }}"></script>
+{% endblock %}

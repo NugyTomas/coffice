@@ -3,15 +3,17 @@
 ========================================= */
 :root {
     --WHITE_COLOR: #FFF8F0;
+    --NEUTRAL_BROWN_COLOR: #f5eee7;
     --LIGHT_BROWN_COLOR: #C08552;
     --BROWN_COLOR: #8C5A3C;
     --DARK_BROWN_COLOR: #4B2E2B;
+
 }
 
 /* =========================================
    GENERAL
 ========================================= */
-body{
+body {
     font-family: "DM Sans", Arial, sans-serif;
     color: var(--BROWN_COLOR);
     background-color: var(--WHITE_COLOR);
@@ -39,7 +41,7 @@ nav {
     font-weight: 700;
 }
 
-.nav-add-cafe{
+.nav-add-cafe {
     font-weight: 600;
 }
 
@@ -65,13 +67,101 @@ nav {
 /* =========================================
    HEADER
 ========================================= */
-h1{
-    font-size:3rem;
+h1 {
+    font-size: 3rem;
     font-weight: 700;
 }
 
 .slogan {
     font-size: 1.2rem;
     font-weight: 500;
+}
+
+/* =========================================
+   SUGGESTION-SECTION
+========================================= */
+.anchor-back {
+    color: var(--BROWN_COLOR);
+    font-size: 1.5rem;
+    position: relative;
+    transition: .3s ease;
+}
+
+.anchor-back span {
+    display: inline-block;
+    transition: .3s ease;
+}
+
+.anchor-back:hover {
+    color: var(--DARK_BROWN_COLOR);
+}
+
+.anchor-back:hover::after {
+    transform: scaleX(1);
+}
+
+.anchor-back:hover span {
+    transform: translateX(-8px);
+}
+
+/* =========================================
+   SEARCH-SECTION */
+
+.cafe-search {
+    max-width: 650px;
+    margin: 2rem auto 0;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+#cafe-search-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--LIGHT_BROWN_COLOR);
+    border-radius: 0.5rem;
+}
+
+#cafe-search-input:focus {
+    border-color: var(--DARK_BROWN_COLOR);
+}
+
+.cafe-suggestions {
+    display: none;
+    width: 100%;
+    max-height: 15rem;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid var(--LIGHT_BROWN_COLOR);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.suggestion-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background-color: var(--NEUTRAL_BROWN_COLOR)
+}
+
+.manual-cafe {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.manual-cafe-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--DARK_BROWN_COLOR);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.manual-cafe-button:hover {
+    opacity: 0.7;
 }
 

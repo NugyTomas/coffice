@@ -19,6 +19,11 @@ with app.app_context():
 def home():
     return render_template("index.html")
 
+@app.route('/suggest-cafe')
+def suggest_cafe():
+    return render_template("suggest-cafe.html")
+
+
 # =========================================
 # APPLICATION ENTRY POINT
 # =========================================
