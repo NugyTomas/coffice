@@ -148,6 +148,7 @@ h1 {
 }
 
 .manual-cafe {
+    font-size: 1.1rem;
     margin-top: 2rem;
     text-align: center;
 }
@@ -163,5 +164,142 @@ h1 {
 
 .manual-cafe-button:hover {
     opacity: 0.7;
+}
+
+/* =========================================
+   CAFE-INFORMATION */
+.is-hidden {
+    display: none;
+}
+
+.form-section {
+    width: min(90%, 65rem);
+    margin: 3rem auto 0;
+    padding: 1rem 2rem 2rem;
+    background-color: var(--NEUTRAL_BROWN_COLOR);
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.form-section.is-collapsed {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.section-toggle {
+    width: 100%;
+    margin-bottom: 1rem;
+    border: none;
+    background: none;
+    color: var(--DARK_BROWN_COLOR);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: left;
+    position: relative;
+}
+
+.form-section.is-collapsed .section-toggle {
+    margin-bottom: 0;
+}
+
+.section-toggle:hover{
+    opacity: 0.7;
+}
+
+.section-toggle span {
+    display:inline-block;
+    transition: transform .3s ease;
+}
+
+.section-toggle:hover span {
+    transform: translateX(5px);
+}
+
+
+.section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.section-content.is-hidden {
+    display: none;
+}
+
+.form-field input,
+.form-field select {
+    position: relative;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--LIGHT_BROWN_COLOR);
+    border-radius: 0.4rem;
+    background-color: var(--WHITE_COLOR);
+    color: var(--DARK_BROWN_COLOR);
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: var(--DARK_BROWN_COLOR);
+}
+
+.continue-btn {
+    align-self: flex-end;
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 0.4rem;
+    background-color: var(--DARK_BROWN_COLOR);
+    color: var(--WHITE_COLOR);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.continue-btn:hover {
+    opacity: 0.8;
+}
+
+/* =========================================
+   CAFE-FEATURES */
+.work-friendly-features .section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 1rem 2rem 0;
+}
+
+.feature {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    align-items: center;
+    column-gap: 2rem;
+}
+
+.feature > label{
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+
+}
+
+.feature-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 2rem;
+    align-items: center;
+    font-size: 1.05rem;
+}
+
+
+.feature-options label {
+    cursor: pointer;
+    font-weight: 400;
+    color: var(--LIGHT_BROWN_COLOR)
+}
+
+.feature-options input {
+    cursor: pointer;
 }
 

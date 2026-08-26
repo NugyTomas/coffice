@@ -98,7 +98,7 @@ class CafeSuggestion(db.Model):
     __tablename__ = "cafe_suggestions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    external_place_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    external_place_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     address: Mapped[str] = mapped_column(String(250), nullable=False)
     city: Mapped[str] = mapped_column(String(100), nullable=False)

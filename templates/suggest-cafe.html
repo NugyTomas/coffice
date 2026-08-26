@@ -5,37 +5,381 @@ Coffice
 {% endblock %}
 
 {% block content %}
-<form>
-    <section class="suggest_new_cafe">
-        <div class="container pt-4">
-            <a href="{{url_for('home')}}" class="text-decoration-none anchor-back "><span>&larr;</span> Back</a>
-            <div class="row justify-content-center">
-                <div class="col-lg-9 col-md-10 text-center">
-                    <h1 class="mb-4">Help us expand Coffice ☕💻</h1>
-                    <div class="cafe-search">
+<form class="container pt-4">
 
-                        <label for="cafe-search-input" class="form-label">Find a café</label>
+    <section class="suggest-new-cafe">
 
-                        <div class="search-wrapper">
-                            <input type="text" id="cafe-search-input" placeholder="Start typing a café name"
-                                   autocomplete="off">
-                            <div class="cafe-suggestions">
-                                <!-- JavaScript will add suggestions here -->
-                            </div>
-                        </div>
+        <a href="{{url_for('home')}}" class="text-decoration-none anchor-back "><span>&larr;</span> Back</a>
 
-                        <div class="manual-cafe">
-                            <span>Can't find the café you're looking for?</span>
-                            <button type="button" class="manual-cafe-button">Add it manually</button>
-                        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-10 text-center">
+                <h1 class="mb-4">Help us expand Coffice ☕💻</h1>
 
+                <div class="cafe-search">
+                    <label for="cafe-search-input" class="form-label slogan ">Find a café</label>
+
+                    <div class="search-wrapper">
+                        <input type="text" id="cafe-search-input" placeholder="Start typing a café name"
+                               autocomplete="off">
+                        <div class="cafe-suggestions"></div>
                     </div>
+
+                    <div class="manual-cafe">
+                        <span>Can't find the café you're looking for?</span>
+                        <button type="button" class="manual-cafe-button">Add it manually</button>
+                    </div>
+
                 </div>
             </div>
         </div>
     </section>
+
+    <section class="cafe-basic-information form-section is-hidden">
+
+        <button type="button" class="section-toggle">Basic information <span> ▼</span></button>
+
+        <div class="section-content">
+            <div class="row g-5">
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-name" class="mb-2">Name *</label>
+                    <input type="text" id="cafe-name" required minlength="2" maxlength="50">
+                </div>
+
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-city" class="mb-2">City *</label>
+                    <input type="text" id="cafe-city" required minlength="2" maxlength="50">
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-address" class="mb-2">Address *</label>
+                    <input type="text" id="cafe-address" required minlength="3" maxlength="100">
+                </div>
+
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-postal-code" class="mb-2">Postal code *</label>
+                    <input type="text" id="cafe-postal-code" required pattern="[0-9]{3} [0-9]{2}" placeholder="XXX XX">
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-phone" class="mb-2">Phone</label>
+                    <input type="tel" id="cafe-phone" placeholder="-">
+                </div>
+
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-email" class="mb-2">Email</label>
+                    <input type="email" id="cafe-email" maxlength="200" placeholder="-">
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-website" class="mb-2">Website</label>
+                    <input type="url" id="cafe-website" maxlength="2048" placeholder="-">
+                </div>
+
+                <div class="col-12 col-md-6 form-field">
+                    <label for="cafe-instagram" class="mb-2">Instagram</label>
+                    <input type="url" id="cafe-instagram" value="@">
+                </div>
+            </div>
+
+            <div class="col-12 form-field">
+                <label for="cafe-price-level" class="mb-2">Price level *</label>
+                <select id="cafe-price-level" required>
+                    <option value="">Select price level</option>
+                    <option value="1">💵</option>
+                    <option value="2">💵💵</option>
+                    <option value="3">💵💵💵</option>
+                </select>
+            </div>
+
+            <button type="button" class="continue-btn">Continue</button>
+
+        </div>
+
+    </section>
+
+    <section class="work-friendly-features form-section">
+
+    <button type="button" class="section-toggle">Work-friendly features <span>▼</span></button>
+        
+    <div class="section-content">
+
+
+        <div class="feature">
+            <label>Wi-Fi</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="wifi-unknown" name="wifi" value="unknown" required>
+                    <label for="wifi-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="wifi-no" name="wifi" value="not-available">
+                    <label for="wifi-no">Not available</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="wifi-slow" name="wifi" value="slow">
+                    <label for="wifi-slow">Slow</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="wifi-stable" name="wifi" value="stable">
+                    <label for="wifi-stable">Stable</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="wifi-fast" name="wifi" value="fast">
+                    <label for="wifi-fast">Fast</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="feature">
+            <label>Power outlets</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="outlets-unknown" name="outlets" value="unknown" required>
+                    <label for="outlets-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="outlets-no" name="outlets" value="not-available">
+                    <label for="outlets-no">Not available</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="outlets-limited" name="outlets" value="limited">
+                    <label for="outlets-limited">Limited</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="outlets-everywhere" name="outlets" value="everywhere">
+                    <label for="outlets-everywhere">At every table</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="feature">
+            <label>Noise level</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="noise-unknown" name="noise" value="unknown" required>
+                    <label for="noise-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="noise-noisy" name="noise" value="noisy">
+                    <label for="noise-noisy">Noisy</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="noise-moderate" name="noise" value="moderate">
+                    <label for="noise-moderate">Moderate</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="noise-quiet" name="noise" value="quiet">
+                    <label for="noise-quiet">Quiet</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="feature">
+            <label>Seating</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="seating-unknown" name="seating" value="unknown" required>
+                    <label for="seating-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="seating-no" name="seating" value="not-available">
+                    <label for="seating-no">Not available</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="seating-lounge" name="seating" value="bar-like">
+                    <label for="seating-lounge">Bar-like</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="seating-casual" name="seating" value="casual">
+                    <label for="seating-casual">Casual</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="seating-work-friendly" name="seating" value="work-friendly">
+                    <label for="seating-work-friendly">Work-friendly</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="feature">
+            <label>Air-conditioning</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="air-conditioning-unknown" name="air-conditioning" value="unknown" required>
+                    <label for="air-conditioning-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="air-conditioning-no" name="air-conditioning" value="no">
+                    <label for="air-conditioning-no">No</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="air-conditioning-yes" name="air-conditioning" value="yes">
+                    <label for="air-conditioning-yes">Yes</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="feature">
+            <label>Typical occupancy</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="occupancy-unknown" name="occupancy" value="unknown" required>
+                    <label for="occupancy-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="occupancy-low" name="occupancy" value="low">
+                    <label for="occupancy-low">Low</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="occupancy-moderate" name="occupancy" value="moderate">
+                    <label for="occupancy-moderate">Moderate</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="occupancy-busy" name="occupancy" value="busy">
+                    <label for="occupancy-busy">Busy</label>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="feature">
+            <label>Food available</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="food-unknown" name="food" value="unknown" required>
+                    <label for="food-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="food-no" name="food" value="not-available">
+                    <label for="food-no">Not available</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="food-snacks" name="food" value="snacks">
+                    <label for="food-snacks">Snacks-only</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="food-variety" name="food" value="good-variety">
+                    <label for="food-variety">Good variety</label>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="feature">
+            <label>Vegetarian options</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="vegetarian-unknown" name="vegetarian" value="unknown" required>
+                    <label for="vegetarian-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="vegetarian-no" name="vegetarian" value="not-available">
+                    <label for="vegetarian-no">Not available</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="vegetarian-snacks" name="vegetarian" value="snacks">
+                    <label for="vegetarian-snacks">Snacks-only</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="vegetarian-variety" name="vegetarian" value="good-variety">
+                    <label for="vegetarian-variety">Good variety</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="feature">
+            <label>Card payment</label>
+
+            <div class="feature-options">
+
+                <div class="feature-option">
+                    <input type="radio" id="card-unknown" name="card" value="unknown" required>
+                    <label for="card-unknown">Not sure</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="card-no" name="card" value="no">
+                    <label for="card-no">No</label>
+                </div>
+
+                <div class="feature-option">
+                    <input type="radio" id="card-yes" name="card" value="yes">
+                    <label for="card-yes">Yes</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <button type="button" class="continue-btn">
+            Continue
+        </button>
+
+    </div>
+
+</section>
+
 </form>
+
 {% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/suggest-cafe.js') }}"></script>
 {% endblock %}

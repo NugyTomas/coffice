@@ -23,7 +23,6 @@ def home():
 def suggest_cafe():
     return render_template("suggest-cafe.html")
 
-
 # =========================================
 # APPLICATION ENTRY POINT
 # =========================================
