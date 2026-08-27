@@ -269,6 +269,10 @@ h1 {
     padding: 1rem 2rem 0;
 }
 
+.section-content.is-hidden {
+    display: none;
+}
+
 .feature {
     display: grid;
     grid-template-columns: 11rem minmax(0, 1fr);
@@ -277,7 +281,7 @@ h1 {
 }
 
 .feature > label{
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     white-space: nowrap;
 
@@ -295,7 +299,7 @@ h1 {
 
 .feature-options label {
     cursor: pointer;
-    font-weight: 400;
+    font-weight: 500;
     color: var(--LIGHT_BROWN_COLOR)
 }
 

@@ -19,13 +19,17 @@ const cafeEmail = document.getElementById("cafe-email");
 const cafeWebsite = document.getElementById("cafe-website")
 
 const cafeInformation = document.querySelector(".cafe-basic-information");
-const cafeInformationSectionButton = document.querySelector(".cafe-basic-information .section-toggle")
+const cafeInformationSection = cafeInformation.querySelector(".section-content");
+const cafeInformationSectionButton = cafeInformation.querySelector(".section-toggle")
 const cafeInformationSectionArrow = cafeInformationSectionButton.querySelector("span");
-const cafeInformationSection = document.querySelector(".cafe-basic-information .section-content");
-const cafeInformationContinueButton = document.querySelector(".cafe-basic-information .continue-btn")
+const cafeInformationContinueButton = cafeInformation.querySelector(".continue-btn")
 
 //================ CAFE-FEATURES ================
 const cafeFeatures = document.querySelector(".work-friendly-features");
+const cafeFeaturesSection = cafeFeatures.querySelector(".section-content");
+const cafeFeaturesSectionButton = cafeFeatures.querySelector(".section-toggle");
+const cafeFeaturesSectionArrow = cafeFeaturesSectionButton.querySelector("span");
+
 
 const API_KEY = "";
 
@@ -58,17 +62,25 @@ function showCafeInformationForm() {
     manualCafeDiv.style.display = "none";
 }
 
-function toggleBasicInformationForm(){
+function toggleBasicInformationForm() {
     cafeInformationSection.classList.toggle("is-hidden");
     formSection.classList.toggle("is-collapsed")
-
-    console.log(cafeInformationSection);
-    console.log(cafeInformationSection.classList);
 
     if (cafeInformationSection.classList.contains("is-hidden")) {
         cafeInformationSectionArrow.textContent = "▶";
     } else {
         cafeInformationSectionArrow.textContent = "▼";
+    }
+}
+
+function toggleCafeFeaturesForm() {
+    cafeFeaturesSection.classList.toggle("is-hidden");
+    cafeFeatures.classList.toggle("is-collapsed");
+
+    if (cafeFeaturesSection.classList.contains("is-hidden")) {
+        cafeFeaturesSectionArrow.textContent = "▶";
+    } else {
+        cafeFeaturesSectionArrow.textContent = "▼";
     }
 }
 
@@ -84,7 +96,7 @@ function validateBasicInformation() {
         }
     }
 
-    if (!cafeInformationSectionButton.textContent.includes("✔️")){
+    if (!cafeInformationSectionButton.textContent.includes("✔️")) {
         cafeInformationSectionButton.prepend("✔️ ")
     }
 
@@ -163,12 +175,10 @@ searchInput.addEventListener("input", async () => {
         suggestions.style.display = "none"
     }
 })
-
-manualCafeButton.addEventListener("click",   showCafeInformationForm);
+manualCafeButton.addEventListener("click", showCafeInformationForm);
 
 //================ CAFE-BASIC-INFORMATION ================
 cafeInformationSectionButton.addEventListener("click", toggleBasicInformationForm);
-
 cafeInformationContinueButton.addEventListener("click", () => {
     if (!validateBasicInformation()) {
         return;
@@ -178,4 +188,8 @@ cafeInformationContinueButton.addEventListener("click", () => {
     toggleBasicInformationForm();
 
 });
+
+//================ CAFE-FEATURES ================
+cafeFeaturesSectionButton.addEventListener("click", toggleCafeFeaturesForm);
+
 
