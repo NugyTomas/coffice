@@ -10,6 +10,7 @@
 
 }
 
+
 /* =========================================
    GENERAL
 ========================================= */
@@ -26,10 +27,10 @@ h2 {
     letter-spacing: 1px
 }
 
+
 /* =========================================
    NAVBAR
 ========================================= */
-
 nav {
     font-size: 1.1rem;
     background-color: var(--DARK_BROWN_COLOR);
@@ -60,9 +61,13 @@ nav {
     font-weight: 500;
 }
 
-.cafe-brand:hover, .nav-add-cafe:hover, .nav-login:hover, .nav-register:hover {
+.cafe-brand:hover,
+.nav-add-cafe:hover,
+.nav-login:hover,
+.nav-register:hover {
     color: var(--LIGHT_BROWN_COLOR);
 }
+
 
 /* =========================================
    HEADER
@@ -76,6 +81,7 @@ h1 {
     font-size: 1.2rem;
     font-weight: 500;
 }
+
 
 /* =========================================
    SUGGESTION-SECTION
@@ -104,6 +110,8 @@ h1 {
     transform: translateX(-8px);
 }
 
+
+
 /* =========================================
    SEARCH-SECTION */
 
@@ -127,6 +135,10 @@ h1 {
     border-color: var(--DARK_BROWN_COLOR);
 }
 
+
+/* =========================================
+   CAFE SUGGESTIONS
+========================================= */
 .cafe-suggestions {
     display: none;
     width: 100%;
@@ -147,6 +159,10 @@ h1 {
     background-color: var(--NEUTRAL_BROWN_COLOR)
 }
 
+
+/* =========================================
+   MANUAL CAFE
+========================================= */
 .manual-cafe {
     font-size: 1.1rem;
     margin-top: 2rem;
@@ -166,8 +182,10 @@ h1 {
     opacity: 0.7;
 }
 
+
 /* =========================================
-   CAFE-INFORMATION */
+   FORM SECTIONS
+========================================= */
 .is-hidden {
     display: none;
 }
@@ -185,6 +203,7 @@ h1 {
 .form-section.is-collapsed {
     padding-top: 1rem;
     padding-bottom: 1rem;
+
 }
 
 .section-toggle {
@@ -208,16 +227,19 @@ h1 {
     opacity: 0.7;
 }
 
-.section-toggle span {
+.section-arrow {
     display:inline-block;
     transition: transform .3s ease;
 }
 
-.section-toggle:hover span {
-    transform: translateX(5px);
+.section-toggle:hover .section-arrow {
+    transform: translateX(6px);
 }
 
 
+/* =========================================
+   FORM SECTION CONTENT
+========================================= */
 .section-content {
     display: flex;
     flex-direction: column;
@@ -228,6 +250,10 @@ h1 {
     display: none;
 }
 
+
+/* =========================================
+   FORM FIELDS
+========================================= */
 .form-field input,
 .form-field select {
     position: relative;
@@ -244,6 +270,10 @@ h1 {
     border-color: var(--DARK_BROWN_COLOR);
 }
 
+
+/* =========================================
+   FORM BUTTONS
+========================================= */
 .continue-btn {
     align-self: flex-end;
     margin-top: 1.5rem;
@@ -260,17 +290,13 @@ h1 {
     opacity: 0.8;
 }
 
+
 /* =========================================
-   CAFE-FEATURES */
+   WORK-FRIENDLY FEATURES
+========================================= */
 .work-friendly-features .section-content {
-    display: flex;
-    flex-direction: column;
     gap: 2.5rem;
     padding: 1rem 2rem 0;
-}
-
-.section-content.is-hidden {
-    display: none;
 }
 
 .feature {
@@ -296,7 +322,6 @@ h1 {
     font-size: 1.05rem;
 }
 
-
 .feature-options label {
     cursor: pointer;
     font-weight: 500;
@@ -306,4 +331,6 @@ h1 {
 .feature-options input {
     cursor: pointer;
 }
+
+
 

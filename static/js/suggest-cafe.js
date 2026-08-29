@@ -5,30 +5,31 @@
 //================ CAFE-SUGGESTION ================
 const searchInput = document.getElementById("cafe-search-input");
 const suggestions = document.querySelector(".cafe-suggestions");
-const manualCafeDiv = document.querySelector(".manual-cafe")
 const manualCafeButton = document.querySelector(".manual-cafe-button");
 
-const formSection = document.querySelector(".form-section");
-//================ CAFE-BASIC-INFORMATION ================
+//================ BASIC-INFORMATION ================
 const cafeName = document.getElementById("cafe-name");
 const cafeCity = document.getElementById("cafe-city");
 const cafeAddress = document.getElementById("cafe-address");
 const cafePostCode = document.getElementById("cafe-postal-code");
 const cafePhone = document.getElementById("cafe-phone");
 const cafeEmail = document.getElementById("cafe-email");
-const cafeWebsite = document.getElementById("cafe-website")
+const cafeWebsite = document.getElementById("cafe-website");
 
-const cafeInformation = document.querySelector(".cafe-basic-information");
-const cafeInformationSection = cafeInformation.querySelector(".section-content");
-const cafeInformationSectionButton = cafeInformation.querySelector(".section-toggle")
-const cafeInformationSectionArrow = cafeInformationSectionButton.querySelector("span");
-const cafeInformationContinueButton = cafeInformation.querySelector(".continue-btn")
+const information = document.querySelector(".cafe-basic-information");
+const informationContent = information.querySelector(".section-content");
+const informationSectionButton = information.querySelector(".section-toggle");
+const informationStatus = informationSectionButton.querySelector(".section-status");
+const informationArrow = informationSectionButton.querySelector(".section-arrow");
+const informationContinueButton = information.querySelector(".continue-btn");
 
-//================ CAFE-FEATURES ================
-const cafeFeatures = document.querySelector(".work-friendly-features");
-const cafeFeaturesSection = cafeFeatures.querySelector(".section-content");
-const cafeFeaturesSectionButton = cafeFeatures.querySelector(".section-toggle");
-const cafeFeaturesSectionArrow = cafeFeaturesSectionButton.querySelector("span");
+//================ FEATURES ================
+const features = document.querySelector(".work-friendly-features");
+const featuresContent = features.querySelector(".section-content");
+const featuresSectionButton = features.querySelector(".section-toggle");
+const featuresStatus = featuresSectionButton.querySelector(".section-status");
+const featuresArrow = featuresSectionButton.querySelector(".section-arrow");
+const featuresContinueButton = features.querySelector(".continue-btn");
 
 
 const API_KEY = "";
@@ -48,64 +49,85 @@ async function initializeLocation() {
 }
 
 async function getPlaceDetails(placeId) {
-    const urlForPlaceDetails = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${API_KEY}`;
+    const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${API_KEY}`;
 
-    const responseForPlaceDetails = await fetch(urlForPlaceDetails);
-    const dataForPlaceDetails = await responseForPlaceDetails.json();
-
-    return dataForPlaceDetails;
+    const response = await fetch(url);
+    return await response.json();
 }
 
-//================ CAFE-BASIC-INFORMATION ================
-function showCafeInformationForm() {
-    cafeInformation.classList.remove("is-hidden");
-    manualCafeDiv.style.display = "none";
+//================ BASIC-INFORMATION ================
+function showInformationForm() {
+    information.classList.remove("is-hidden");
+    information.classList.remove("is-collapsed");
+    informationContent.classList.remove("is-hidden");
+    informationArrow.textContent = "▼";
 }
 
-function toggleBasicInformationForm() {
-    cafeInformationSection.classList.toggle("is-hidden");
-    formSection.classList.toggle("is-collapsed")
+function toggleInformationForm() {
+    informationContent.classList.toggle("is-hidden");
+    information.classList.toggle("is-collapsed");
 
-    if (cafeInformationSection.classList.contains("is-hidden")) {
-        cafeInformationSectionArrow.textContent = "▶";
+    if (informationContent.classList.contains("is-hidden")) {
+        informationArrow.textContent = "▶";
     } else {
-        cafeInformationSectionArrow.textContent = "▼";
+        informationArrow.textContent = "▼";
     }
 }
 
-function toggleCafeFeaturesForm() {
-    cafeFeaturesSection.classList.toggle("is-hidden");
-    cafeFeatures.classList.toggle("is-collapsed");
-
-    if (cafeFeaturesSection.classList.contains("is-hidden")) {
-        cafeFeaturesSectionArrow.textContent = "▶";
-    } else {
-        cafeFeaturesSectionArrow.textContent = "▼";
-    }
-}
-
-function validateBasicInformation() {
-    const requiredFields = cafeInformation.querySelectorAll(
+function validateInformationForm() {
+    const requiredFields = information.querySelectorAll(
         "input[required], select[required]"
     );
 
     for (const field of requiredFields) {
         if (!field.checkValidity()) {
             field.reportValidity();
+            informationStatus.textContent = "❌ ";
             return false;
         }
     }
 
-    if (!cafeInformationSectionButton.textContent.includes("✔️")) {
-        cafeInformationSectionButton.prepend("✔️ ")
-    }
+    informationStatus.textContent = "✔️ ";
 
     return true;
 }
 
-//================ CAFE-FEATURES ================
-function showFeatureInformationForm() {
-    cafeFeatures.classList.remove("is-hidden");
+//================ FEATURES ================
+function showFeaturesForm() {
+    if (!features.classList.contains("is-hidden")) {
+        return;
+    }
+
+    features.classList.remove("is-hidden");
+}
+
+function toggleFeaturesForm() {
+    featuresContent.classList.toggle("is-hidden");
+    features.classList.toggle("is-collapsed");
+
+    if (featuresContent.classList.contains("is-hidden")) {
+        featuresArrow.textContent = "▶";
+    } else {
+        featuresArrow.textContent = "▼";
+    }
+}
+
+function validateFeaturesForm() {
+    const requiredFields = features.querySelectorAll(
+        "input[required]"
+    );
+
+    for (const field of requiredFields) {
+        if (!field.checkValidity()) {
+            field.reportValidity();
+            featuresStatus.textContent = "❌ ";
+            return false;
+        }
+    }
+
+    featuresStatus.textContent = "✔️ ";
+
+    return true;
 }
 
 initializeLocation();
@@ -123,21 +145,21 @@ searchInput.addEventListener("input", async () => {
         return;
     }
 
-    let urlForAutoComplete = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json&apiKey=${API_KEY}`;
+    let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json&apiKey=${API_KEY}`;
 
     if (userLocation) {
         const radiusInMeters = 493000;
-        urlForAutoComplete += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
+        url += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
-    const responseForAutoComplete = await fetch(urlForAutoComplete);
-    const dataForAutoComplete = await responseForAutoComplete.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
     suggestions.innerHTML = "";
 
     let cafeFound = false;
 
-    dataForAutoComplete.results.forEach(result => {
+    data.results.forEach(result => {
 
         if (result.category === 'catering.cafe') {
             cafeFound = true;
@@ -149,9 +171,9 @@ searchInput.addEventListener("input", async () => {
                 suggestions.style.display = "none";
                 searchInput.value = `${result.name}, ${result.address_line2}`;
 
-                const dataForPlaceDetail = await getPlaceDetails(result.place_id)
-                const cafeDetails = dataForPlaceDetail.features[0].properties
-                console.log(cafeDetails)
+                const placeDetails = await getPlaceDetails(result.place_id);
+                const cafeDetails = placeDetails.features[0].properties;
+                console.log(cafeDetails);
 
                 cafeName.value = cafeDetails.name || "";
                 cafeCity.value = cafeDetails.city || "";
@@ -162,7 +184,7 @@ searchInput.addEventListener("input", async () => {
                 cafeEmail.value = cafeDetails.contact?.email || "";
                 cafeWebsite.value = cafeDetails.website || "";
 
-                showCafeInformationForm();
+                showInformationForm();
             });
 
             suggestions.appendChild(item);
@@ -172,24 +194,35 @@ searchInput.addEventListener("input", async () => {
     if (cafeFound) {
         suggestions.style.display = "block";
     } else {
-        suggestions.style.display = "none"
+        suggestions.style.display = "none";
     }
-})
-manualCafeButton.addEventListener("click", showCafeInformationForm);
+});
 
-//================ CAFE-BASIC-INFORMATION ================
-cafeInformationSectionButton.addEventListener("click", toggleBasicInformationForm);
-cafeInformationContinueButton.addEventListener("click", () => {
-    if (!validateBasicInformation()) {
+manualCafeButton.addEventListener("click", showInformationForm);
+
+//================ BASIC-INFORMATION ================
+informationSectionButton.addEventListener("click", toggleInformationForm);
+
+informationContinueButton.addEventListener("click", () => {
+    if (!validateInformationForm()) {
         return;
     }
 
-    showFeatureInformationForm();
-    toggleBasicInformationForm();
+    showFeaturesForm();
+    toggleInformationForm();
 
 });
 
-//================ CAFE-FEATURES ================
-cafeFeaturesSectionButton.addEventListener("click", toggleCafeFeaturesForm);
+//================ FEATURES ================
+featuresSectionButton.addEventListener("click", toggleFeaturesForm);
+
+featuresContinueButton.addEventListener("click", () => {
+    if (!validateFeaturesForm()) {
+        return;
+    }
+
+    toggleFeaturesForm();
+});
+
 
 
