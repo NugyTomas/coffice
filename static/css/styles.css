@@ -2,11 +2,11 @@
    CONSTANTS
 ========================================= */
 :root {
-    --WHITE_COLOR: #FFF8F0;
-    --NEUTRAL_BROWN_COLOR: #f5eee7;
-    --LIGHT_BROWN_COLOR: #C08552;
-    --BROWN_COLOR: #8C5A3C;
-    --DARK_BROWN_COLOR: #4B2E2B;
+    --white-color: #FFF8F0;
+    --neutral-brown-color: #f5eee7;
+    --light-brown-color: #C08552;
+    --brown-color: #8C5A3C;
+    --dark-brown-color: #4B2E2B;
 
 }
 
@@ -16,8 +16,8 @@
 ========================================= */
 body {
     font-family: "DM Sans", Arial, sans-serif;
-    color: var(--BROWN_COLOR);
-    background-color: var(--WHITE_COLOR);
+    color: var(--brown-color);
+    background-color: var(--white-color);
 }
 
 .cafe-brand,
@@ -33,8 +33,8 @@ h2 {
 ========================================= */
 nav {
     font-size: 1.1rem;
-    background-color: var(--DARK_BROWN_COLOR);
-    color: var(--WHITE_COLOR)
+    background-color: var(--dark-brown-color);
+    color: var(--white-color)
 }
 
 .cafe-brand {
@@ -48,7 +48,7 @@ nav {
 
 .auth-links {
     display: flex;
-    border: 1px solid var(--WHITE_COLOR);
+    border: 1px solid var(--white-color);
     border-radius: 0.4rem;
 }
 
@@ -57,7 +57,7 @@ nav {
 }
 
 .auth-links .nav-link + .nav-link {
-    border-left: 1px solid var(--WHITE_COLOR);
+    border-left: 1px solid var(--white-color);
     font-weight: 500;
 }
 
@@ -65,7 +65,7 @@ nav {
 .nav-add-cafe:hover,
 .nav-login:hover,
 .nav-register:hover {
-    color: var(--LIGHT_BROWN_COLOR);
+    color: var(--light-brown-color);
 }
 
 
@@ -77,17 +77,12 @@ h1 {
     font-weight: 700;
 }
 
-.slogan {
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
 
 /* =========================================
    SUGGESTION-SECTION
 ========================================= */
 .anchor-back {
-    color: var(--BROWN_COLOR);
+    color: var(--brown-color);
     font-size: 1.5rem;
     position: relative;
     transition: .3s ease;
@@ -99,11 +94,7 @@ h1 {
 }
 
 .anchor-back:hover {
-    color: var(--DARK_BROWN_COLOR);
-}
-
-.anchor-back:hover::after {
-    transform: scaleX(1);
+    color: var(--dark-brown-color);
 }
 
 .anchor-back:hover span {
@@ -111,10 +102,9 @@ h1 {
 }
 
 
-
 /* =========================================
-   SEARCH-SECTION */
-
+   SEARCH-SECTION
+========================================= */
 .cafe-search {
     max-width: 650px;
     margin: 2rem auto 0;
@@ -127,12 +117,12 @@ h1 {
 #cafe-search-input {
     width: 100%;
     padding: 0.8rem 1rem;
-    border: 2px solid var(--LIGHT_BROWN_COLOR);
+    border: 2px solid var(--light-brown-color);
     border-radius: 0.5rem;
 }
 
 #cafe-search-input:focus {
-    border-color: var(--DARK_BROWN_COLOR);
+    border-color: var(--dark-brown-color);
 }
 
 
@@ -145,7 +135,7 @@ h1 {
     max-height: 15rem;
     overflow-y: auto;
     background-color: white;
-    border: 1px solid var(--LIGHT_BROWN_COLOR);
+    border: 1px solid var(--light-brown-color);
     border-radius: 0 0 0.5rem 0.5rem;
 }
 
@@ -156,7 +146,7 @@ h1 {
 }
 
 .suggestion-item:hover {
-    background-color: var(--NEUTRAL_BROWN_COLOR)
+    background-color: var(--neutral-brown-color)
 }
 
 
@@ -173,7 +163,7 @@ h1 {
     background: none;
     border: none;
     padding: 0;
-    color: var(--DARK_BROWN_COLOR);
+    color: var(--dark-brown-color);
     text-decoration: underline;
     cursor: pointer;
 }
@@ -182,25 +172,21 @@ h1 {
     opacity: 0.7;
 }
 
-
 /* =========================================
    FORM SECTIONS
 ========================================= */
-.is-hidden {
-    display: none;
-}
-
-.form-section {
+.section-form {
     width: min(90%, 65rem);
     margin: 3rem auto 0;
     padding: 1rem 2rem 2rem;
-    background-color: var(--NEUTRAL_BROWN_COLOR);
+    background-color: var(--neutral-brown-color);
     border-radius: 0.75rem;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
+
 }
 
-.form-section.is-collapsed {
+.section-form.is-collapsed {
     padding-top: 1rem;
     padding-bottom: 1rem;
 
@@ -211,7 +197,7 @@ h1 {
     margin-bottom: 1rem;
     border: none;
     background: none;
-    color: var(--DARK_BROWN_COLOR);
+    color: var(--dark-brown-color);
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.8rem;
     font-weight: 700;
@@ -219,16 +205,16 @@ h1 {
     position: relative;
 }
 
-.form-section.is-collapsed .section-toggle {
+.section-form.is-collapsed .section-toggle {
     margin-bottom: 0;
 }
 
-.section-toggle:hover{
+.section-toggle:hover {
     opacity: 0.7;
 }
 
 .section-arrow {
-    display:inline-block;
+    display: inline-block;
     transition: transform .3s ease;
 }
 
@@ -243,11 +229,8 @@ h1 {
 .section-content {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-}
-
-.section-content.is-hidden {
-    display: none;
+    gap: 2.5rem;
+    padding: 1rem 2rem 0;
 }
 
 
@@ -259,15 +242,15 @@ h1 {
     position: relative;
     width: 100%;
     padding: 0.7rem 0.9rem;
-    border: 1px solid var(--LIGHT_BROWN_COLOR);
+    border: 1px solid var(--light-brown-color);
     border-radius: 0.4rem;
-    background-color: var(--WHITE_COLOR);
-    color: var(--DARK_BROWN_COLOR);
+    background-color: var(--white-color);
+    color: var(--dark-brown-color);
 }
 
 .form-field input:focus,
 .form-field select:focus {
-    border-color: var(--DARK_BROWN_COLOR);
+    border-color: var(--dark-brown-color);
 }
 
 
@@ -280,8 +263,8 @@ h1 {
     padding: 0.7rem 1.5rem;
     border: none;
     border-radius: 0.4rem;
-    background-color: var(--DARK_BROWN_COLOR);
-    color: var(--WHITE_COLOR);
+    background-color: var(--dark-brown-color);
+    color: var(--white-color);
     cursor: pointer;
     transition: opacity 0.2s ease;
 }
@@ -290,24 +273,19 @@ h1 {
     opacity: 0.8;
 }
 
-
 /* =========================================
    WORK-FRIENDLY FEATURES
 ========================================= */
-.work-friendly-features .section-content {
-    gap: 2.5rem;
-    padding: 1rem 2rem 0;
-}
-
 .feature {
     display: grid;
     grid-template-columns: 11rem minmax(0, 1fr);
     align-items: center;
     column-gap: 2rem;
+    border-bottom: 1px solid var(--brown-color);
+    padding-bottom: 2rem;
 }
 
-.feature > label{
-    font-size: 1.15rem;
+.feature > label {
     font-weight: 700;
     white-space: nowrap;
 
@@ -317,20 +295,127 @@ h1 {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.75rem 2rem;
+    gap: 0 2rem;
     align-items: center;
     font-size: 1.05rem;
+
 }
 
-.feature-options label {
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--LIGHT_BROWN_COLOR)
-}
-
+.feature-options label,
 .feature-options input {
     cursor: pointer;
 }
 
+.feature-options label {
+    font-weight: 500;
+    color: var(--light-brown-color)
+}
+
+/* =========================================
+   OPENING HOURS
+========================================= */
+.opening-hours-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.opening-day {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--brown-color);
+}
+
+.opening-day-name {
+    margin: 0;
+    font-weight: 700;
+}
+
+.opening-day-content {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.opening-status-options {
+    flex: 0 0 37%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-evenly;
+}
+
+.opening-status-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.05rem;
+}
+
+.opening-status-option input,
+.opening-status-option label {
+    cursor: pointer;
+}
+
+.opening-status-option label {
+    font-weight: 500;
+    color: var(--light-brown-color);
+
+}
+
+.opening-intervals {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.opening-interval {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.opening-interval input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--light-brown-color);
+    border-radius: 0.4rem;
+    background-color: var(--white-color);
+    color: var(--dark-brown-color);
+}
+
+.opening-interval input:focus {
+    border-color: var(--dark-brown-color);
+}
+
+.opening-time-separator {
+    font-weight: 700;
+}
+
+.opening-interval-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--light-brown-color);
+    border-radius: 50%;
+    background: none;
+    color: var(--dark-brown-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.opening-interval-add:hover {
+    background-color: var(--dark-brown-color);
+    color: var(--white-color);
+}
+
+.is-hidden {
+    display: none;
+}
 
 

@@ -1,6 +1,8 @@
 // =========================================
 // CONSTANTS
 // =========================================
+const API_KEY = "";
+let userLocation = null;
 
 //================ CAFE-SUGGESTION ================
 const searchInput = document.getElementById("cafe-search-input");
@@ -16,7 +18,7 @@ const cafePhone = document.getElementById("cafe-phone");
 const cafeEmail = document.getElementById("cafe-email");
 const cafeWebsite = document.getElementById("cafe-website");
 
-const information = document.querySelector(".cafe-basic-information");
+const information = document.querySelector(".basic-information");
 const informationContent = information.querySelector(".section-content");
 const informationSectionButton = information.querySelector(".section-toggle");
 const informationStatus = informationSectionButton.querySelector(".section-status");
@@ -24,22 +26,20 @@ const informationArrow = informationSectionButton.querySelector(".section-arrow"
 const informationContinueButton = information.querySelector(".continue-btn");
 
 //================ FEATURES ================
-const features = document.querySelector(".work-friendly-features");
+const features = document.querySelector(".features");
 const featuresContent = features.querySelector(".section-content");
 const featuresSectionButton = features.querySelector(".section-toggle");
 const featuresStatus = featuresSectionButton.querySelector(".section-status");
 const featuresArrow = featuresSectionButton.querySelector(".section-arrow");
+const cardPayment = document.getElementById("card-yes");
 const featuresContinueButton = features.querySelector(".continue-btn");
 
-
-const API_KEY = "";
-
-let userLocation = null;
+//================ OPENING-HOURS ================
+const openingDays = document.querySelectorAll(".opening-day");
 
 // =========================================
 // FUNCTIONS
 // =========================================
-
 async function initializeLocation() {
     try {
         userLocation = await getUserLocation();
@@ -53,6 +53,13 @@ async function getPlaceDetails(placeId) {
 
     const response = await fetch(url);
     return await response.json();
+}
+
+function formatTime(date) {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
 }
 
 //================ BASIC-INFORMATION ================
@@ -130,6 +137,8 @@ function validateFeaturesForm() {
     return true;
 }
 
+//================ OPENING-HOURS ================
+
 initializeLocation();
 
 // =========================================
@@ -179,12 +188,67 @@ searchInput.addEventListener("input", async () => {
                 cafeCity.value = cafeDetails.city || "";
                 cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
                 cafePostCode.value = cafeDetails.postcode || "";
-
                 cafePhone.value = cafeDetails.contact?.phone || "";
                 cafeEmail.value = cafeDetails.contact?.email || "";
                 cafeWebsite.value = cafeDetails.website || "";
 
+                const cafeAcceptsCards = !!(
+                    cafeDetails.payment_options?.debit_cards ||
+                    cafeDetails.payment_options?.credit_cards
+                );
+                cardPayment.checked = cafeAcceptsCards;
+
+
+                const cafeOpeningHours = cafeDetails.opening_hours
+
+                if (cafeOpeningHours) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const nextWeek = new Date(today);
+                    nextWeek.setDate(today.getDate() + 7);
+
+                    const openingHours = new opening_hours(cafeOpeningHours);
+                    const intervals = openingHours.getOpenIntervals(today, nextWeek);
+
+                    const openingSchedule = {
+                        monday: [],
+                        tuesday: [],
+                        wednesday: [],
+                        thursday: [],
+                        friday: [],
+                        saturday: [],
+                        sunday: []
+                    };
+                    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+                    intervals.forEach(([start, end]) => {  //„Projdi každý interval. Z něj si vezmi začátek a konec. Podívej se podle začátku, kterému dni patří. Najdi v našem rozvrhu tento den a přidej do něj začátek a konec ve formátu HH:MM.“
+                        const day = days[start.getDay()]; //Jaký den v týdnu je toto datum? Vrati napr. 1
+
+                        openingSchedule[day].push({
+                            open: formatTime(start),
+                            close: formatTime(end)
+                        });
+                    });
+
+                    days.forEach(day => {
+                        const openingDay = document.querySelector(`[data-day="${day}"]`);
+                        const openingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-open"]`);
+                        const closingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-close"]`);
+
+                        openingTimeInputs.forEach(openingTimeInput => {
+                            openingTimeInput.value = openingSchedule[day][0].open;
+                        })
+
+                        closingTimeInputs.forEach(closingTimeInput => {
+                            closingTimeInput.value = openingSchedule[day][0].close;
+                        })
+
+                    });
+
+                }
+
                 showInformationForm();
+
             });
 
             suggestions.appendChild(item);
@@ -222,6 +286,39 @@ featuresContinueButton.addEventListener("click", () => {
     }
 
     toggleFeaturesForm();
+});
+
+//================ OPENING-HOURS ================
+openingDays.forEach(day => {
+    const dayRadios = day.querySelectorAll('input[type="radio"]');
+    const openingInterval = day.querySelector(".opening-interval");
+    const openingIntervals = day.querySelector(".opening-intervals");
+    const addButton = day.querySelector(".opening-interval-add");
+
+    dayRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            if (radio.value === "open") {
+                openingInterval.classList.remove("is-hidden");
+            } else {
+                openingInterval.classList.add("is-hidden");
+            }
+        });
+    });
+
+    addButton.addEventListener("click", () => {
+        const newInterval = openingInterval.cloneNode(true);
+        const newAddButton = newInterval.querySelector(".opening-interval-add");
+
+        newAddButton.textContent = "-";
+        addButton.classList.add("is-hidden");
+
+        newAddButton.addEventListener("click", () => {
+            newInterval.remove();
+            addButton.classList.remove("is-hidden");
+        });
+
+        openingIntervals.append(newInterval);
+    });
 });
 
 
