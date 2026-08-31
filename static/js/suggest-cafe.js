@@ -1,7 +1,9 @@
 // =========================================
 // CONSTANTS
 // =========================================
+const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 const API_KEY = "";
+let searchRequestId = 0;
 let userLocation = null;
 
 //================ CAFE-SUGGESTION ================
@@ -35,7 +37,13 @@ const cardPayment = document.getElementById("card-yes");
 const featuresContinueButton = features.querySelector(".continue-btn");
 
 //================ OPENING-HOURS ================
+const openingHours = document.querySelector(".opening-hours");
+const openingHoursContent = openingHours.querySelector(".section-content");
+const openingHoursSectionButton = openingHours.querySelector(".section-toggle");
+const openingHoursArrow = openingHoursSectionButton.querySelector(".section-arrow");
+const openingHoursStatus = openingHours.querySelector(".section-status");
 const openingDays = document.querySelectorAll(".opening-day");
+const openingHoursContinueButton = openingHours.querySelector(".continue-btn");
 
 // =========================================
 // FUNCTIONS
@@ -60,6 +68,36 @@ function formatTime(date) {
     const minutes = String(date.getMinutes()).padStart(2, "0");
 
     return `${hours}:${minutes}`;
+}
+
+function resetOpeningHours() {
+
+    openingDays.forEach(day => {
+        const openingInterval = day.querySelectorAll(".opening-interval");
+        openingInterval.forEach(interval => {
+            const removeButton = interval.querySelector(".opening-interval-remove");
+
+            if (removeButton) {
+                removeButton.click();
+            }
+        })
+
+        const radioInputs = day.querySelectorAll('input[type="radio"]');
+        radioInputs.forEach(radio => {
+            radio.checked = false;
+        });
+
+    });
+
+    days.forEach(dayName => {
+        const openingTimeInput = document.querySelector(`input[name="${dayName}-open"]`);
+        const closingTimeInput = document.querySelector(`input[name="${dayName}-close"]`);
+
+        openingTimeInput.value = "";
+        closingTimeInput.value = "";
+    });
+
+
 }
 
 //================ BASIC-INFORMATION ================
@@ -138,6 +176,96 @@ function validateFeaturesForm() {
 }
 
 //================ OPENING-HOURS ================
+function showOpeningHoursForm() {
+    if (!openingHours.classList.contains("is-hidden")) {
+        return;
+    }
+
+    openingHours.classList.remove("is-hidden");
+}
+
+function toggleOpeningHoursForm() {
+    openingHoursContent.classList.toggle("is-hidden");
+    openingHours.classList.toggle("is-collapsed");
+
+    if (openingHoursContent.classList.contains("is-hidden")) {
+        openingHoursArrow.textContent = "▶";
+    } else {
+        openingHoursArrow.textContent = "▼";
+    }
+}
+
+function validateOpeningHoursForm() {
+    openingDays.forEach(day => {
+        const radioOpenInput = day.querySelector("input[value='open']");
+        const timeInputs = day.querySelectorAll(".opening-interval input");
+
+        if (radioOpenInput.checked) {
+            timeInputs.forEach(timeInput => {
+                timeInput.required = true;
+            });
+
+        } else {
+            timeInputs.forEach(timeInput => {
+                timeInput.required = false;
+            });
+        }
+    });
+
+    for (const day of openingDays) {
+        const radioOpenInput = day.querySelector("input[value='open']");
+        const openingTimeInputs = day.querySelectorAll("input[name$='-open']");
+        const closingTimeInputs = day.querySelectorAll("input[name$='-close']");
+
+        if (!radioOpenInput.checked) {
+            continue;
+        }
+
+        for (let i = 0; i < openingTimeInputs.length; i++) {
+            openingTimeInputs[i].setCustomValidity("");
+
+            const openingTime = openingTimeInputs[i].value;
+            const closingTime = closingTimeInputs[i].value;
+
+            if (openingTime && closingTime && openingTime >= closingTime) {
+                openingTimeInputs[i].setCustomValidity(
+                    "Opening time must be earlier than closing time."
+                );
+                openingTimeInputs[i].reportValidity();
+                openingHoursStatus.textContent = "❌ ";
+                return false;
+            }
+
+            if (i > 0) {
+                const previousClosingTime = closingTimeInputs[i - 1].value;
+
+                if (openingTime < previousClosingTime) {
+                    openingTimeInputs[i].setCustomValidity(
+                        "Opening intervals must not overlap."
+                    );
+                    openingTimeInputs[i].reportValidity();
+                    openingHoursStatus.textContent = "❌ ";
+                    return false;
+                }
+            }
+        }
+    }
+
+    const requiredFields = openingHours.querySelectorAll("input[required]");
+
+    for (const field of requiredFields) {
+        if (!field.checkValidity()) {
+            field.reportValidity();
+            openingHoursStatus.textContent = "❌ ";
+            return false;
+        }
+    }
+
+
+    openingHoursStatus.textContent = "✔️ ";
+
+    return true;
+}
 
 initializeLocation();
 
@@ -147,12 +275,16 @@ initializeLocation();
 
 //================ CAFE-SUGGESTION ================
 searchInput.addEventListener("input", async () => {
+    //================ CAFE-SUGGESTION ================
     const text = searchInput.value.trim();
 
     if (text.length < 3) {
         suggestions.style.display = "none";
+        suggestions.innerHTML = "";
         return;
     }
+
+    const requestId = ++searchRequestId;
 
     let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json&apiKey=${API_KEY}`;
 
@@ -161,104 +293,117 @@ searchInput.addEventListener("input", async () => {
         url += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-    suggestions.innerHTML = "";
-
-    let cafeFound = false;
-
-    data.results.forEach(result => {
-
-        if (result.category === 'catering.cafe') {
-            cafeFound = true;
-            const item = document.createElement("div");
-            item.classList.add("suggestion-item");
-            item.innerHTML = `<strong>${result.name}</strong>,<small>${result.address_line2}</small>`;
-
-            item.addEventListener("click", async () => {
-                suggestions.style.display = "none";
-                searchInput.value = `${result.name}, ${result.address_line2}`;
-
-                const placeDetails = await getPlaceDetails(result.place_id);
-                const cafeDetails = placeDetails.features[0].properties;
-                console.log(cafeDetails);
-
-                cafeName.value = cafeDetails.name || "";
-                cafeCity.value = cafeDetails.city || "";
-                cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
-                cafePostCode.value = cafeDetails.postcode || "";
-                cafePhone.value = cafeDetails.contact?.phone || "";
-                cafeEmail.value = cafeDetails.contact?.email || "";
-                cafeWebsite.value = cafeDetails.website || "";
-
-                const cafeAcceptsCards = !!(
-                    cafeDetails.payment_options?.debit_cards ||
-                    cafeDetails.payment_options?.credit_cards
-                );
-                cardPayment.checked = cafeAcceptsCards;
-
-
-                const cafeOpeningHours = cafeDetails.opening_hours
-
-                if (cafeOpeningHours) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const nextWeek = new Date(today);
-                    nextWeek.setDate(today.getDate() + 7);
-
-                    const openingHours = new opening_hours(cafeOpeningHours);
-                    const intervals = openingHours.getOpenIntervals(today, nextWeek);
-
-                    const openingSchedule = {
-                        monday: [],
-                        tuesday: [],
-                        wednesday: [],
-                        thursday: [],
-                        friday: [],
-                        saturday: [],
-                        sunday: []
-                    };
-                    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-
-                    intervals.forEach(([start, end]) => {  //„Projdi každý interval. Z něj si vezmi začátek a konec. Podívej se podle začátku, kterému dni patří. Najdi v našem rozvrhu tento den a přidej do něj začátek a konec ve formátu HH:MM.“
-                        const day = days[start.getDay()]; //Jaký den v týdnu je toto datum? Vrati napr. 1
-
-                        openingSchedule[day].push({
-                            open: formatTime(start),
-                            close: formatTime(end)
-                        });
-                    });
-
-                    days.forEach(day => {
-                        const openingDay = document.querySelector(`[data-day="${day}"]`);
-                        const openingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-open"]`);
-                        const closingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-close"]`);
-
-                        openingTimeInputs.forEach(openingTimeInput => {
-                            openingTimeInput.value = openingSchedule[day][0].open;
-                        })
-
-                        closingTimeInputs.forEach(closingTimeInput => {
-                            closingTimeInput.value = openingSchedule[day][0].close;
-                        })
-
-                    });
-
-                }
-
-                showInformationForm();
-
-            });
-
-            suggestions.appendChild(item);
+        if (requestId !== searchRequestId) {
+            return;
         }
-    });
 
-    if (cafeFound) {
-        suggestions.style.display = "block";
-    } else {
-        suggestions.style.display = "none";
+        suggestions.innerHTML = "";
+
+        let cafeFound = false;
+
+        data.results.forEach(result => {
+
+            if (result.category === 'catering.cafe') {
+                cafeFound = true;
+                const item = document.createElement("div");
+                item.classList.add("suggestion-item");
+                item.innerHTML = `<strong>${result.name}</strong>,<small>${result.address_line2}</small>`;
+
+                item.addEventListener("click", async () => {
+
+                    suggestions.style.display = "none";
+
+                    searchRequestId++;
+
+                    searchInput.value = `${result.name}, ${result.address_line2}`;
+
+                    const placeDetails = await getPlaceDetails(result.place_id);
+                    const cafeDetails = placeDetails.features[0].properties;
+                    console.log(cafeDetails);
+
+                    cafeName.value = cafeDetails.name || "";
+                    cafeCity.value = cafeDetails.city || "";
+                    cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
+                    cafePostCode.value = cafeDetails.postcode || "";
+                    cafePhone.value = cafeDetails.contact?.phone || "";
+                    cafeEmail.value = cafeDetails.contact?.email || "";
+                    cafeWebsite.value = cafeDetails.website || "";
+
+                    const cafeAcceptsCards = !!(
+                        cafeDetails.payment_options?.debit_cards ||
+                        cafeDetails.payment_options?.credit_cards
+                    );
+                    cardPayment.checked = cafeAcceptsCards;
+
+                    resetOpeningHours();
+                    const cafeOpeningHours = cafeDetails.opening_hours
+                    if (cafeOpeningHours) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const nextWeek = new Date(today);
+                        nextWeek.setDate(today.getDate() + 7);
+
+                        const openingHours = new opening_hours(cafeOpeningHours);
+                        const intervals = openingHours.getOpenIntervals(today, nextWeek);
+
+                        const openingSchedule = {
+                            monday: [],
+                            tuesday: [],
+                            wednesday: [],
+                            thursday: [],
+                            friday: [],
+                            saturday: [],
+                            sunday: []
+                        };
+
+                        intervals.forEach(([start, end]) => {  //„Projdi každý interval. Z něj si vezmi začátek a konec. Podívej se podle začátku, kterému dni patří. Najdi v našem rozvrhu tento den a přidej do něj začátek a konec ve formátu HH:MM.“
+                            const day = days[start.getDay()]; //Jaký den v týdnu je toto datum? Vrati napr. 1
+
+                            openingSchedule[day].push({
+                                open: formatTime(start),
+                                close: formatTime(end)
+                            });
+                        });
+
+                        days.forEach(day => {
+                            openingSchedule[day].forEach((schedule, index) => {
+                                const openingDay = document.querySelector(`[data-day="${day}"]`);
+
+                                const openRadio = openingDay.querySelector(`input[name="${day}"][value="open"]`);
+                                openRadio.click();
+
+                                const addButton = openingDay.querySelector(".opening-interval-add")
+
+                                if (index > 0) {
+                                    addButton.click();
+                                }
+
+                                const openingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-open"]`);
+                                const closingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-close"]`);
+
+                                openingTimeInputs[index].value = schedule.open;
+                                closingTimeInputs[index].value = schedule.close;
+                            });
+
+
+                        });
+
+                    }
+                    showInformationForm();
+                });
+
+                suggestions.appendChild(item);
+            }
+        });
+
+        suggestions.style.display = cafeFound ? "block" : "none";
+
+    } catch (error) {
+        console.error("Autocomplete request failed:", error);
     }
 });
 
@@ -289,30 +434,55 @@ featuresContinueButton.addEventListener("click", () => {
 });
 
 //================ OPENING-HOURS ================
+openingHoursSectionButton.addEventListener("click", toggleOpeningHoursForm);
+
+openingHoursContinueButton.addEventListener("click", () => {
+    if (!validateOpeningHoursForm()) {
+        return;
+    }
+
+    toggleOpeningHoursForm();
+})
+
 openingDays.forEach(day => {
-    const dayRadios = day.querySelectorAll('input[type="radio"]');
+    const statusRadios = day.querySelectorAll('input[type="radio"]');
     const openingInterval = day.querySelector(".opening-interval");
     const openingIntervals = day.querySelector(".opening-intervals");
     const addButton = day.querySelector(".opening-interval-add");
 
-    dayRadios.forEach(radio => {
+    statusRadios.forEach(radio => {
         radio.addEventListener("change", () => {
+            const allOpeningIntervals = day.querySelectorAll(".opening-interval");
+
             if (radio.value === "open") {
-                openingInterval.classList.remove("is-hidden");
+                allOpeningIntervals.forEach(interval => {
+                    interval.classList.remove("is-hidden");
+                });
+
             } else {
-                openingInterval.classList.add("is-hidden");
+                allOpeningIntervals.forEach(interval => {
+                    interval.classList.add("is-hidden");
+                });
             }
         });
     });
 
     addButton.addEventListener("click", () => {
         const newInterval = openingInterval.cloneNode(true);
-        const newAddButton = newInterval.querySelector(".opening-interval-add");
+        const newOpeningTime = newInterval.querySelector("input[name$='-open']");
+        const newClosingTime = newInterval.querySelector("input[name$='-close']");
+        const removeButton = newInterval.querySelector(".opening-interval-add");
 
-        newAddButton.textContent = "-";
+        removeButton.textContent = "-";
+        removeButton.classList.remove("opening-interval-add");
+        removeButton.classList.add("opening-interval-remove");
+
+        newOpeningTime.value = "";
+        newClosingTime.value = "";
+
         addButton.classList.add("is-hidden");
 
-        newAddButton.addEventListener("click", () => {
+        removeButton.addEventListener("click", () => {
             newInterval.remove();
             addButton.classList.remove("is-hidden");
         });
@@ -320,6 +490,8 @@ openingDays.forEach(day => {
         openingIntervals.append(newInterval);
     });
 });
+
+
 
 
 

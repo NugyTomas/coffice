@@ -177,7 +177,7 @@ h1 {
 ========================================= */
 .section-form {
     width: min(90%, 65rem);
-    margin: 3rem auto 0;
+    margin: 1.25rem auto 0;
     padding: 1rem 2rem 2rem;
     background-color: var(--neutral-brown-color);
     border-radius: 0.75rem;
@@ -379,11 +379,12 @@ h1 {
 
 .opening-interval input {
     width: 100%;
-    padding: 0.7rem 1rem;
+    padding: 0.5rem 1rem;
     border: 1px solid var(--light-brown-color);
     border-radius: 0.4rem;
     background-color: var(--white-color);
     color: var(--dark-brown-color);
+    text-align: center;
 }
 
 .opening-interval input:focus {
@@ -394,7 +395,9 @@ h1 {
     font-weight: 700;
 }
 
-.opening-interval-add {
+.opening-interval-add,
+.opening-interval-remove
+{
     display: flex;
     align-items: center;
     justify-content: center;
