@@ -2,9 +2,14 @@
 // CONSTANTS
 // =========================================
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
 const API_KEY = "";
-let searchRequestId = 0;
+
 let userLocation = null;
+let searchRequestId = 0;
+let autocompleteController = null;
+let placeDetailsController = null;
+
 
 //================ CAFE-SUGGESTION ================
 const searchInput = document.getElementById("cafe-search-input");
@@ -40,10 +45,22 @@ const featuresContinueButton = features.querySelector(".continue-btn");
 const openingHours = document.querySelector(".opening-hours");
 const openingHoursContent = openingHours.querySelector(".section-content");
 const openingHoursSectionButton = openingHours.querySelector(".section-toggle");
-const openingHoursArrow = openingHoursSectionButton.querySelector(".section-arrow");
 const openingHoursStatus = openingHours.querySelector(".section-status");
+const openingHoursArrow = openingHoursSectionButton.querySelector(".section-arrow");
 const openingDays = document.querySelectorAll(".opening-day");
 const openingHoursContinueButton = openingHours.querySelector(".continue-btn");
+
+//================ FINAL-REVIEW ================
+const finalReview = document.querySelector(".final-review");
+const finalReviewContent = finalReview.querySelector(".section-content")
+const finalReviewSectionButton = finalReview.querySelector(".section-toggle");
+const finalReviewStatus = finalReview.querySelector(".section-status");
+const finalReviewArrow = finalReview.querySelector(".section-arrow");
+const ratingError = finalReview.querySelector(".rating-error");
+let selectedPhotos = [];
+const photoInput = document.getElementById("cafe-photo-input");
+const photoPreviewContainer = document.querySelector(".photo-preview-container");
+const finalReviewSubmitButton = finalReview.querySelector(".submit-btn");
 
 // =========================================
 // FUNCTIONS
@@ -56,10 +73,10 @@ async function initializeLocation() {
     }
 }
 
-async function getPlaceDetails(placeId) {
+async function getPlaceDetails(placeId, signal) {
     const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${API_KEY}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {signal: signal});
     return await response.json();
 }
 
@@ -75,15 +92,15 @@ function resetOpeningHours() {
     openingDays.forEach(day => {
         const openingInterval = day.querySelectorAll(".opening-interval");
         openingInterval.forEach(interval => {
-            const removeButton = interval.querySelector(".opening-interval-remove");
+            const removeIntervalButton = interval.querySelector(".opening-interval-remove");
 
-            if (removeButton) {
-                removeButton.click();
+            if (removeIntervalButton) {
+                removeIntervalButton.click();
             }
         })
 
-        const radioInputs = day.querySelectorAll('input[type="radio"]');
-        radioInputs.forEach(radio => {
+        const radioButtons = day.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
             radio.checked = false;
         });
 
@@ -133,16 +150,11 @@ function validateInformationForm() {
     }
 
     informationStatus.textContent = "✔️ ";
-
     return true;
 }
 
 //================ FEATURES ================
 function showFeaturesForm() {
-    if (!features.classList.contains("is-hidden")) {
-        return;
-    }
-
     features.classList.remove("is-hidden");
 }
 
@@ -171,16 +183,11 @@ function validateFeaturesForm() {
     }
 
     featuresStatus.textContent = "✔️ ";
-
     return true;
 }
 
 //================ OPENING-HOURS ================
 function showOpeningHoursForm() {
-    if (!openingHours.classList.contains("is-hidden")) {
-        return;
-    }
-
     openingHours.classList.remove("is-hidden");
 }
 
@@ -196,11 +203,14 @@ function toggleOpeningHoursForm() {
 }
 
 function validateOpeningHoursForm() {
-    openingDays.forEach(day => {
-        const radioOpenInput = day.querySelector("input[value='open']");
-        const timeInputs = day.querySelectorAll(".opening-interval input");
 
-        if (radioOpenInput.checked) {
+    for (const day of openingDays) {
+        const radioOpenButton = day.querySelector("input[value='open']");
+        const timeInputs = day.querySelectorAll(".opening-interval input");
+        const openingTimeInputs = day.querySelectorAll("input[name$='-open']");
+        const closingTimeInputs = day.querySelectorAll("input[name$='-close']");
+
+        if (radioOpenButton.checked) {
             timeInputs.forEach(timeInput => {
                 timeInput.required = true;
             });
@@ -210,14 +220,8 @@ function validateOpeningHoursForm() {
                 timeInput.required = false;
             });
         }
-    });
 
-    for (const day of openingDays) {
-        const radioOpenInput = day.querySelector("input[value='open']");
-        const openingTimeInputs = day.querySelectorAll("input[name$='-open']");
-        const closingTimeInputs = day.querySelectorAll("input[name$='-close']");
-
-        if (!radioOpenInput.checked) {
+        if (!radioOpenButton.checked) {
             continue;
         }
 
@@ -227,14 +231,6 @@ function validateOpeningHoursForm() {
             const openingTime = openingTimeInputs[i].value;
             const closingTime = closingTimeInputs[i].value;
 
-            if (openingTime && closingTime && openingTime >= closingTime) {
-                openingTimeInputs[i].setCustomValidity(
-                    "Opening time must be earlier than closing time."
-                );
-                openingTimeInputs[i].reportValidity();
-                openingHoursStatus.textContent = "❌ ";
-                return false;
-            }
 
             if (i > 0) {
                 const previousClosingTime = closingTimeInputs[i - 1].value;
@@ -261,10 +257,72 @@ function validateOpeningHoursForm() {
         }
     }
 
-
     openingHoursStatus.textContent = "✔️ ";
 
     return true;
+}
+
+//================ FINAL-REVIEW ================
+function showFinalReviewForm() {
+    finalReview.classList.remove("is-hidden");
+}
+
+function toggleFinalReviewForm() {
+    finalReviewContent.classList.toggle("is-hidden");
+    finalReview.classList.toggle("is-collapsed");
+
+    if (finalReviewContent.classList.contains("is-hidden")) {
+        finalReviewArrow.textContent = "▶";
+    } else {
+        finalReviewArrow.textContent = "▼";
+    }
+}
+
+function renderPhotoPreviews() {
+    photoPreviewContainer.innerHTML = "";
+
+    selectedPhotos.forEach((file, index) => {
+        const photoContainer = document.createElement("div");
+        photoContainer.classList.add("photo-preview");
+
+        const image = document.createElement("img");
+        image.src = URL.createObjectURL(file);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.textContent = "x";
+
+        removeButton.addEventListener("click", () => {
+            selectedPhotos.splice(index, 1);
+            renderPhotoPreviews();
+        });
+
+        photoContainer.appendChild(image);
+        photoContainer.appendChild(removeButton);
+
+        photoPreviewContainer.appendChild(photoContainer);
+    });
+}
+
+function validateFinalReviewForm() {
+    const requiredFields = finalReview.querySelectorAll("input[required]")
+
+    for (const field of requiredFields) {
+        if (!field.checkValidity()) {
+            console.log(field);
+            console.log(field.validity.valid);
+            field.reportValidity();
+            finalReviewStatus.textContent = "❌ ";
+            return false;
+        }
+    }
+
+    finalReviewStatus.textContent = "✔️ ";
+    return true;
+}
+
+function validateSuggestionForm() {
+    return !!(validateInformationForm() & validateFeaturesForm() & validateOpeningHoursForm() & validateFinalReviewForm());
 }
 
 initializeLocation();
@@ -284,6 +342,12 @@ searchInput.addEventListener("input", async () => {
         return;
     }
 
+    if (autocompleteController) {
+        autocompleteController.abort();
+    }
+
+    autocompleteController = new AbortController();
+
     const requestId = ++searchRequestId;
 
     let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json&apiKey=${API_KEY}`;
@@ -294,13 +358,12 @@ searchInput.addEventListener("input", async () => {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {signal: autocompleteController.signal});
         const data = await response.json();
 
         if (requestId !== searchRequestId) {
             return;
         }
-
         suggestions.innerHTML = "";
 
         let cafeFound = false;
@@ -314,84 +377,128 @@ searchInput.addEventListener("input", async () => {
                 item.innerHTML = `<strong>${result.name}</strong>,<small>${result.address_line2}</small>`;
 
                 item.addEventListener("click", async () => {
-
-                    suggestions.style.display = "none";
-
                     searchRequestId++;
 
+                    suggestions.style.display = "none";
                     searchInput.value = `${result.name}, ${result.address_line2}`;
 
-                    const placeDetails = await getPlaceDetails(result.place_id);
-                    const cafeDetails = placeDetails.features[0].properties;
-                    console.log(cafeDetails);
+                    if (placeDetailsController) {
+                        placeDetailsController.abort();
+                    }
 
-                    cafeName.value = cafeDetails.name || "";
-                    cafeCity.value = cafeDetails.city || "";
-                    cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
-                    cafePostCode.value = cafeDetails.postcode || "";
-                    cafePhone.value = cafeDetails.contact?.phone || "";
-                    cafeEmail.value = cafeDetails.contact?.email || "";
-                    cafeWebsite.value = cafeDetails.website || "";
+                    placeDetailsController = new AbortController();
 
-                    const cafeAcceptsCards = !!(
-                        cafeDetails.payment_options?.debit_cards ||
-                        cafeDetails.payment_options?.credit_cards
-                    );
-                    cardPayment.checked = cafeAcceptsCards;
+                    try {
+                        const placeDetails = await getPlaceDetails(result.place_id, placeDetailsController.signal);
 
-                    resetOpeningHours();
-                    const cafeOpeningHours = cafeDetails.opening_hours
-                    if (cafeOpeningHours) {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const nextWeek = new Date(today);
-                        nextWeek.setDate(today.getDate() + 7);
+                        if (!placeDetails.features || placeDetails.features.length === 0) {
+                            console.error("No place details found.");
+                        }
 
-                        const openingHours = new opening_hours(cafeOpeningHours);
-                        const intervals = openingHours.getOpenIntervals(today, nextWeek);
+                        const cafeDetails = placeDetails.features[0].properties;
+                        console.log(cafeDetails);
 
-                        const openingSchedule = {
-                            monday: [],
-                            tuesday: [],
-                            wednesday: [],
-                            thursday: [],
-                            friday: [],
-                            saturday: [],
-                            sunday: []
-                        };
+                        cafeName.value = cafeDetails.name || "";
+                        cafeCity.value = cafeDetails.city || "";
+                        cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
+                        cafePostCode.value = cafeDetails.postcode || "";
+                        cafePhone.value = cafeDetails.contact?.phone || "";
+                        cafeEmail.value = cafeDetails.contact?.email || "";
+                        cafeWebsite.value = cafeDetails.website || "";
 
-                        intervals.forEach(([start, end]) => {  //„Projdi každý interval. Z něj si vezmi začátek a konec. Podívej se podle začátku, kterému dni patří. Najdi v našem rozvrhu tento den a přidej do něj začátek a konec ve formátu HH:MM.“
-                            const day = days[start.getDay()]; //Jaký den v týdnu je toto datum? Vrati napr. 1
+                        const cafeAcceptsCards = !!(
+                            cafeDetails.payment_options?.debit_cards ||
+                            cafeDetails.payment_options?.credit_cards
+                        );
+                        cardPayment.checked = cafeAcceptsCards;
 
-                            openingSchedule[day].push({
-                                open: formatTime(start),
-                                close: formatTime(end)
+                        resetOpeningHours();
+                        const cafeOpeningHours = cafeDetails.opening_hours
+                        if (cafeOpeningHours) {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+
+                            const nextWeek = new Date(today);
+                            nextWeek.setDate(today.getDate() + 7);
+
+                            const queryStart = new Date(today);
+                            queryStart.setDate(queryStart.getDate() - 1);
+
+                            const queryEnd = new Date(today);
+                            queryEnd.setDate(queryEnd.getDate() + 8);
+
+                            const openingHours = new opening_hours(cafeOpeningHours);
+                            const intervals = openingHours.getOpenIntervals(queryStart, queryEnd);
+
+                            const openingSchedule = {
+                                monday: [],
+                                tuesday: [],
+                                wednesday: [],
+                                thursday: [],
+                                friday: [],
+                                saturday: [],
+                                sunday: []
+                            };
+
+                            const mergedIntervals = [];
+
+                            intervals.forEach(([start, end]) => {
+                                const last = mergedIntervals[mergedIntervals.length - 1];
+                                if (last && last[1].getTime() === start.getTime()) {
+                                    last[1] = end;
+                                } else {
+                                    mergedIntervals.push([start, end]);
+                                }
                             });
-                        });
 
-                        days.forEach(day => {
-                            openingSchedule[day].forEach((schedule, index) => {
-                                const openingDay = document.querySelector(`[data-day="${day}"]`);
+                            const relevantIntervals = [];
+                            mergedIntervals.forEach(interval => {
+                                const start = interval[0];
 
-                                const openRadio = openingDay.querySelector(`input[name="${day}"][value="open"]`);
-                                openRadio.click();
-
-                                const addButton = openingDay.querySelector(".opening-interval-add")
-
-                                if (index > 0) {
-                                    addButton.click();
+                                if (start >= today && start < nextWeek) {
+                                    relevantIntervals.push(interval);
                                 }
 
-                                const openingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-open"]`);
-                                const closingTimeInputs = openingDay.querySelectorAll(`input[name="${day}-close"]`);
+                            });
 
-                                openingTimeInputs[index].value = schedule.open;
-                                closingTimeInputs[index].value = schedule.close;
+                            relevantIntervals.forEach(([start, end]) => {
+                                const day = days[start.getDay()];
+
+                                openingSchedule[day].push({
+                                    open: formatTime(start),
+                                    close: formatTime(end)
+                                });
                             });
 
 
-                        });
+                            days.forEach(day => {
+                                openingSchedule[day].forEach((schedule, index) => {
+                                    const openingDayElement = document.querySelector(`[data-day="${day}"]`);
 
+                                    const openRadioButton = openingDayElement.querySelector(`input[name="${day}"][value="open"]`);
+                                    openRadioButton.click();
+
+                                    const addIntervalButton = openingDayElement.querySelector(".opening-interval-add")
+
+                                    if (index > 0) {
+                                        addIntervalButton.click();
+                                    }
+
+                                    const openingTimeInputs = openingDayElement.querySelectorAll(`input[name="${day}-open"]`);
+                                    const closingTimeInputs = openingDayElement.querySelectorAll(`input[name="${day}-close"]`);
+
+                                    openingTimeInputs[index].value = schedule.open;
+                                    closingTimeInputs[index].value = schedule.close;
+                                });
+
+
+                            });
+
+                        }
+                    } catch (error) {
+                        if (error.name !== "AbortError") {
+                            console.error("Failed to get place details:", error);
+                        }
                     }
                     showInformationForm();
                 });
@@ -403,7 +510,9 @@ searchInput.addEventListener("input", async () => {
         suggestions.style.display = cafeFound ? "block" : "none";
 
     } catch (error) {
-        console.error("Autocomplete request failed:", error);
+        if (error.name !== "AbortError") {
+            console.error("Autocomplete request failed:", error);
+        }
     }
 });
 
@@ -417,8 +526,8 @@ informationContinueButton.addEventListener("click", () => {
         return;
     }
 
-    showFeaturesForm();
     toggleInformationForm();
+    showFeaturesForm();
 
 });
 
@@ -431,28 +540,21 @@ featuresContinueButton.addEventListener("click", () => {
     }
 
     toggleFeaturesForm();
+    showOpeningHoursForm();
 });
 
 //================ OPENING-HOURS ================
 openingHoursSectionButton.addEventListener("click", toggleOpeningHoursForm);
 
-openingHoursContinueButton.addEventListener("click", () => {
-    if (!validateOpeningHoursForm()) {
-        return;
-    }
-
-    toggleOpeningHoursForm();
-})
-
-openingDays.forEach(day => {
-    const statusRadios = day.querySelectorAll('input[type="radio"]');
-    const openingInterval = day.querySelector(".opening-interval");
-    const openingIntervals = day.querySelector(".opening-intervals");
-    const addButton = day.querySelector(".opening-interval-add");
+openingDays.forEach(dayElement => {
+    const statusRadios = dayElement.querySelectorAll('input[type="radio"]');
+    const openingIntervalTemplate = dayElement.querySelector(".opening-interval");
+    const openingIntervalsContainer = dayElement.querySelector(".opening-intervals");
+    const addIntervalButton = dayElement.querySelector(".opening-interval-add");
 
     statusRadios.forEach(radio => {
         radio.addEventListener("change", () => {
-            const allOpeningIntervals = day.querySelectorAll(".opening-interval");
+            const allOpeningIntervals = dayElement.querySelectorAll(".opening-interval");
 
             if (radio.value === "open") {
                 allOpeningIntervals.forEach(interval => {
@@ -467,30 +569,64 @@ openingDays.forEach(day => {
         });
     });
 
-    addButton.addEventListener("click", () => {
-        const newInterval = openingInterval.cloneNode(true);
+    addIntervalButton.addEventListener("click", () => {
+        const newInterval = openingIntervalTemplate.cloneNode(true);
         const newOpeningTime = newInterval.querySelector("input[name$='-open']");
         const newClosingTime = newInterval.querySelector("input[name$='-close']");
-        const removeButton = newInterval.querySelector(".opening-interval-add");
+        const removeIntervalButton = newInterval.querySelector(".opening-interval-add");
 
-        removeButton.textContent = "-";
-        removeButton.classList.remove("opening-interval-add");
-        removeButton.classList.add("opening-interval-remove");
+        removeIntervalButton.textContent = "-";
+        removeIntervalButton.classList.remove("opening-interval-add");
+        removeIntervalButton.classList.add("opening-interval-remove");
 
         newOpeningTime.value = "";
         newClosingTime.value = "";
 
-        addButton.classList.add("is-hidden");
+        addIntervalButton.classList.add("is-hidden");
 
-        removeButton.addEventListener("click", () => {
+        removeIntervalButton.addEventListener("click", () => {
             newInterval.remove();
-            addButton.classList.remove("is-hidden");
+            addIntervalButton.classList.remove("is-hidden");
         });
 
-        openingIntervals.append(newInterval);
+        openingIntervalsContainer.append(newInterval);
     });
 });
 
+openingHoursContinueButton.addEventListener("click", () => {
+    if (!validateOpeningHoursForm()) {
+        return;
+    }
+
+    toggleOpeningHoursForm();
+    showFinalReviewForm();
+
+})
+
+//================ FINAL-REVIEW ================
+finalReviewSectionButton.addEventListener("click", toggleFinalReviewForm)
+
+finalReviewSubmitButton.addEventListener("click", () => {
+    if(!validateSuggestionForm()){
+        console.log("CHYBA!")
+        return
+    }
+        console.log("Funguje!")
+    toggleFinalReviewForm();
+});
+
+photoInput.addEventListener("change", () => {
+
+    if (selectedPhotos.length + photoInput.files.length > 6) {
+        return;
+    }
+
+    for (const file of photoInput.files) {
+        selectedPhotos.push(file);
+    }
+
+    renderPhotoPreviews();
+});
 
 
 

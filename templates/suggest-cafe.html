@@ -36,30 +36,30 @@ Coffice
 
     <section class="basic-information section-form is-hidden">
 
-        <button type="button" class="section-toggle"><span class="section-status"></span>Basic information<span
+        <button type="button" class="section-toggle"><span class="section-status"></span>Basic information <span
                 class="section-arrow">▼</span></button>
 
         <div class="section-content">
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-name" class="mb-2">Name *</label>
+                    <label for="cafe-name" class="mb-2">Name*</label>
                     <input type="text" id="cafe-name" required minlength="2" maxlength="50">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-city" class="mb-2">City *</label>
+                    <label for="cafe-city" class="mb-2">City*</label>
                     <input type="text" id="cafe-city" required minlength="2" maxlength="50">
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2">Address *</label>
+                    <label for="cafe-address" class="mb-2">Address*</label>
                     <input type="text" id="cafe-address" required minlength="3" maxlength="100">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-postal-code" class="mb-2">Postal code *</label>
+                    <label for="cafe-postal-code" class="mb-2">Postal code*</label>
                     <input type="text" id="cafe-postal-code" required pattern="[0-9]{3} ?[0-9]{2}" placeholder="XXX XX">
                 </div>
             </div>
@@ -90,22 +90,24 @@ Coffice
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-price-level" class="mb-2">Price level *</label>
+                    <label for="cafe-price-level" class="mb-2">Price level*</label>
                     <select id="cafe-price-level" required>
-                        <option value="">Select price level</option>
-                        <option value="1">💵</option>
-                        <option value="2">💵💵</option>
-                        <option value="3">💵💵💵</option>
+                        <option value="" disabled selected hidden>Select price level</option>
+                        <option value="1">Unknown</option>
+                        <option value="2">💵</option>
+                        <option value="3">💵💵</option>
+                        <option value="4">💵💵💵</option>
                     </select>
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="coffee-quality" class="mb-2">Coffee quality *</label>
+                    <label for="coffee-quality" class="mb-2">Coffee quality*</label>
                     <select id="coffee-quality" required>
-                        <option value="">Select quality level</option>
-                        <option value="1">🤎</option>
-                        <option value="2">🤎🤎</option>
-                        <option value="3">🤎🤎🤎</option>
+                        <option value="" disabled selected hidden>Select quality level</option>
+                        <option value="1">Unknown</option>
+                        <option value="2">🤎</option>
+                        <option value="3">🤎🤎</option>
+                        <option value="4">🤎🤎🤎</option>
                     </select>
                 </div>
             </div>
@@ -124,7 +126,7 @@ Coffice
         <div class="section-content">
 
             <div class="feature">
-                <label>Wi-Fi *</label>
+                <label>Wi-Fi*</label>
 
                 <div class="feature-options">
 
@@ -134,8 +136,8 @@ Coffice
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-no" name="cafe-wifi" value="not-available">
-                        <label for="wifi-no">Not available</label>
+                        <input type="radio" id="wifi-no" name="cafe-wifi" value="unavailable">
+                        <label for="wifi-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
@@ -157,7 +159,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Power outlets *</label>
+                <label>Power outlets*</label>
 
                 <div class="feature-options">
                     <div class="feature-option">
@@ -166,8 +168,8 @@ Coffice
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="outlets-no" name="cafe-outlets" value="not-available">
-                        <label for="outlets-no">Not available</label>
+                        <input type="radio" id="outlets-no" name="cafe-outlets" value="unavailable">
+                        <label for="outlets-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
@@ -184,7 +186,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Noise level *</label>
+                <label>Noise level*</label>
 
                 <div class="feature-options">
 
@@ -212,7 +214,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Seating *</label>
+                <label>Seating*</label>
 
                 <div class="feature-options">
 
@@ -222,8 +224,8 @@ Coffice
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-no" name="cafe-seating" value="not-available">
-                        <label for="seating-no">Not available</label>
+                        <input type="radio" id="seating-no" name="cafe-seating" value="unavailable">
+                        <label for="seating-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
@@ -245,7 +247,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Air-conditioning *</label>
+                <label>Air-conditioning*</label>
 
                 <div class="feature-options">
 
@@ -269,7 +271,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Typical occupancy *</label>
+                <label>Typical occupancy*</label>
 
                 <div class="feature-options">
 
@@ -297,7 +299,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Food available *</label>
+                <label>Food available*</label>
 
                 <div class="feature-options">
 
@@ -307,8 +309,8 @@ Coffice
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="food-no" name="cafe-food" value="not-available">
-                        <label for="food-no">Not available</label>
+                        <input type="radio" id="food-no" name="cafe-food" value="unavailable">
+                        <label for="food-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
@@ -325,7 +327,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Vegetarian options *</label>
+                <label>Vegetarian options*</label>
 
                 <div class="feature-options">
 
@@ -335,8 +337,8 @@ Coffice
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="vegetarian-no" name="cafe-vegetarian" value="not-available">
-                        <label for="vegetarian-no">Not available</label>
+                        <input type="radio" id="vegetarian-no" name="cafe-vegetarian" value="unavailable">
+                        <label for="vegetarian-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
@@ -353,7 +355,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Card payment *</label>
+                <label>Card payment*</label>
 
                 <div class="feature-options">
 
@@ -383,7 +385,7 @@ Coffice
 
     </section>
 
-    <section class="opening-hours section-form">
+    <section class="opening-hours section-form is-hidden">
 
         <button type="button" class="section-toggle"><span class="section-status"></span>Opening hours <span
                 class="section-arrow">▼</span></button>
@@ -394,7 +396,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="monday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Monday *</p>
+                        <p class="opening-day-name">Monday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -435,7 +437,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="tuesday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Tuesday *</p>
+                        <p class="opening-day-name">Tuesday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -475,7 +477,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="wednesday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Wednesday *</p>
+                        <p class="opening-day-name">Wednesday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -516,7 +518,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="thursday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Thursday *</p>
+                        <p class="opening-day-name">Thursday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -556,7 +558,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="friday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Friday *</p>
+                        <p class="opening-day-name">Friday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -597,7 +599,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="saturday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Saturday *</p>
+                        <p class="opening-day-name">Saturday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -638,7 +640,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="sunday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Sunday *</p>
+                        <p class="opening-day-name">Sunday*</p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -685,6 +687,59 @@ Coffice
 
         </div>
 
+    </section>
+
+    <section class="final-review section-form ">
+        <button type="button" class="section-toggle"><span class="section-status"></span>Final review <span
+                class="section-arrow">▼</span></button>
+        <div class="section-content ">
+
+            <div class="star-rating-container">
+                <label>Your rating</label>
+                <p>How would you rate this café?</p>
+                <div class="star-rating">
+                    <input type="radio" id="5-star" name="rating" value="5">
+                    <label for="5-star">★</label>
+
+                    <input type="radio" id="4-star" name="rating" value="4">
+                    <label for="4-star">★</label>
+
+                    <input type="radio" id="3-star" name="rating" value="3">
+                    <label for="3-star">★</label>
+
+                    <input type="radio" id="2-star" name="rating" value="2">
+                    <label for="2-star">★</label>
+
+                    <input type="radio" id="1-star" name="rating" value="1" required>
+                    <label for="1-star">★</label>
+                </div>
+            </div>
+
+            <div class="user-review">
+                <label for="review"> Your review</label>
+                <textarea id="review" placeholder="Tell us more about this café..."></textarea>
+            </div>
+
+            <div class="cafe-photos">
+                <label>Café photos</label>
+                <p>Add up to 6 photos.</p>
+                <div class="photo-upload-container">
+                    <label for="cafe-photo-input" class="add-photo">
+                        <span>+</span>
+                    </label>
+
+                    <input type="file" id="cafe-photo-input" accept="image/jpeg,image/png,image/webp" multiple/>
+                    <div class="photo-preview-container">
+
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn">
+                Submit
+            </button>
+
+        </div>
     </section>
 
 </form>
