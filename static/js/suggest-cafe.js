@@ -1,15 +1,25 @@
 // =========================================
-// CONSTANTS
+// CONFIG
 // =========================================
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-
 const API_KEY = "";
 
+// =========================================
+// STATE
+// =========================================
 let userLocation = null;
 let searchRequestId = 0;
+let addressSearchRequestId = 0;
 let autocompleteController = null;
 let placeDetailsController = null;
+let addressAutocompleteController = null;
+let cafeLatitude = null;
+let cafeLongitude = null;
+let selectedPhotos = [];
 
+// =========================================
+// DOM REFERENCES
+// =========================================
 
 //================ CAFE-SUGGESTION ================
 const searchInput = document.getElementById("cafe-search-input");
@@ -20,6 +30,7 @@ const manualCafeButton = document.querySelector(".manual-cafe-button");
 const cafeName = document.getElementById("cafe-name");
 const cafeCity = document.getElementById("cafe-city");
 const cafeAddress = document.getElementById("cafe-address");
+const cafeAddressSuggestions = document.querySelector(".cafe-address-suggestions");
 const cafePostCode = document.getElementById("cafe-postal-code");
 const cafePhone = document.getElementById("cafe-phone");
 const cafeEmail = document.getElementById("cafe-email");
@@ -52,15 +63,15 @@ const openingHoursContinueButton = openingHours.querySelector(".continue-btn");
 
 //================ FINAL-REVIEW ================
 const finalReview = document.querySelector(".final-review");
-const finalReviewContent = finalReview.querySelector(".section-content")
+const finalReviewContent = finalReview.querySelector(".section-content");
 const finalReviewSectionButton = finalReview.querySelector(".section-toggle");
 const finalReviewStatus = finalReview.querySelector(".section-status");
 const finalReviewArrow = finalReview.querySelector(".section-arrow");
-const ratingError = finalReview.querySelector(".rating-error");
-let selectedPhotos = [];
-const photoInput = document.getElementById("cafe-photo-input");
 const photoPreviewContainer = document.querySelector(".photo-preview-container");
-const finalReviewSubmitButton = finalReview.querySelector(".submit-btn");
+const finalReviewContinueButton = finalReview.querySelector(".continue-btn");
+const photoInput = document.getElementById("cafe-photo-input");
+const finalWarning = document.querySelector(".final-warning");
+const finalWarningSubmitButton = document.querySelector(".submit-btn");
 
 // =========================================
 // FUNCTIONS
@@ -136,6 +147,27 @@ function toggleInformationForm() {
     }
 }
 
+function formatPhoneNumber(phoneNumber) {
+    if (!phoneNumber) {
+        return "";
+    }
+
+    phoneNumber = phoneNumber.replace("+420", "");
+    phoneNumber = phoneNumber.replace(/\D/g, "");
+    phoneNumber = phoneNumber.slice(0, 9);
+
+    if (phoneNumber.length > 6) {
+        phoneNumber = phoneNumber.slice(0, 3) + " " +
+            phoneNumber.slice(3, 6) + " " +
+            phoneNumber.slice(6);
+    } else if (phoneNumber.length > 3) {
+        phoneNumber = phoneNumber.slice(0, 3) + " " +
+            phoneNumber.slice(3);
+    }
+
+    return phoneNumber;
+}
+
 function validateInformationForm() {
     const requiredFields = information.querySelectorAll(
         "input[required], select[required]"
@@ -148,6 +180,19 @@ function validateInformationForm() {
             return false;
         }
     }
+
+    if (cafePhone.value !== "" && !cafePhone.checkValidity()) {
+        cafePhone.reportValidity();
+        informationStatus.textContent = "❌ ";
+        return false;
+    }
+
+    if (cafeEmail.value !== "" && !cafeEmail.checkValidity()) {
+        cafeEmail.reportValidity();
+        informationStatus.textContent = "❌ ";
+        return false;
+    }
+
 
     informationStatus.textContent = "✔️ ";
     return true;
@@ -402,7 +447,7 @@ searchInput.addEventListener("input", async () => {
                         cafeCity.value = cafeDetails.city || "";
                         cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
                         cafePostCode.value = cafeDetails.postcode || "";
-                        cafePhone.value = cafeDetails.contact?.phone || "";
+                        cafePhone.value = formatPhoneNumber(cafeDetails.contact?.phone) || "";
                         cafeEmail.value = cafeDetails.contact?.email || "";
                         cafeWebsite.value = cafeDetails.website || "";
 
@@ -413,7 +458,7 @@ searchInput.addEventListener("input", async () => {
                         cardPayment.checked = cafeAcceptsCards;
 
                         resetOpeningHours();
-                        const cafeOpeningHours = cafeDetails.opening_hours
+                        const cafeOpeningHours = cafeDetails.opening_hours;
                         if (cafeOpeningHours) {
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
@@ -521,6 +566,92 @@ manualCafeButton.addEventListener("click", showInformationForm);
 //================ BASIC-INFORMATION ================
 informationSectionButton.addEventListener("click", toggleInformationForm);
 
+cafeAddress.addEventListener("input", async () => {
+    const text = cafeAddress.value.trim();
+
+    if (text.length < 3) {
+        cafeAddressSuggestions.style.display = "none";
+        cafeAddressSuggestions.innerHTML = "";
+        return;
+    }
+
+    if (addressAutocompleteController) {
+        addressAutocompleteController.abort();
+    }
+
+    addressAutocompleteController = new AbortController();
+
+    const requestId = ++addressSearchRequestId;
+
+    let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:cz&limit=5&format=json&apiKey=${API_KEY}`;
+
+    if (userLocation) {
+        const radiusInMeters = 493000;
+        url += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
+    }
+
+    try {
+        const response = await fetch(url, {signal: addressAutocompleteController.signal});
+        const data = await response.json();
+
+        if (requestId !== addressSearchRequestId) {
+            return;
+        }
+        cafeAddressSuggestions.innerHTML = "";
+
+        let cafeAddressFound = false;
+
+        data.results.forEach(result => {
+
+            cafeAddressFound = true;
+            const item = document.createElement("div");
+            item.classList.add("suggestion-item");
+            item.innerHTML = `<strong>${result.formatted}</strong>`;
+
+            item.addEventListener("click", async () => {
+                addressSearchRequestId++;
+
+                cafeAddressSuggestions.style.display = "none";
+                cafeAddress.value = result.address_line1 || "";
+                cafeCity.value = result.city || "";
+                cafePostCode.value = result.postcode || "";
+
+                cafeLatitude = result.lat;
+                cafeLongitude = result.lon;
+                console.log(cafeLatitude, cafeLongitude);
+            });
+            cafeAddressSuggestions.appendChild(item);
+        });
+
+        cafeAddressSuggestions.style.display = cafeAddressFound ? "block" : "none";
+
+    } catch (error) {
+        if (error.name !== "AbortError") {
+            console.error("Autocomplete request failed:", error);
+        }
+    }
+});
+
+cafePhone.addEventListener("input", () => {
+    let phoneNumber = cafePhone.value;
+
+    phoneNumber = phoneNumber.replace(/\D/g, "");
+
+    phoneNumber = phoneNumber.slice(0, 9);
+
+    if (phoneNumber.length > 6) {
+        phoneNumber = phoneNumber.slice(0, 3) + " " +
+            phoneNumber.slice(3, 6) + " " +
+            phoneNumber.slice(6);
+    } else if (phoneNumber.length > 3) {
+        phoneNumber = phoneNumber.slice(0, 3) + " " +
+            phoneNumber.slice(3);
+    }
+
+    cafePhone.value = phoneNumber;
+
+});
+
 informationContinueButton.addEventListener("click", () => {
     if (!validateInformationForm()) {
         return;
@@ -606,13 +737,12 @@ openingHoursContinueButton.addEventListener("click", () => {
 //================ FINAL-REVIEW ================
 finalReviewSectionButton.addEventListener("click", toggleFinalReviewForm)
 
-finalReviewSubmitButton.addEventListener("click", () => {
-    if(!validateSuggestionForm()){
-        console.log("CHYBA!")
+finalReviewContinueButton.addEventListener("click", () => {
+    if (!validateFinalReviewForm()) {
         return
     }
-        console.log("Funguje!")
     toggleFinalReviewForm();
+    finalWarning.classList.remove("is-hidden");
 });
 
 photoInput.addEventListener("change", () => {
@@ -627,6 +757,13 @@ photoInput.addEventListener("change", () => {
 
     renderPhotoPreviews();
 });
+
+finalWarningSubmitButton.addEventListener("click", () => {
+    if(!validateSuggestionForm()){
+        return;
+    }
+    //jinak posli do suggestions db
+})
 
 
 

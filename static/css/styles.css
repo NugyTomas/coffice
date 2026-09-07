@@ -105,6 +105,17 @@ h1 {
 /* =========================================
    SEARCH-SECTION
 ========================================= */
+.required-info {
+    font-size: 0.95rem;
+    text-align: center;
+    margin:0;
+}
+
+.asterisk {
+    color: var(--red-color);
+    font-weight: 700;
+}
+
 .cafe-search {
     max-width: 650px;
     margin: 2rem auto 0;
@@ -129,7 +140,8 @@ h1 {
 /* =========================================
    CAFE SUGGESTIONS
 ========================================= */
-.cafe-suggestions {
+.cafe-suggestions,
+.cafe-address-suggestions {
     display: none;
     width: 100%;
     max-height: 15rem;
@@ -181,9 +193,8 @@ h1 {
     padding: 1rem 2rem 2rem;
     background-color: var(--neutral-brown-color);
     border-radius: 0.75rem;
-    font-size: 1.15rem;
-    font-weight: 700;
-
+    font-size: 1.05rem;
+    font-weight: 400;
 }
 
 .section-form.is-collapsed {
@@ -229,7 +240,7 @@ h1 {
 .section-content {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 2rem;
     padding: 1rem 2rem 0;
 }
 
@@ -237,6 +248,10 @@ h1 {
 /* =========================================
    FORM FIELDS
 ========================================= */
+.form-field label {
+    font-weight: 600;
+}
+
 .form-field input,
 .form-field select {
     position: relative;
@@ -251,6 +266,25 @@ h1 {
 .form-field input:focus,
 .form-field select:focus {
     border-color: var(--dark-brown-color);
+}
+
+.phone-input {
+    display: flex;
+}
+
+.phone-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 0.9rem;
+    border: 1px solid var(--light-brown-color);
+    border-right: none;
+    border-radius: 0.4rem 0 0 0.4rem;
+    background-color: var(--white-color);
+    color: var(--dark-brown-color);
+}
+
+.phone-input input {
+    border-radius: 0 0.4rem 0.4rem 0;
 }
 
 
@@ -290,7 +324,7 @@ h1 {
 }
 
 .feature > label {
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
 
 }
@@ -320,11 +354,11 @@ h1 {
 .opening-hours-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .opening-day {
-    padding-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--brown-color);
 }
 
@@ -424,17 +458,24 @@ h1 {
    FINAL REVIEW
 ========================================= */
 /* RATING */
+.final-review label {
+    font-weight: 600;
+}
+
+.final-review .section-content {
+    gap: 1.75rem;
+}
 
 /* Kontejner s hvězdami pozpátku */
 .star-rating-container {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .star-rating-container p {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin: 0;
     font-weight: 400;
 }
@@ -497,6 +538,10 @@ h1 {
     gap: 0.75rem;
 }
 
+.user-review label {
+    font-weight: 600;
+}
+
 .user-review textarea {
     min-height: 9rem;
     padding: 0.8rem 1rem;
@@ -511,6 +556,16 @@ h1 {
 }
 
 /* CAFE-PHOTOS */
+.cafe-photos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cafe-photos label {
+    font-weight: 600;
+}
+
 .cafe-photos p {
     margin: 0;
     font-size: 1rem;
@@ -525,7 +580,6 @@ h1 {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
-
 }
 
 .add-photo,
@@ -591,12 +645,13 @@ h1 {
 }
 
 .final-warning {
-    margin: 2rem 0 0;
-    padding: 1rem;
     border-left: 3px solid var(--light-brown-color);
     font-size: 1rem;
     font-weight: 500;
     color: var(--dark-brown-color);
+    width: min(90%, 65rem);
+    margin: 1.25rem auto 0;
+    padding: 1rem 2rem 2rem;
 }
 
 .submit-btn {

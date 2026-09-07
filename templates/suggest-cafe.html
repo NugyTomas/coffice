@@ -29,6 +29,7 @@ Coffice
                         <button type="button" class="manual-cafe-button">Add it manually</button>
                     </div>
 
+
                 </div>
             </div>
         </div>
@@ -39,27 +40,33 @@ Coffice
         <button type="button" class="section-toggle"><span class="section-status"></span>Basic information <span
                 class="section-arrow">▼</span></button>
 
+
         <div class="section-content">
+            <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-name" class="mb-2">Name*</label>
+                    <label for="cafe-name" class="mb-2">Name<span class="asterisk">*</span></label>
                     <input type="text" id="cafe-name" required minlength="2" maxlength="50">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-city" class="mb-2">City*</label>
-                    <input type="text" id="cafe-city" required minlength="2" maxlength="50">
+                    <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span></label>
+                    <div class="search-wrapper">
+                        <input type="text" id="cafe-address" required minlength="3" maxlength="100">
+                        <div class="cafe-address-suggestions"></div>
+                    </div>
+
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2">Address*</label>
-                    <input type="text" id="cafe-address" required minlength="3" maxlength="100">
+                    <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
+                    <input type="text" id="cafe-city" required minlength="2" maxlength="50">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-postal-code" class="mb-2">Postal code*</label>
+                    <label for="cafe-postal-code" class="mb-2">Postal code<span class="asterisk">*</span></label>
                     <input type="text" id="cafe-postal-code" required pattern="[0-9]{3} ?[0-9]{2}" placeholder="XXX XX">
                 </div>
             </div>
@@ -67,7 +74,13 @@ Coffice
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-phone" class="mb-2">Phone</label>
-                    <input type="tel" id="cafe-phone" placeholder="-">
+
+                    <div class="phone-input">
+                        <span class="phone-prefix">+420</span>
+                        <input type="tel" id="cafe-phone" placeholder="123 456 789"
+                               pattern="[0-9]{3} [0-9]{3} [0-9]{3}">
+                    </div>
+
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
@@ -90,7 +103,7 @@ Coffice
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-price-level" class="mb-2">Price level*</label>
+                    <label for="cafe-price-level" class="mb-2">Price level<span class="asterisk">*</span></label>
                     <select id="cafe-price-level" required>
                         <option value="" disabled selected hidden>Select price level</option>
                         <option value="1">Unknown</option>
@@ -101,7 +114,7 @@ Coffice
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="coffee-quality" class="mb-2">Coffee quality*</label>
+                    <label for="coffee-quality" class="mb-2">Coffee quality<span class="asterisk">*</span></label>
                     <select id="coffee-quality" required>
                         <option value="" disabled selected hidden>Select quality level</option>
                         <option value="1">Unknown</option>
@@ -123,10 +136,11 @@ Coffice
         <button type="button" class="section-toggle"><span class="section-status"></span>Work-friendly features <span
                 class="section-arrow">▼</span></button>
 
-        <div class="section-content">
 
+        <div class="section-content">
+            <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
             <div class="feature">
-                <label>Wi-Fi*</label>
+                <label>Wi-Fi<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -159,7 +173,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Power outlets*</label>
+                <label>Power outlets<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
                     <div class="feature-option">
@@ -186,7 +200,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Noise level*</label>
+                <label>Noise level<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -214,7 +228,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Seating*</label>
+                <label>Seating<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -247,7 +261,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Air-conditioning*</label>
+                <label>Air-conditioning<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -271,7 +285,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Typical occupancy*</label>
+                <label>Typical occupancy<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -299,7 +313,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Food available*</label>
+                <label>Food available<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -327,7 +341,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Vegetarian options*</label>
+                <label>Vegetarian options<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -355,7 +369,7 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Card payment*</label>
+                <label>Card payment<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
@@ -390,13 +404,14 @@ Coffice
         <button type="button" class="section-toggle"><span class="section-status"></span>Opening hours <span
                 class="section-arrow">▼</span></button>
 
-        <div class="section-content">
 
+        <div class="section-content">
+            <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
             <div class="opening-hours-list">
 
                 <div class="opening-day row g-4 align-items-center" data-day="monday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Monday*</p>
+                        <p class="opening-day-name">Monday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -437,7 +452,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="tuesday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Tuesday*</p>
+                        <p class="opening-day-name">Tuesday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -477,7 +492,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="wednesday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Wednesday*</p>
+                        <p class="opening-day-name">Wednesday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -518,7 +533,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="thursday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Thursday*</p>
+                        <p class="opening-day-name">Thursday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -558,7 +573,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="friday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Friday*</p>
+                        <p class="opening-day-name">Friday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -599,7 +614,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="saturday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Saturday*</p>
+                        <p class="opening-day-name">Saturday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -640,7 +655,7 @@ Coffice
 
                 <div class="opening-day row g-4 align-items-center" data-day="sunday">
                     <div class="col-12 col-md-2">
-                        <p class="opening-day-name">Sunday*</p>
+                        <p class="opening-day-name">Sunday<span class="asterisk">*</span></p>
                     </div>
 
                     <div class="col-12 col-md-10">
@@ -689,13 +704,14 @@ Coffice
 
     </section>
 
-    <section class="final-review section-form ">
+    <section class="final-review section-form is-hidden">
         <button type="button" class="section-toggle"><span class="section-status"></span>Final review <span
                 class="section-arrow">▼</span></button>
-        <div class="section-content ">
 
+        <div class="section-content ">
+            <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
             <div class="star-rating-container">
-                <label>Your rating</label>
+                <label>Your rating<span class="asterisk">*</span></label>
                 <p>How would you rate this café?</p>
                 <div class="star-rating">
                     <input type="radio" id="5-star" name="rating" value="5">
@@ -735,12 +751,18 @@ Coffice
                 </div>
             </div>
 
-            <button type="button" class="submit-btn">
-                Submit
+            <button type="button" class="continue-btn">
+                Continue
             </button>
 
         </div>
     </section>
+
+    <div class="final-warning is-hidden">
+        <p>By submitting this café, you confirm that the information you provided is accurate to the best of your
+            knowledge. </p>
+        <button type="submit" class="submit-btn">Submit café</button>
+    </div>
 
 </form>
 
