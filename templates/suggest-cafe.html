@@ -5,7 +5,7 @@ Coffice
 {% endblock %}
 
 {% block content %}
-<form class="container pt-4">
+<form class="container pt-4 cafe-suggestion-form">
 
     <section class="search-section">
 
@@ -46,13 +46,13 @@ Coffice
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-name" class="mb-2">Name<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-name" required minlength="2" maxlength="50">
+                    <input type="text" id="cafe-name" name="cafeName" required minlength="2" maxlength="50">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span></label>
                     <div class="search-wrapper">
-                        <input type="text" id="cafe-address" required minlength="3" maxlength="100">
+                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100">
                         <div class="cafe-address-suggestions"></div>
                     </div>
 
@@ -62,12 +62,13 @@ Coffice
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-city" required minlength="2" maxlength="50">
+                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-postal-code" class="mb-2">Postal code<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-postal-code" required pattern="[0-9]{3} ?[0-9]{2}" placeholder="XXX XX">
+                    <input type="text" id="cafe-postal-code" name="cafePostCode" required pattern="[0-9]{3} [0-9]{2}"
+                           placeholder="XXX XX">
                 </div>
             </div>
 
@@ -77,7 +78,7 @@ Coffice
 
                     <div class="phone-input">
                         <span class="phone-prefix">+420</span>
-                        <input type="tel" id="cafe-phone" placeholder="123 456 789"
+                        <input type="tel" id="cafe-phone" name="cafePhone" placeholder="123 456 789"
                                pattern="[0-9]{3} [0-9]{3} [0-9]{3}">
                     </div>
 
@@ -85,42 +86,42 @@ Coffice
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-email" class="mb-2">Email</label>
-                    <input type="email" id="cafe-email" maxlength="200" placeholder="-">
+                    <input type="email" id="cafe-email" name="cafeEmail" maxlength="200"  placeholder="email@example.com" >
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-website" class="mb-2">Website</label>
-                    <input type="url" id="cafe-website" maxlength="2048" placeholder="-">
+                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048" pattern="(https?://)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(/.*)?" placeholder="example.com">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-instagram" class="mb-2">Instagram</label>
-                    <input type="text" id="cafe-instagram" value="@">
+                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31" placeholder="We will add @ for you." />
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-price-level" class="mb-2">Price level<span class="asterisk">*</span></label>
-                    <select id="cafe-price-level" required>
+                    <label for="cafe-price" class="mb-2">Price level<span class="asterisk">*</span></label>
+                    <select id="cafe-price" name="cafePrice" required>
                         <option value="" disabled selected hidden>Select price level</option>
-                        <option value="1">Unknown</option>
-                        <option value="2">💵</option>
-                        <option value="3">💵💵</option>
-                        <option value="4">💵💵💵</option>
+                        <option value="unknown">Unknown</option>
+                        <option value="1">💵</option>
+                        <option value="2">💵💵</option>
+                        <option value="3">💵💵💵</option>
                     </select>
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="coffee-quality" class="mb-2">Coffee quality<span class="asterisk">*</span></label>
-                    <select id="coffee-quality" required>
+                    <select id="coffee-quality" name="coffeeQuality" required>
                         <option value="" disabled selected hidden>Select quality level</option>
-                        <option value="1">Unknown</option>
-                        <option value="2">🤎</option>
-                        <option value="3">🤎🤎</option>
-                        <option value="4">🤎🤎🤎</option>
+                        <option value="unknown">Unknown</option>
+                        <option value="1">🤎</option>
+                        <option value="2">🤎🤎</option>
+                        <option value="3">🤎🤎🤎</option>
                     </select>
                 </div>
             </div>
@@ -145,27 +146,27 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-unknown" name="cafe-wifi" value="unknown" required>
+                        <input type="radio" id="wifi-unknown" name="cafeWifi" value="unknown" required>
                         <label for="wifi-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-no" name="cafe-wifi" value="unavailable">
+                        <input type="radio" id="wifi-no" name="cafeWifi" value="unavailable">
                         <label for="wifi-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-slow" name="cafe-wifi" value="slow">
+                        <input type="radio" id="wifi-slow" name="cafeWifi" value="slow">
                         <label for="wifi-slow">Slow</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-stable" name="cafe-wifi" value="stable">
+                        <input type="radio" id="wifi-stable" name="cafeWifi" value="stable">
                         <label for="wifi-stable">Stable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="wifi-fast" name="cafe-wifi" value="fast">
+                        <input type="radio" id="wifi-fast" name="cafeWifi" value="fast">
                         <label for="wifi-fast">Fast</label>
                     </div>
 
@@ -177,22 +178,22 @@ Coffice
 
                 <div class="feature-options">
                     <div class="feature-option">
-                        <input type="radio" id="outlets-unknown" name="cafe-outlets" value="unknown" required>
+                        <input type="radio" id="outlets-unknown" name="cafeOutlets" value="unknown" required>
                         <label for="outlets-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="outlets-no" name="cafe-outlets" value="unavailable">
+                        <input type="radio" id="outlets-no" name="cafeOutlets" value="unavailable">
                         <label for="outlets-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="outlets-limited" name="cafe-outlets" value="limited">
+                        <input type="radio" id="outlets-limited" name="cafeOutlets" value="limited">
                         <label for="outlets-limited">Limited</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="outlets-everywhere" name="cafe-outlets" value="everywhere">
+                        <input type="radio" id="outlets-everywhere" name="cafeOutlets" value="everywhere">
                         <label for="outlets-everywhere">At every table</label>
                     </div>
 
@@ -205,22 +206,22 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="noise-unknown" name="cafe-noise" value="unknown" required>
+                        <input type="radio" id="noise-unknown" name="cafeNoise" value="unknown" required>
                         <label for="noise-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="noise-noisy" name="cafe-noise" value="noisy">
+                        <input type="radio" id="noise-noisy" name="cafeNoise" value="noisy">
                         <label for="noise-noisy">Noisy</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="noise-moderate" name="cafe-noise" value="moderate">
+                        <input type="radio" id="noise-moderate" name="cafeNoise" value="moderate">
                         <label for="noise-moderate">Moderate</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="noise-quiet" name="cafe-noise" value="quiet">
+                        <input type="radio" id="noise-quiet" name="cafeNoise" value="quiet">
                         <label for="noise-quiet">Quiet</label>
                     </div>
 
@@ -233,27 +234,27 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-unknown" name="cafe-seating" value="unknown" required>
+                        <input type="radio" id="seating-unknown" name="cafeSeating" value="unknown" required>
                         <label for="seating-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-no" name="cafe-seating" value="unavailable">
+                        <input type="radio" id="seating-no" name="cafeSeating" value="unavailable">
                         <label for="seating-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-bar-like" name="cafe-seating" value="bar-like">
+                        <input type="radio" id="seating-bar-like" name="cafeSeating" value="bar-like">
                         <label for="seating-bar-like">Bar-like</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-casual" name="cafe-seating" value="casual">
+                        <input type="radio" id="seating-casual" name="cafeSeating" value="casual">
                         <label for="seating-casual">Casual</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="seating-work-friendly" name="cafe-seating" value="work-friendly">
+                        <input type="radio" id="seating-work-friendly" name="cafeSeating" value="work-friendly">
                         <label for="seating-work-friendly">Work-friendly</label>
                     </div>
 
@@ -266,18 +267,18 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="air-conditioning-unknown" name="cafe-air-conditioning" value="unknown"
+                        <input type="radio" id="air-conditioning-unknown" name="cafeAirConditioning" value="unknown"
                                required>
                         <label for="air-conditioning-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="air-conditioning-no" name="cafe-air-conditioning" value="no">
+                        <input type="radio" id="air-conditioning-no" name="cafeAirConditioning" value="no">
                         <label for="air-conditioning-no">No</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="air-conditioning-yes" name="cafe-air-conditioning" value="yes">
+                        <input type="radio" id="air-conditioning-yes" name="cafeAirConditioning" value="yes">
                         <label for="air-conditioning-yes">Yes</label>
                     </div>
 
@@ -290,22 +291,22 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="occupancy-unknown" name="cafe-occupancy" value="unknown" required>
+                        <input type="radio" id="occupancy-unknown" name="cafeOccupancy" value="unknown" required>
                         <label for="occupancy-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="occupancy-low" name="cafe-occupancy" value="low">
+                        <input type="radio" id="occupancy-low" name="cafeOccupancy" value="low">
                         <label for="occupancy-low">Low</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="occupancy-moderate" name="cafe-occupancy" value="moderate">
+                        <input type="radio" id="occupancy-moderate" name="cafeOccupancy" value="moderate">
                         <label for="occupancy-moderate">Moderate</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="occupancy-busy" name="cafe-occupancy" value="busy">
+                        <input type="radio" id="occupancy-busy" name="cafeOccupancy" value="busy">
                         <label for="occupancy-busy">Busy</label>
                     </div>
 
@@ -313,27 +314,27 @@ Coffice
             </div>
 
             <div class="feature">
-                <label>Food available<span class="asterisk">*</span></label>
+                <label>Food options<span class="asterisk">*</span></label>
 
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="food-unknown" name="cafe-food" value="unknown" required>
+                        <input type="radio" id="food-unknown" name="cafeFood" value="unknown" required>
                         <label for="food-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="food-no" name="cafe-food" value="unavailable">
+                        <input type="radio" id="food-no" name="cafeFood" value="unavailable">
                         <label for="food-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="food-snacks" name="cafe-food" value="snacks">
+                        <input type="radio" id="food-snacks" name="cafeFood" value="snacks">
                         <label for="food-snacks">Snacks-only</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="food-variety" name="cafe-food" value="good-variety">
+                        <input type="radio" id="food-variety" name="cafeFood" value="good-variety">
                         <label for="food-variety">Good variety</label>
                     </div>
 
@@ -346,22 +347,22 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="vegetarian-unknown" name="cafe-vegetarian" value="unknown" required>
+                        <input type="radio" id="vegetarian-unknown" name="cafeVegetarian" value="unknown" required>
                         <label for="vegetarian-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="vegetarian-no" name="cafe-vegetarian" value="unavailable">
+                        <input type="radio" id="vegetarian-no" name="cafeVegetarian" value="unavailable">
                         <label for="vegetarian-no">Unavailable</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="vegetarian-snacks" name="cafe-vegetarian" value="snacks">
+                        <input type="radio" id="vegetarian-snacks" name="cafeVegetarian" value="snacks">
                         <label for="vegetarian-snacks">Snacks-only</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="vegetarian-variety" name="cafe-vegetarian" value="good-variety">
+                        <input type="radio" id="vegetarian-variety" name="cafeVegetarian" value="good-variety">
                         <label for="vegetarian-variety">Good variety</label>
                     </div>
 
@@ -374,17 +375,17 @@ Coffice
                 <div class="feature-options">
 
                     <div class="feature-option">
-                        <input type="radio" id="card-unknown" name="cafe-card" value="unknown" required>
+                        <input type="radio" id="card-unknown" name="cafeCard" value="unknown" required>
                         <label for="card-unknown">Not sure</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="card-no" name="cafe-card" value="no">
+                        <input type="radio" id="card-no" name="cafeCard" value="no">
                         <label for="card-no">No</label>
                     </div>
 
                     <div class="feature-option">
-                        <input type="radio" id="card-yes" name="cafe-card" value="yes">
+                        <input type="radio" id="card-yes" name="cafeCard" value="yes">
                         <label for="card-yes">Yes</label>
                     </div>
 
@@ -714,37 +715,40 @@ Coffice
                 <label>Your rating<span class="asterisk">*</span></label>
                 <p>How would you rate this café?</p>
                 <div class="star-rating">
-                    <input type="radio" id="5-star" name="rating" value="5">
+                    <input type="radio" id="5-star" name="userRating" value="5">
                     <label for="5-star">★</label>
 
-                    <input type="radio" id="4-star" name="rating" value="4">
+                    <input type="radio" id="4-star" name="userRating" value="4">
                     <label for="4-star">★</label>
 
-                    <input type="radio" id="3-star" name="rating" value="3">
+                    <input type="radio" id="3-star" name="userRating" value="3">
                     <label for="3-star">★</label>
 
-                    <input type="radio" id="2-star" name="rating" value="2">
+                    <input type="radio" id="2-star" name="userRating" value="2">
                     <label for="2-star">★</label>
 
-                    <input type="radio" id="1-star" name="rating" value="1" required>
+                    <input type="radio" id="1-star" name="userRating" value="1" required>
                     <label for="1-star">★</label>
                 </div>
             </div>
 
             <div class="user-review">
                 <label for="review"> Your review</label>
-                <textarea id="review" placeholder="Tell us more about this café..."></textarea>
+                <textarea id="review" name="userReview" placeholder="Tell us more about this café..."></textarea>
             </div>
 
             <div class="cafe-photos">
                 <label>Café photos</label>
                 <p>Add up to 6 photos.</p>
+                <div id="photo-error" class="photo-error" role="alert"></div>
                 <div class="photo-upload-container">
+
                     <label for="cafe-photo-input" class="add-photo">
                         <span>+</span>
                     </label>
 
                     <input type="file" id="cafe-photo-input" accept="image/jpeg,image/png,image/webp" multiple/>
+
                     <div class="photo-preview-container">
 
                     </div>
@@ -761,7 +765,7 @@ Coffice
     <div class="final-warning is-hidden">
         <p>By submitting this café, you confirm that the information you provided is accurate to the best of your
             knowledge. </p>
-        <button type="submit" class="submit-btn">Submit café</button>
+        <button type="button" class="submit-btn">Submit café</button>
     </div>
 
 </form>

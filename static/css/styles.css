@@ -576,6 +576,22 @@ h1 {
     display: none;
 }
 
+.photo-error {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border: 1px solid #f5c2c7;
+    border-radius: 8px;
+    background-color: #f8d7da;
+    color: #842029;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.photo-error:not(:empty) {
+    display: block;
+}
+
 .photo-upload-container {
     display: flex;
     gap: 1rem;
