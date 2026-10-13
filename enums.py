@@ -1,5 +1,17 @@
 from enum import Enum as PythonEnum
 
+class CafePrice(PythonEnum):
+    UNKNOWN = "unknown"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+class CoffeeQuality(PythonEnum):
+    UNKNOWN = "unknown"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
 class WifiQuality(PythonEnum):
     UNKNOWN = "unknown"
     UNAVAILABLE = "unavailable"
@@ -26,6 +38,11 @@ class Seating(PythonEnum):
     CASUAL = "casual"
     WORK_FRIENDLY = "work-friendly"
 
+class AirConditioning(PythonEnum):
+    UNKNOWN = "unknown"
+    NO = "no"
+    YES = "yes"
+
 class TypicalOccupancy(PythonEnum):
     UNKNOWN = "unknown"
     LOW = "low"
@@ -44,10 +61,31 @@ class VegetarianOptions(PythonEnum):
     SNACKS = "snacks"
     GOOD_VARIETY = "good-variety"
 
+class CardPayment(PythonEnum):
+    UNKNOWN = "unknown"
+    YES = "yes"
+    NO = "no"
+
 class OpeningDayStatus(PythonEnum):
     UNKNOWN = "unknown"
     CLOSED = "closed"
     OPEN = "open"
+
+class WeekDay(PythonEnum):
+    MONDAY = "monday"
+    TUESDAY = "tuesday"
+    WEDNESDAY = "wednesday"
+    THURSDAY = "thursday"
+    FRIDAY = "friday"
+    SATURDAY = "saturday"
+    SUNDAY = "sunday"
+
+class Rating(PythonEnum):
+    ONE = "one"
+    TWO = "two"
+    THREE = "three"
+    FOUR = "four"
+    FIVE = "five"
 
 
 

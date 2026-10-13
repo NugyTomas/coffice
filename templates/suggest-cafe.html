@@ -50,9 +50,9 @@ Coffice
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span></label>
+                    <label for="cafe-address" class="mb-2" >Address<span class="asterisk">*</span></label>
                     <div class="search-wrapper">
-                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100">
+                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100" pattern=".*\p{L}.*">
                         <div class="cafe-address-suggestions"></div>
                     </div>
 
@@ -62,7 +62,7 @@ Coffice
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50">
+                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50" pattern=".*\p{L}.*">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
@@ -86,19 +86,19 @@ Coffice
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-email" class="mb-2">Email</label>
-                    <input type="email" id="cafe-email" name="cafeEmail" maxlength="200"  placeholder="email@example.com" >
+                    <input type="text" id="cafe-email" name="cafeEmail" maxlength="250" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" placeholder="email@example.com" >
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-website" class="mb-2">Website</label>
-                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048" pattern="(https?://)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(/.*)?" placeholder="example.com">
+                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048" pattern="(https?://)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}(/.*)?" placeholder="example.com">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-instagram" class="mb-2">Instagram</label>
-                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31" placeholder="We will add @ for you." />
+                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31" pattern="@[a-z0-9_]+(\.[a-z0-9_]+)*" placeholder="We will add @ for you." />
                 </div>
             </div>
 
@@ -108,9 +108,9 @@ Coffice
                     <select id="cafe-price" name="cafePrice" required>
                         <option value="" disabled selected hidden>Select price level</option>
                         <option value="unknown">Unknown</option>
-                        <option value="1">💵</option>
-                        <option value="2">💵💵</option>
-                        <option value="3">💵💵💵</option>
+                        <option value="low">💵</option>
+                        <option value="medium">💵💵</option>
+                        <option value="high">💵💵💵</option>
                     </select>
                 </div>
 
@@ -119,9 +119,9 @@ Coffice
                     <select id="coffee-quality" name="coffeeQuality" required>
                         <option value="" disabled selected hidden>Select quality level</option>
                         <option value="unknown">Unknown</option>
-                        <option value="1">🤎</option>
-                        <option value="2">🤎🤎</option>
-                        <option value="3">🤎🤎🤎</option>
+                        <option value="low">🤎</option>
+                        <option value="medium">🤎🤎</option>
+                        <option value="high">🤎🤎🤎</option>
                     </select>
                 </div>
             </div>
@@ -715,26 +715,26 @@ Coffice
                 <label>Your rating<span class="asterisk">*</span></label>
                 <p>How would you rate this café?</p>
                 <div class="star-rating">
-                    <input type="radio" id="5-star" name="userRating" value="5">
+                    <input type="radio" id="5-star" name="userRating" value="five">
                     <label for="5-star">★</label>
 
-                    <input type="radio" id="4-star" name="userRating" value="4">
+                    <input type="radio" id="4-star" name="userRating" value="four">
                     <label for="4-star">★</label>
 
-                    <input type="radio" id="3-star" name="userRating" value="3">
+                    <input type="radio" id="3-star" name="userRating" value="three">
                     <label for="3-star">★</label>
 
-                    <input type="radio" id="2-star" name="userRating" value="2">
+                    <input type="radio" id="2-star" name="userRating" value="two">
                     <label for="2-star">★</label>
 
-                    <input type="radio" id="1-star" name="userRating" value="1" required>
+                    <input type="radio" id="1-star" name="userRating" value="one" required>
                     <label for="1-star">★</label>
                 </div>
             </div>
 
             <div class="user-review">
                 <label for="review"> Your review</label>
-                <textarea id="review" name="userReview" placeholder="Tell us more about this café..."></textarea>
+                <textarea id="review" name="userReview" placeholder="Tell us more about this café..." maxlength="2048"></textarea>
             </div>
 
             <div class="cafe-photos">
@@ -765,6 +765,9 @@ Coffice
     <div class="final-warning is-hidden">
         <p>By submitting this café, you confirm that the information you provided is accurate to the best of your
             knowledge. </p>
+
+        <p class="submission-message" role="status"></p>
+
         <button type="button" class="submit-btn">Submit café</button>
     </div>
 

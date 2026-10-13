@@ -2,9 +2,8 @@
 // CONFIG
 // =========================================
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-const API_KEY = "";
 
-const allowedPhotoTypes = ["image/jpeg", "image/png", "image/webp"];
+const allowedPhotoTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 const maxPhotoSize = 5 * 1024 * 1024;
 const maxPhotoCount = 6;
 
@@ -70,6 +69,8 @@ let selectedPhotos = [];
 const finalWarning = document.querySelector(".final-warning");
 const finalWarningSubmitButton = document.querySelector(".submit-btn");
 
+const submissionMessage = document.querySelector(".submission-message");
+
 // =========================================
 // FUNCTIONS
 // =========================================
@@ -123,7 +124,7 @@ async function getCafeData(text) {
 
     autocompleteController = new AbortController();
 
-    let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json&apiKey=${API_KEY}`;
+    let url = `/api/geoapify/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json`;
 
     if (userLocation) {
         const radiusInMeters = 493000;
@@ -135,7 +136,7 @@ async function getCafeData(text) {
 }
 
 async function getPlaceDetails(placeId, signal) {
-    const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${API_KEY}`;
+    const url = `/api/geoapify/place-details?id=${encodeURIComponent(placeId)}`;
 
     const response = await fetch(url, {signal: signal});
     return response.json();
@@ -166,7 +167,7 @@ async function selectCafe(result) {
         }
 
         const cafeDetails = placeDetails.features[0].properties;
-
+        console.log(cafeDetails);
         fillCafeDetails(cafeDetails);
         resetOpeningHours();
 
@@ -189,7 +190,7 @@ function fillCafeDetails(cafeDetails) {
     cafeName.value = cafeDetails.name || "";
     cafeCity.value = cafeDetails.city || "";
     cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
-    cafePostCode.value = cafeDetails.postcode || "";
+    cafePostCode.value = formatPostalCode(cafeDetails.postcode) || "";
     cafePhone.value = formatPhoneNumber(cafeDetails.contact?.phone) || "";
     cafeEmail.value = cafeDetails.contact?.email || "";
     cafeWebsite.value = cafeDetails.website || "";
@@ -211,7 +212,7 @@ async function getCafeAddress(text) {
 
     addressAutocompleteController = new AbortController();
 
-    let url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:cz&limit=5&format=json&apiKey=${API_KEY}`;
+    let url = `/api/geoapify/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:cz&limit=5&format=json`;
 
     if (userLocation) {
         const radiusInMeters = 493000;
@@ -226,7 +227,7 @@ function fillAddressDetails(addressDetails) {
     cafeAddressSuggestions.style.display = "none";
     cafeAddress.value = addressDetails.address_line1 || "";
     cafeCity.value = addressDetails.city || "";
-    cafePostCode.value = addressDetails.postcode || "";
+    cafePostCode.value = formatPostalCode(addressDetails.postcode) || "";
 
     cafeLatitude = addressDetails.lat;
     cafeLongitude = addressDetails.lon;
@@ -241,6 +242,9 @@ function formatTime(date) {
 }
 
 function resetOpeningHours() {
+    openingSchedule = Object.fromEntries(
+        days.map(day => [day, []])
+    );
 
     openingDays.forEach(day => {
         const openingInterval = day.querySelectorAll(".opening-interval");
@@ -342,7 +346,7 @@ function fillCafeOpeningHours(cafeOpeningHours) {
 }
 
 function updateOpeningScheduleData() {
-    openingSchedule = {};
+    const scheduleData = {};
 
     days.forEach(day => {
         const openingDayElement = document.querySelector(
@@ -372,11 +376,13 @@ function updateOpeningScheduleData() {
             }
         }
 
-        openingSchedule[day] = {
+        scheduleData[day] = {
             status: selectedStatus.value,
             intervals: intervals
         };
     });
+
+    return scheduleData
 }
 
 //================ BASIC-INFORMATION ================
@@ -385,6 +391,11 @@ function showInformationForm() {
     information.section.classList.remove("is-collapsed");
     information.sectionContent.classList.remove("is-hidden");
     information.arrow.textContent = "▼";
+}
+
+function formatPostalCode(value) {
+    const digits = (value || "").replace(/\D/g, "").slice(0, 5);
+    return digits.length > 3 ? digits.slice(0, 3) + " " + digits.slice(3) : digits;
 }
 
 function formatPhoneNumber(phoneNumber) {
@@ -413,12 +424,11 @@ function formatInstagramUsername(username) {
         return "";
     }
 
-    username = username.trim();
     username = username.toLowerCase();
-
     username = username.replace(/[^a-z0-9._]/g, "");
     username = username.replace(/\.{2,}/g, ".");
-    username = username.replace(/^\.|\.$/g, "");
+    username = username.slice(0, 30);
+    username = username.replace(/^\.+|\.+$/g, "");
 
     return username ? "@" + username : "";
 }
@@ -448,8 +458,14 @@ function validateInformationForm() {
         return false;
     }
 
-     if (cafeWebsite.value !== "" && !cafeWebsite.checkValidity()) {
+    if (cafeWebsite.value !== "" && !cafeWebsite.checkValidity()) {
         cafeWebsite.reportValidity();
+        information.status.textContent = "❌ ";
+        return false;
+    }
+
+    if (cafeInstagram.value !== "" && !cafeInstagram.checkValidity()) {
+        cafeInstagram.reportValidity();
         information.status.textContent = "❌ ";
         return false;
     }
@@ -510,6 +526,15 @@ function validateOpeningHoursForm() {
             if (i > 0) {
                 const previousClosingTime = closingTimeInputs[i - 1].value;
 
+                if (openingTime === "") {
+                    openingTimeInputs[i].setCustomValidity(
+                        "Please enter valid interval"
+                    );
+                    openingTimeInputs[i].reportValidity();
+                    openingHours.status.textContent = "❌ ";
+                    return false;
+                }
+
                 if (openingTime < previousClosingTime) {
                     openingTimeInputs[i].setCustomValidity(
                         "Opening intervals must not overlap."
@@ -539,7 +564,7 @@ function validateOpeningHoursForm() {
 
 //================ FINAL-REVIEW ================
 function renderPhotoPreviews() {
-    photoPreviewContainer.innerHTML = "";
+    photoPreviewContainer.textContent = "";
 
     selectedPhotos.forEach((file, index) => {
         const photoContainer = document.createElement("div");
@@ -611,7 +636,7 @@ function validateSuggestionForm() {
 function collectCafeSuggestionData() {
     const htmlFormData = new FormData(cafeSuggestionForm);
 
-    updateOpeningScheduleData();
+    const scheduleData = updateOpeningScheduleData();
 
     const cafeSuggestion = {
         cafe: {
@@ -626,23 +651,23 @@ function collectCafeSuggestionData() {
             email: htmlFormData.get("cafeEmail"),
             website: htmlFormData.get("cafeWebsite"),
             instagram: htmlFormData.get("cafeInstagram"),
-            cafe_price: htmlFormData.get("cafePrice"),
+            price_level: htmlFormData.get("cafePrice"),
             coffee_quality: htmlFormData.get("coffeeQuality")
         },
 
-        feature: {
+        cafe_features: {
             wifi_quality: htmlFormData.get("cafeWifi"),
-            socket_availability: htmlFormData.get("cafeOutlets"),
+            power_outlets: htmlFormData.get("cafeOutlets"),
             noise_level: htmlFormData.get("cafeNoise"),
             seating_type: htmlFormData.get("cafeSeating"),
             air_conditioning: htmlFormData.get("cafeAirConditioning"),
             typical_occupancy: htmlFormData.get("cafeOccupancy"),
             card_payment: htmlFormData.get("cafeCard"),
-            food_available: htmlFormData.get("cafeFood"),
+            food_options: htmlFormData.get("cafeFood"),
             vegetarian_options: htmlFormData.get("cafeVegetarian")
         },
 
-        opening_hours: openingSchedule,
+        cafe_opening_hours: scheduleData,
 
         cafe_review: {
             rating: htmlFormData.get("userRating"),
@@ -671,13 +696,16 @@ function createCafeSuggestionFormData(cafeSuggestion) {
 
 async function prepareCafeSuggestion() {
     const cafeSuggestion = collectCafeSuggestionData();
+
     const completeFormData = createCafeSuggestionFormData(cafeSuggestion);
 
+    submissionMessage.textContent = "";
+
     try {
-        const result = await sendCafeSuggestion(completeFormData);
-        console.log("Suggestion sent successfully:", result);
+        await sendCafeSuggestion(completeFormData);
+        submissionMessage.textContent = "Café suggestion submitted successfully.";
     } catch (error) {
-        console.error("Failed to send cafe suggestion:", error);
+        submissionMessage.textContent = error.message;
     }
 }
 
@@ -687,11 +715,24 @@ async function sendCafeSuggestion(completeFormData) {
         body: completeFormData
     });
 
-    if (!response.ok) {
-        throw new Error("Failed to send cafe suggestion.");
+    const contentType = response.headers.get("content-type");
+    let result = null;
+
+    if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
     }
 
-    return response.json();
+    if (!response.ok) {
+        const errorMessage = result?.errors
+            ? Object.values(result.errors)
+                .flat()
+                .join("\n")
+            : "Something went wrong while submitting the café suggestion.";
+
+        throw new Error(errorMessage);
+    }
+
+    return result;
 }
 
 initializeLocation();
@@ -708,7 +749,7 @@ searchInput.addEventListener("input", async () => {
 
     if (text.length < 3) {
         suggestions.style.display = "none";
-        suggestions.innerHTML = "";
+        suggestions.textContent = "";
         return;
     }
 
@@ -720,7 +761,7 @@ searchInput.addEventListener("input", async () => {
         if (requestId !== searchRequestId) {
             return;
         }
-        suggestions.innerHTML = "";
+        suggestions.textContent = "";
 
         let cafeFound = false;
 
@@ -730,8 +771,14 @@ searchInput.addEventListener("input", async () => {
                 cafeFound = true;
                 const item = document.createElement("div");
                 item.classList.add("suggestion-item");
-                item.innerHTML = `<strong>${result.name}</strong>,<small>${result.address_line2}</small>`;
 
+                const name = document.createElement("strong");
+                name.textContent = result.name;
+
+                const address = document.createElement("small");
+                address.textContent = result.address_line2;
+
+                item.append(name, document.createTextNode(", "), address);
                 item.addEventListener("click", () => selectCafe(result));
 
                 suggestions.appendChild(item);
@@ -770,7 +817,7 @@ cafeAddress.addEventListener("input", async () => {
 
     if (text.length < 3) {
         cafeAddressSuggestions.style.display = "none";
-        cafeAddressSuggestions.innerHTML = "";
+        cafeAddressSuggestions.textContent = "";
         return;
     }
 
@@ -782,7 +829,7 @@ cafeAddress.addEventListener("input", async () => {
         if (requestId !== addressSearchRequestId) {
             return;
         }
-        cafeAddressSuggestions.innerHTML = "";
+        cafeAddressSuggestions.textContent = "";
 
         let cafeAddressFound = false;
 
@@ -791,8 +838,11 @@ cafeAddress.addEventListener("input", async () => {
             cafeAddressFound = true;
             const item = document.createElement("div");
             item.classList.add("suggestion-item");
-            item.innerHTML = `<strong>${result.formatted}</strong>`;
 
+            const address = document.createElement("strong");
+            address.textContent = result.formatted;
+
+            item.appendChild(address);
             item.addEventListener("click", () => {
                 addressSearchRequestId++;
                 fillAddressDetails(result);
@@ -809,43 +859,35 @@ cafeAddress.addEventListener("input", async () => {
     }
 });
 
+[cafeName, cafeAddress, cafeCity].forEach(field => {
+    field.addEventListener("blur", () => {
+        field.value = field.value.trim().replace(/\s{2,}/g, " ");
+    });
+});
+
 cafePostCode.addEventListener("input", () => {
-    let postCode = cafePostCode.value;
-
-    postCode = postCode.replace(/\D/g, "");
-
-    postCode = postCode.slice(0, 5);
-
-    if (postCode.length > 3) {
-        postCode = postCode.slice(0, 3) + " " + postCode.slice(3);
-    }
-
-    cafePostCode.value = postCode;
-})
+    cafePostCode.value = formatPostalCode(cafePostCode.value);
+});
 
 cafePhone.addEventListener("input", () => {
-    let phoneNumber = cafePhone.value;
+    cafePhone.value = formatPhoneNumber(cafePhone.value);
+});
 
-    phoneNumber = phoneNumber.replace(/\D/g, "");
-
-    phoneNumber = phoneNumber.slice(0, 9);
-
-    if (phoneNumber.length > 6) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " +
-            phoneNumber.slice(3, 6) + " " +
-            phoneNumber.slice(6);
-    } else if (phoneNumber.length > 3) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " +
-            phoneNumber.slice(3);
-    }
-
-    cafePhone.value = phoneNumber;
-
+[cafeEmail, cafeWebsite].forEach(field => {
+    field.addEventListener("input", () => {
+        field.value = field.value.replace(/\s/g, "");
+    });
 });
 
 cafeInstagram.addEventListener("input", () => {
+    let username = cafeInstagram.value.toLowerCase().replace(/[^a-z0-9._]/g, "");
+    username = username.replace(/\.{2,}/g, ".").slice(0, 30);
+    cafeInstagram.value = username ? "@" + username : "";
+});
+
+cafeInstagram.addEventListener("blur", () => {
     cafeInstagram.value = formatInstagramUsername(cafeInstagram.value);
-})
+});
 
 //================ FEATURES ================
 features.sectionButton.addEventListener("click", () => {

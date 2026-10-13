@@ -4,8 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Time, Float, ForeignKey, Boolean, DateTime, UniqueConstraint
 from sqlalchemy import Enum as SQLAlchemyEnum
 
-from enums import WifiQuality, PowerOutlets, NoiseLevel, Seating, TypicalOccupancy, FoodOptions, VegetarianOptions, OpeningDayStatus
-
+from enums import CafePrice, CoffeeQuality, WifiQuality, PowerOutlets, NoiseLevel, Seating, AirConditioning, \
+    TypicalOccupancy, FoodOptions, VegetarianOptions, CardPayment, OpeningDayStatus, WeekDay, Rating
 from extensions import db
 
 
@@ -15,17 +15,17 @@ class Cafe(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     external_place_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    address: Mapped[str] = mapped_column(String(250), nullable=False)
-    city: Mapped[str] = mapped_column(String(100), nullable=False)
-    postal_code: Mapped[str] = mapped_column(String(10), nullable=False)
+    address: Mapped[str] = mapped_column(String(100), nullable=False)
+    city: Mapped[str] = mapped_column(String(50), nullable=False)
+    postal_code: Mapped[str] = mapped_column(String(6), nullable=False)
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
-    phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(16), nullable=True)
     email: Mapped[str | None] = mapped_column(String(250), nullable=True)
     website: Mapped[str | None] = mapped_column(String(2048), nullable=True)
-    instagram: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    coffee_quality: Mapped[int | None] = mapped_column(Integer,nullable=True)
-    price_level: Mapped[int | None] = mapped_column(Integer,nullable=True)
+    instagram: Mapped[str | None] = mapped_column(String(31), nullable=True)
+    coffee_quality: Mapped[CoffeeQuality] = mapped_column(SQLAlchemyEnum(CoffeeQuality), nullable=True)
+    price_level: Mapped[CafePrice] = mapped_column(SQLAlchemyEnum(CafePrice), nullable=True)
 
     opening_hours: Mapped[list["OpeningHours"]] = relationship(back_populates="cafe")
     cafe_photos: Mapped[list["CafePhoto"]] = relationship(back_populates="cafe")
@@ -38,10 +38,10 @@ class OpeningHours(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     cafe_id: Mapped[int] = mapped_column(ForeignKey("cafes.id"), nullable=False)
-    day_of_week: Mapped[str] = mapped_column(String(20), nullable=False)
-    status: Mapped[OpeningDayStatus] = mapped_column(SQLAlchemyEnum(OpeningDayStatus),nullable=False)
-    open_time: Mapped[time | None] = mapped_column(Time,nullable=True)
-    close_time: Mapped[time | None] = mapped_column(Time,nullable=True)
+    day_of_week: Mapped[WeekDay] = mapped_column(SQLAlchemyEnum(WeekDay), nullable=False)
+    status: Mapped[OpeningDayStatus] = mapped_column(SQLAlchemyEnum(OpeningDayStatus), nullable=False)
+    open_time: Mapped[time | None] = mapped_column(Time, nullable=True)
+    close_time: Mapped[time | None] = mapped_column(Time, nullable=True)
 
     cafe: Mapped["Cafe"] = relationship(back_populates="opening_hours")
 
@@ -57,21 +57,20 @@ class CafePhoto(db.Model):
     cafe: Mapped["Cafe"] = relationship(back_populates="cafe_photos")
 
 
-
 class CafeFeature(db.Model):
     __tablename__ = "cafe_features"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     cafe_id: Mapped[int] = mapped_column(ForeignKey("cafes.id"), nullable=False, unique=True)
     wifi_quality: Mapped[WifiQuality] = mapped_column(SQLAlchemyEnum(WifiQuality), nullable=False)
-    power_outlets_availability: Mapped[PowerOutlets] = mapped_column(SQLAlchemyEnum(PowerOutlets), nullable=False)
-    noise_level: Mapped[NoiseLevel] = mapped_column(SQLAlchemyEnum(NoiseLevel),nullable=False)
-    seating_type: Mapped[Seating] = mapped_column(SQLAlchemyEnum(Seating),nullable=False)
-    air_conditioning: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    power_outlets: Mapped[PowerOutlets] = mapped_column(SQLAlchemyEnum(PowerOutlets), nullable=False)
+    noise_level: Mapped[NoiseLevel] = mapped_column(SQLAlchemyEnum(NoiseLevel), nullable=False)
+    seating_type: Mapped[Seating] = mapped_column(SQLAlchemyEnum(Seating), nullable=False)
+    air_conditioning: Mapped[AirConditioning] = mapped_column(SQLAlchemyEnum(AirConditioning), nullable=True)
     typical_occupancy: Mapped[TypicalOccupancy | None] = mapped_column(SQLAlchemyEnum(TypicalOccupancy), nullable=True)
-    food_available: Mapped[FoodOptions] = mapped_column(SQLAlchemyEnum(FoodOptions), nullable=False)
+    food_options: Mapped[FoodOptions] = mapped_column(SQLAlchemyEnum(FoodOptions), nullable=False)
     vegetarian_options: Mapped[VegetarianOptions] = mapped_column(SQLAlchemyEnum(VegetarianOptions), nullable=False)
-    card_payment: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    card_payment: Mapped[CardPayment] = mapped_column(SQLAlchemyEnum(CardPayment), nullable=True)
 
     cafe: Mapped["Cafe"] = relationship(back_populates="features")
 
@@ -83,7 +82,7 @@ class User(db.Model):
     username: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime,default=datetime.now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
 
     reviews: Mapped[list["Review"]] = relationship(back_populates="user")
     suggestions: Mapped[list["CafeSuggestion"]] = relationship(back_populates="user")
@@ -96,9 +95,9 @@ class Review(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     cafe_id: Mapped[int] = mapped_column(ForeignKey("cafes.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    rating: Mapped[int] = mapped_column(Integer, nullable=False)
-    text: Mapped[str] = mapped_column(String(2048), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime,default=datetime.now, nullable=False)
+    rating: Mapped[Rating] = mapped_column(SQLAlchemyEnum(Rating), nullable=False)
+    text: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
 
     cafe: Mapped["Cafe"] = relationship(back_populates="reviews")
     user: Mapped["User"] = relationship(back_populates="reviews")
@@ -112,19 +111,19 @@ class CafeSuggestion(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     external_place_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    address: Mapped[str] = mapped_column(String(250), nullable=False)
-    city: Mapped[str] = mapped_column(String(100), nullable=False)
-    postal_code: Mapped[str] = mapped_column(String(10), nullable=False)
-    latitude: Mapped[float] = mapped_column(Float, nullable=False)
-    longitude: Mapped[float] = mapped_column(Float, nullable=False)
-    phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    address: Mapped[str] = mapped_column(String(100), nullable=False)
+    city: Mapped[str] = mapped_column(String(50), nullable=False)
+    postal_code: Mapped[str] = mapped_column(String(6), nullable=False)
+    latitude: Mapped[float] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float] = mapped_column(Float, nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(16), nullable=True)
     email: Mapped[str | None] = mapped_column(String(250), nullable=True)
     website: Mapped[str | None] = mapped_column(String(2048), nullable=True)
-    instagram: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    coffee_quality: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    price_level: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    instagram: Mapped[str | None] = mapped_column(String(31), nullable=True)
+    coffee_quality: Mapped[CoffeeQuality] = mapped_column(SQLAlchemyEnum(CoffeeQuality), nullable=True)
+    price_level: Mapped[CafePrice] = mapped_column(SQLAlchemyEnum(CafePrice), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime,default=datetime.now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
 
     suggestion_opening_hours: Mapped[list["CafeSuggestionOpeningHours"]] = relationship(back_populates="suggestion")
     suggestion_photos: Mapped[list["CafeSuggestionPhoto"]] = relationship(back_populates="suggestion")
@@ -138,16 +137,16 @@ class CafeSuggestionFeature(db.Model):
     __tablename__ = "cafe_suggestion_features"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"),nullable=False,unique=True)
+    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"), nullable=False, unique=True)
     wifi_quality: Mapped[WifiQuality] = mapped_column(SQLAlchemyEnum(WifiQuality), nullable=False)
-    power_outlets_availability: Mapped[PowerOutlets] = mapped_column(SQLAlchemyEnum(PowerOutlets), nullable=False)
+    power_outlets: Mapped[PowerOutlets] = mapped_column(SQLAlchemyEnum(PowerOutlets), nullable=False)
     noise_level: Mapped[NoiseLevel] = mapped_column(SQLAlchemyEnum(NoiseLevel), nullable=False)
     seating_type: Mapped[Seating] = mapped_column(SQLAlchemyEnum(Seating), nullable=False)
-    air_conditioning: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    air_conditioning: Mapped[AirConditioning] = mapped_column(SQLAlchemyEnum(AirConditioning), nullable=True)
     typical_occupancy: Mapped[TypicalOccupancy | None] = mapped_column(SQLAlchemyEnum(TypicalOccupancy), nullable=True)
-    food_available: Mapped[FoodOptions] = mapped_column(SQLAlchemyEnum(FoodOptions), nullable=False)
+    food_options: Mapped[FoodOptions] = mapped_column(SQLAlchemyEnum(FoodOptions), nullable=False)
     vegetarian_options: Mapped[VegetarianOptions] = mapped_column(SQLAlchemyEnum(VegetarianOptions), nullable=False)
-    card_payment: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    card_payment: Mapped[CardPayment] = mapped_column(SQLAlchemyEnum(CardPayment), nullable=True)
 
     suggestion: Mapped["CafeSuggestion"] = relationship(back_populates="suggestion_features")
 
@@ -156,8 +155,8 @@ class CafeSuggestionOpeningHours(db.Model):
     __tablename__ = "cafe_suggestion_opening_hours"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"),nullable=False)
-    day_of_week: Mapped[str] = mapped_column(String(20), nullable=False)
+    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"), nullable=False)
+    day_of_week: Mapped[WeekDay] = mapped_column(SQLAlchemyEnum(WeekDay), nullable=False)
     status: Mapped[OpeningDayStatus] = mapped_column(SQLAlchemyEnum(OpeningDayStatus), nullable=False)
     open_time: Mapped[time | None] = mapped_column(Time, nullable=True)
     close_time: Mapped[time | None] = mapped_column(Time, nullable=True)
@@ -169,7 +168,7 @@ class CafeSuggestionPhoto(db.Model):
     __tablename__ = "cafe_suggestion_photos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"),nullable=False)
+    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"), nullable=False)
     image_url: Mapped[str] = mapped_column(String(2048), nullable=False)
     is_main: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
@@ -180,11 +179,11 @@ class CafeSuggestionReview(db.Model):
     __tablename__ = "cafe_suggestion_reviews"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"),nullable=False,unique=True)
+    suggestion_id: Mapped[int] = mapped_column(ForeignKey("cafe_suggestions.id"), nullable=False, unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    rating: Mapped[int] = mapped_column(Integer, nullable=False)
-    text: Mapped[str] = mapped_column(String(2048), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime,default=datetime.now, nullable=False)
+    rating: Mapped[Rating] = mapped_column(SQLAlchemyEnum(Rating), nullable=False)
+    text: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
 
     suggestion: Mapped["CafeSuggestion"] = relationship(back_populates="suggestion_reviews")
     user: Mapped["User"] = relationship(back_populates="suggestion_reviews")
