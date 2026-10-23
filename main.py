@@ -12,27 +12,27 @@ from flask import Flask, render_template, request, jsonify
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy import select
 
-from enums import (CafePrice,
-                   CoffeeQuality,
-                   WifiQuality,
-                   PowerOutlets,
-                   NoiseLevel,
-                   Seating,
-                   AirConditioning,
-                   TypicalOccupancy,
-                   FoodOptions,
-                   VegetarianOptions,
-                   CardPayment,
-                   OpeningDayStatus,
-                   WeekDay,
-                   Rating)
-from extensions import db
-from models import (Cafe,
-                    CafeSuggestion,
-                    CafeSuggestionOpeningHours,
-                    CafeSuggestionPhoto,
-                    CafeSuggestionFeature,
-                    CafeSuggestionReview)
+from app.enums import (CafePrice,
+                       CoffeeQuality,
+                       WifiQuality,
+                       PowerOutlets,
+                       NoiseLevel,
+                       Seating,
+                       AirConditioning,
+                       TypicalOccupancy,
+                       FoodOptions,
+                       VegetarianOptions,
+                       CardPayment,
+                       OpeningDayStatus,
+                       WeekDay,
+                       Rating)
+from app.extensions import db
+from app.models import (Cafe,
+                        CafeSuggestion,
+                        CafeSuggestionOpeningHours,
+                        CafeSuggestionPhoto,
+                        CafeSuggestionFeature,
+                        CafeSuggestionReview)
 
 
 load_dotenv()
@@ -58,13 +58,13 @@ MAX_ALLOWED_PHOTO_SIZE = 5 * 1024 * 1024
 
 # =================== PATHS SETUP ======================
 PROJECT_DIR = Path(__file__).resolve().parent
-UPLOADS_DIR = PROJECT_DIR / "static" / "uploads"
+UPLOADS_DIR = PROJECT_DIR / "app" / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 # =========================================
 # FLASK
 # =========================================
-app = Flask(__name__)
+app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///coffice.db"
 db.init_app(app)
@@ -620,7 +620,7 @@ def save_cafe_photo(photo, extension):
             )
         raise
 
-    relative_path = photo_path.relative_to(PROJECT_DIR / "static")
+    relative_path = photo_path.relative_to(PROJECT_DIR / "app" / "static")
 
     return photo_path, relative_path.as_posix()
 

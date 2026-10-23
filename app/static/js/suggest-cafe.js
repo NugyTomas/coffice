@@ -905,7 +905,7 @@ cafeAddress.addEventListener("input", async () => {
         let cafeAddressFound = false;
 
         data.results.forEach(result => {
-            if(!result.postcode || !result.housenumber?.includes("/")){
+            if(!result.postcode){
                 return
             }
 
