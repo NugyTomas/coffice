@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
 from flask import Flask, render_template, request, jsonify
 from PIL import Image, UnidentifiedImageError
+from sqlalchemy import select
 
 from enums import (CafePrice,
                    CoffeeQuality,
@@ -26,7 +27,8 @@ from enums import (CafePrice,
                    WeekDay,
                    Rating)
 from extensions import db
-from models import (CafeSuggestion,
+from models import (Cafe,
+                    CafeSuggestion,
                     CafeSuggestionOpeningHours,
                     CafeSuggestionPhoto,
                     CafeSuggestionFeature,
@@ -180,6 +182,25 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     if not isinstance(cafe_basic_info_data, dict):
         errors["cafe"] = "Cafe data must be an object."
         return errors, None
+
+
+    # =================== CAFE_EXTERNAL_ID ======================
+    cafe_external_id = cafe_basic_info_data.get("external_place_id")
+
+    if cafe_external_id is not None:
+        if not isinstance(cafe_external_id, str):
+            errors["cafe_external_id"] = "External ID of a cafe must be a text."
+        else:
+            cafe_external_id = cafe_external_id.strip()
+
+            if cafe_external_id:
+                if len(cafe_external_id) > 255:
+                    errors["cafe_external_id"] = "External ID must contain at most 255 characters."
+                else:
+                    cafe_basic_info_data["external_place_id"] = cafe_external_id
+
+            else:
+                cafe_basic_info_data["external_place_id"] = None
 
     # =================== NAME ======================
     errors |= validate_text_field("name", cafe_basic_info_data, 2, 50)
@@ -605,6 +626,28 @@ def save_cafe_photo(photo, extension):
 
 
 # ======== PROCESSING AND HELPERS ===========
+def mark_existing_cafes(data):
+    results = data.get("results", [])
+    place_ids = []
+    for result in results:
+        if result.get("category") == "catering.cafe" and result.get("place_id"):
+            place_ids.append(result["place_id"])
+
+    if not place_ids:
+        return data
+
+    approved = set(db.session.scalars(select(Cafe.external_place_id).where(Cafe.external_place_id.in_(place_ids))))
+    pending = set(db.session.scalars(select(CafeSuggestion.external_place_id).where(CafeSuggestion.external_place_id.in_(place_ids))))
+
+    for result in results:
+        if result.get("place_id") in approved:
+            result["coffice_status"] = "approved"
+        elif result.get("place_id") in pending:
+            result["coffice_status"] = "pending"
+
+    return data
+
+
 def check_suggestion_data(suggestion_json, photos):
     errors, cafe_suggestion = parse_suggestion_data(suggestion_json)
     if errors:
@@ -684,7 +727,10 @@ def geoapify_autocomplete():
             params=params_list,
             timeout=10,
         )
-        return jsonify(response.json()), response.status_code
+        data = response.json()
+        if response.ok:
+            data = mark_existing_cafes(data)
+        return jsonify(data), response.status_code
 
     except requests.RequestException:
         app.logger.exception("Geoapify autocomplete request failed.")
@@ -741,6 +787,17 @@ def create_cafe_suggestion():
             "success": False,
             "errors": errors
         }), 400
+    external_id = cafe_basic_info_data.get("external_place_id")
+
+    if external_id:
+        exists = (db.session.scalar(select(Cafe.id).where(Cafe.external_place_id == external_id))
+                or db.session.scalar(select(CafeSuggestion.id).where(CafeSuggestion.external_place_id == external_id)))
+
+        if exists:
+            return jsonify({
+                "success": False,
+                "errors": {"cafe": "This café is already on Coffice or waiting for approval."}
+            }), 409
 
     new_cafe_suggestion = CafeSuggestion(**cafe_basic_info_data)
     new_cafe_features_suggestion = CafeSuggestionFeature(**cafe_features_data)

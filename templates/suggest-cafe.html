@@ -50,7 +50,7 @@ Coffice
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2" >Address<span class="asterisk">*</span></label>
+                    <label for="cafe-address" class="mb-2" >Address<span class="asterisk">*</span>  <span class="address-detail">(Format: <strong>Address, City</strong>. For example: <strong>U Letiste 2, Plzen</strong>.)</span></label>
                     <div class="search-wrapper">
                         <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100" pattern=".*\p{L}.*">
                         <div class="cafe-address-suggestions"></div>
@@ -60,15 +60,15 @@ Coffice
             </div>
 
             <div class="row g-5">
-                <div class="col-12 col-md-6 form-field">
+                <div class="col-12 col-md-6 form-field disabled-input">
                     <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50" pattern=".*\p{L}.*">
+                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50" pattern=".*\p{L}.*" readonly>
                 </div>
 
-                <div class="col-12 col-md-6 form-field">
+                <div class="col-12 col-md-6 form-field disabled-input">
                     <label for="cafe-postal-code" class="mb-2">Postal code<span class="asterisk">*</span></label>
                     <input type="text" id="cafe-postal-code" name="cafePostCode" required pattern="[0-9]{3} [0-9]{2}"
-                           placeholder="XXX XX">
+                           placeholder="XXX XX" readonly>
                 </div>
             </div>
 

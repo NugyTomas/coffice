@@ -40,6 +40,14 @@ let cafeLatitude = null;
 let cafeLongitude = null;
 let cafeGeoapifyId = null;
 
+let selectedAddress = {
+    address : "",
+    city: "",
+    postCode: "",
+    latitude: null,
+    longitude: null
+};
+
 const information = getSection(".basic-information");
 
 //================ FEATURES ================
@@ -68,7 +76,6 @@ let selectedPhotos = [];
 //================ SUBMIT ================
 const finalWarning = document.querySelector(".final-warning");
 const finalWarningSubmitButton = document.querySelector(".submit-btn");
-
 const submissionMessage = document.querySelector(".submission-message");
 
 // =========================================
@@ -127,8 +134,7 @@ async function getCafeData(text) {
     let url = `/api/geoapify/autocomplete?text=${encodeURIComponent(text)}&type=amenity&filter=countrycode:cz&limit=20&format=json`;
 
     if (userLocation) {
-        const radiusInMeters = 493000;
-        url += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
+        url += `&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
     const response = await fetch(url, {signal: autocompleteController.signal});
@@ -167,8 +173,8 @@ async function selectCafe(result) {
         }
 
         const cafeDetails = placeDetails.features[0].properties;
-        console.log(cafeDetails);
         fillCafeDetails(cafeDetails);
+        saveAddressDetails(cafeDetails);
         resetOpeningHours();
 
         const cafeOpeningHours = cafeDetails.opening_hours;
@@ -189,7 +195,7 @@ async function selectCafe(result) {
 function fillCafeDetails(cafeDetails) {
     cafeName.value = cafeDetails.name || "";
     cafeCity.value = cafeDetails.city || "";
-    cafeAddress.value = cafeDetails.address_line2?.split(',')[0].trim() || "";
+    cafeAddress.value = buildStreetAddress(cafeDetails);
     cafePostCode.value = formatPostalCode(cafeDetails.postcode) || "";
     cafePhone.value = formatPhoneNumber(cafeDetails.contact?.phone) || "";
     cafeEmail.value = cafeDetails.contact?.email || "";
@@ -215,8 +221,7 @@ async function getCafeAddress(text) {
     let url = `/api/geoapify/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:cz&limit=5&format=json`;
 
     if (userLocation) {
-        const radiusInMeters = 493000;
-        url += `&filter=circle:${userLocation.lon},${userLocation.lat},${radiusInMeters}&bias=proximity:${userLocation.lon},${userLocation.lat}`;
+        url += `&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
     const response = await fetch(url, {signal: addressAutocompleteController.signal});
@@ -225,12 +230,32 @@ async function getCafeAddress(text) {
 
 function fillAddressDetails(addressDetails) {
     cafeAddressSuggestions.style.display = "none";
-    cafeAddress.value = addressDetails.address_line1 || "";
+    cafeAddress.value = buildStreetAddress(addressDetails);
     cafeCity.value = addressDetails.city || "";
     cafePostCode.value = formatPostalCode(addressDetails.postcode) || "";
 
     cafeLatitude = addressDetails.lat;
     cafeLongitude = addressDetails.lon;
+}
+
+function buildStreetAddress(addressDetails) {
+    if (addressDetails.street) {
+        return addressDetails.housenumber? `${addressDetails.street} ${addressDetails.housenumber}` : addressDetails.street;
+    }
+
+    if (addressDetails.housenumber) {
+        return `${addressDetails.city || addressDetails.suburb || ""} ${addressDetails.housenumber}`.trim();
+    }
+
+    return addressDetails.address_line2?.split(",")[0].trim() || "";
+}
+
+function saveAddressDetails(addressDetails) {
+    selectedAddress.address = buildStreetAddress(addressDetails);
+    selectedAddress.city = addressDetails.city || "";
+    selectedAddress.postCode = formatPostalCode(addressDetails.postcode) || "";
+    selectedAddress.latitude = addressDetails.lat;
+    selectedAddress.longitude = addressDetails.lon;
 }
 
 //================ OPENING-HOURS ================
@@ -359,7 +384,7 @@ function updateOpeningScheduleData() {
 
         const intervals = [];
 
-        if (selectedStatus.value === "open") {
+        if (selectedStatus?.value === "open") {
             const openingTimeInputs = openingDayElement.querySelectorAll(
                 `input[name="${day}-open"]`
             );
@@ -377,7 +402,7 @@ function updateOpeningScheduleData() {
         }
 
         scheduleData[day] = {
-            status: selectedStatus.value,
+            status: selectedStatus?.value,
             intervals: intervals
         };
     });
@@ -740,6 +765,33 @@ initializeLocation();
 // =========================================
 // EVENT-LISTENERS
 // =========================================
+document.addEventListener("click", (event) => {
+    const clickedInsideCafeSearch = searchInput.contains(event.target) || suggestions.contains(event.target);
+
+    const clickedInsideAddressSearch = cafeAddress.contains(event.target) || cafeAddressSuggestions.contains(event.target);
+
+    if (!clickedInsideCafeSearch) {
+        searchRequestId++;
+
+        if (autocompleteController) {
+            autocompleteController.abort();
+        }
+
+        suggestions.style.display = "none";
+    }
+
+    if (!clickedInsideAddressSearch) {
+        addressSearchRequestId++;
+
+        if (addressAutocompleteController) {
+            addressAutocompleteController.abort();
+        }
+
+        cafeAddressSuggestions.style.display = "none";
+    }
+
+
+});
 
 //================ CAFE-SUGGESTION ================
 searchInput.addEventListener("input", async () => {
@@ -750,6 +802,7 @@ searchInput.addEventListener("input", async () => {
     if (text.length < 3) {
         suggestions.style.display = "none";
         suggestions.textContent = "";
+        searchRequestId++
         return;
     }
 
@@ -766,7 +819,6 @@ searchInput.addEventListener("input", async () => {
         let cafeFound = false;
 
         data.results.forEach(result => {
-
             if (result.category === 'catering.cafe') {
                 cafeFound = true;
                 const item = document.createElement("div");
@@ -779,7 +831,20 @@ searchInput.addEventListener("input", async () => {
                 address.textContent = result.address_line2;
 
                 item.append(name, document.createTextNode(", "), address);
-                item.addEventListener("click", () => selectCafe(result));
+
+                if (result.coffice_status) {
+                    item.classList.add("suggestion-item-disabled");
+
+                    const badge = document.createElement("span");
+                    badge.classList.add("suggestion-badge");
+                    badge.textContent = result.coffice_status === "approved"
+                        ? "Already on Coffice"
+                        : "Waiting for approval";
+
+                    item.appendChild(badge);
+                } else {
+                    item.addEventListener("click", () => selectCafe(result));
+                }
 
                 suggestions.appendChild(item);
             }
@@ -791,6 +856,13 @@ searchInput.addEventListener("input", async () => {
         if (error.name !== "AbortError") {
             console.error("Autocomplete request failed:", error);
         }
+    }
+});
+
+searchInput.addEventListener("focus", () => {
+    if (searchInput.value.trim().length >= 3 && suggestions.children.length > 0
+    ) {
+        suggestions.style.display = "block";
     }
 });
 
@@ -812,12 +884,11 @@ information.continueButton.addEventListener("click", () => {
 
 cafeAddress.addEventListener("input", async () => {
     const text = cafeAddress.value.trim();
-    cafeLongitude = null;
-    cafeLatitude = null;
 
     if (text.length < 3) {
         cafeAddressSuggestions.style.display = "none";
         cafeAddressSuggestions.textContent = "";
+        addressSearchRequestId++
         return;
     }
 
@@ -834,6 +905,9 @@ cafeAddress.addEventListener("input", async () => {
         let cafeAddressFound = false;
 
         data.results.forEach(result => {
+            if(!result.postcode || !result.housenumber?.includes("/")){
+                return
+            }
 
             cafeAddressFound = true;
             const item = document.createElement("div");
@@ -846,6 +920,7 @@ cafeAddress.addEventListener("input", async () => {
             item.addEventListener("click", () => {
                 addressSearchRequestId++;
                 fillAddressDetails(result);
+                saveAddressDetails(result);
             });
             cafeAddressSuggestions.appendChild(item);
         });
@@ -859,7 +934,20 @@ cafeAddress.addEventListener("input", async () => {
     }
 });
 
-[cafeName, cafeAddress, cafeCity].forEach(field => {
+cafeAddress.addEventListener("focus", () => {
+    if (cafeAddress.value.trim().length >= 3 && cafeAddressSuggestions.children.length > 0
+    ) {
+        cafeAddressSuggestions.style.display = "block";
+    }
+});
+
+cafeAddress.addEventListener("focusout", () => {
+    cafeAddress.value = selectedAddress.address;
+    cafeCity.value = selectedAddress.city;
+    cafePostCode.value = selectedAddress.postCode;
+});
+
+[cafeName, cafeAddress].forEach(field => {
     field.addEventListener("blur", () => {
         field.value = field.value.trim().replace(/\s{2,}/g, " ");
     });
@@ -920,6 +1008,7 @@ openingHours.continueButton.addEventListener("click", () => {
 
 openingDays.forEach(dayElement => {
     const statusRadios = dayElement.querySelectorAll('input[type="radio"]');
+    const openRadio = dayElement.querySelector('input[type="radio"][value="open"]');
     const openingIntervalTemplate = dayElement.querySelector(".opening-interval");
     const openingIntervalsContainer = dayElement.querySelector(".opening-intervals");
     const addIntervalButton = dayElement.querySelector(".opening-interval-add");
@@ -940,6 +1029,16 @@ openingDays.forEach(dayElement => {
             }
         });
     });
+
+    dayElement.addEventListener("input", (event) => {
+        if (!event.target.matches('input[type="time"]')) {
+            return;
+        }
+
+        if (!openRadio.checked) {
+            openRadio.click();
+        }
+});
 
     addIntervalButton.addEventListener("click", () => {
         const newInterval = openingIntervalTemplate.cloneNode(true);

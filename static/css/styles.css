@@ -116,6 +116,10 @@ h1 {
     font-weight: 700;
 }
 
+.address-detail {
+    font-size: 0.75rem;
+}
+
 .cafe-search {
     max-width: 650px;
     margin: 2rem auto 0;
@@ -159,6 +163,25 @@ h1 {
 
 .suggestion-item:hover {
     background-color: var(--neutral-brown-color)
+}
+
+.suggestion-item-disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.suggestion-item-disabled:hover {
+    background-color: inherit;
+}
+
+.suggestion-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background-color: #eee;
+    color: #555;
 }
 
 
@@ -263,10 +286,15 @@ h1 {
     color: var(--dark-brown-color);
 }
 
+.disabled-input input {
+    background-color: var(--neutral-brown-color);
+}
+
 .form-field input:focus,
 .form-field select:focus {
     border-color: var(--dark-brown-color);
 }
+
 
 .phone-input {
     display: flex;
