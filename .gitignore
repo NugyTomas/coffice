@@ -21,4 +21,5 @@ Ideas/
 *.db
 app/static/uploads/
 
-
+# Flask instance data
+instance/
