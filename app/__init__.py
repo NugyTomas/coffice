@@ -3,6 +3,7 @@ from app.extensions import db
 from app import models
 from app.config import Config
 from app.routes.main import main_bp
+from app.routes.geoapify import geoapify_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -11,6 +12,7 @@ def create_app(config_class=Config):
     db.init_app(app)
 
     app.register_blueprint(main_bp)
+    app.register_blueprint(geoapify_bp)
 
     with app.app_context():
         db.create_all()
