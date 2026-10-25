@@ -4,9 +4,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Time, Float, ForeignKey, Boolean, DateTime, UniqueConstraint
 from sqlalchemy import Enum as SQLAlchemyEnum
 
-from enums import CafePrice, CoffeeQuality, WifiQuality, PowerOutlets, NoiseLevel, Seating, AirConditioning, \
+from app.enums import CafePrice, CoffeeQuality, WifiQuality, PowerOutlets, NoiseLevel, Seating, AirConditioning, \
     TypicalOccupancy, FoodOptions, VegetarianOptions, CardPayment, OpeningDayStatus, WeekDay, Rating
-from extensions import db
+from app.extensions import db
 
 
 class Cafe(db.Model):

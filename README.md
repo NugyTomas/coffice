@@ -26,7 +26,8 @@ Python, Flask, SQLAlchemy (SQLite), JavaScript, Bootstrap 5, Geoapify API
 3. Install the dependencies: pip install -r requirements.txt
 4. Sign up for a Geoapify account and get your own free API key.
 5. Create a .env file and add your API key: GEOAPIFY_API_KEY=your_api_key
-6. Run the application: python main.py
+6. Add Secret_KEY to .env file: SECRET_KEY=your-secret-key
+7. Run the application: python run.py
 
 ## Planned Features
 - [ ] Admin login and Café suggestions approval

@@ -17,4 +17,9 @@ __pycache__/
 # Ideas
 Ideas/
 
+# Database
+*.db
+app/static/uploads/
 
+# Flask instance data
+instance/
