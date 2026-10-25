@@ -19,7 +19,7 @@ Users can suggest new cafés through a multi-step form.
 
 Python, Flask, SQLAlchemy (SQLite), JavaScript, Bootstrap 5, Geoapify API
 
-## Jak to spustit
+## How to run it
 
 1. Clone the repository: git clone ...
 2. Create a virtual environment: python -m venv venv and activate it.
