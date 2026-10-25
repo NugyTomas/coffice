@@ -5,6 +5,7 @@ import re
 
 
 from email_validator import validate_email, EmailNotValidError
+from flask import current_app
 from PIL import Image, UnidentifiedImageError
 
 from app.enums import (CafePrice,
@@ -233,7 +234,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
                 else:
                     try:
-                        email_validator = validate_email(cafe_email, check_deliverability=True)
+                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config["CHECK_EMAIL_DELIVERABILITY"])
                         cafe_basic_info_data["email"] = email_validator.normalized
 
                     except EmailNotValidError:

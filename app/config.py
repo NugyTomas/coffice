@@ -13,6 +13,10 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    CHECK_EMAIL_DELIVERABILITY = True
+    MAX_CONTENT_LENGTH = 32 * 1024 * 1024
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite://"
+    CHECK_EMAIL_DELIVERABILITY = False
