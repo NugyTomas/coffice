@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import Cafe, CafeSuggestion
+from app.models import Cafe
 
 
 def mark_existing_cafes(data):
@@ -14,26 +14,16 @@ def mark_existing_cafes(data):
     if not place_ids:
         return data
 
-    approved = set(
-        db.session.scalars(
-            select(Cafe.external_place_id).where(
-                Cafe.external_place_id.in_(place_ids)
-            )
-        )
+    database_selection = select(Cafe.external_place_id, Cafe.status).where(
+        Cafe.external_place_id.in_(place_ids)
     )
+    existing_cafes = db.session.execute(database_selection).all()
 
-    pending = set(
-        db.session.scalars(
-            select(CafeSuggestion.external_place_id).where(
-                CafeSuggestion.external_place_id.in_(place_ids)
-            )
-        )
-    )
+    status_dict = {place_id: cafe_status.value for place_id, cafe_status in existing_cafes}
 
     for result in results:
-        if result.get("place_id") in approved:
-            result["coffice_status"] = "approved"
-        elif result.get("place_id") in pending:
-            result["coffice_status"] = "pending"
+        place_id = result.get("place_id")
+        if place_id in status_dict:
+            result["coffice_status"] = status_dict[place_id]
 
     return data

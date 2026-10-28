@@ -75,7 +75,7 @@ class CafePhoto(db.Model):
     image_url: Mapped[str] = mapped_column(String(2048))
     is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    cafe: Mapped["Cafe"] = relationship(back_populates="cafe_photos")
+    cafe: Mapped["Cafe"] = relationship(back_populates="photos")
 
 class Review(db.Model):
     __tablename__ = "reviews"

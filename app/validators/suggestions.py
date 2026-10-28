@@ -21,7 +21,7 @@ from app.enums import (CafePrice,
                        CardPayment,
                        WeekDay,
                        OpeningDayStatus,
-                       Rating)
+                       )
 
 
 # =========================================
@@ -123,19 +123,22 @@ def validate_coordinate(coordinate, data, min_limit, max_limit):
     errors = {}
     text = data.get(coordinate)
 
-    if text is not None:
+    if text is None:
+        errors[coordinate] = f"{coordinate.capitalize()} is required."
+
+    else:
+        text = text.strip()
         try:
             text = float(text)
+
+        except (TypeError, ValueError):
+            errors[coordinate] = "Invalid data type"
+
+        else:
             if min_limit <= text <= max_limit:
                 data[coordinate] = text
             else:
                 errors[coordinate] = f"{coordinate.capitalize()} is out of range."
-                data[coordinate] = None
-        except (TypeError, ValueError):
-            errors[coordinate] = "Invalid data type"
-            data[coordinate] = None
-    else:
-        data[coordinate] = None
 
     return errors
 
@@ -315,10 +318,11 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     latitude = cafe_basic_info_data["latitude"]
     longitude = cafe_basic_info_data["longitude"]
 
-    if "latitude" not in errors and "longitude" not in errors and (latitude is None) != (longitude is None):
-        errors["coordinates"] = "Latitude and longitude must be provided together."
+    if "latitude" not in errors and "longitude" not in errors:
+        if latitude is None or longitude is None:
+            errors["coordinates"] = "Latitude and longitude must be provided together."
 
-    cafe_basic_info_data["user_id"] = 1
+    cafe_basic_info_data["submitted_by_id"] = 1
 
     return errors, cafe_basic_info_data
 
@@ -484,16 +488,16 @@ def validate_cafe_review_data(cafe_review_data):
     if cafe_rating is None:
         errors["cafe_rating"] = "Cafe rating is required."
 
-    elif not isinstance(cafe_rating, str):
-        errors["cafe_rating"] = "Cafe rating must be a text."
-
     else:
         try:
-            cafe_rating = Rating(cafe_rating)
-        except ValueError:
-            errors["cafe_rating"] = f"Invalid data! Please choose one of the options."
+            cafe_rating = int(cafe_rating)
+            except (ValueError, TypeError):
+            errors["cafe_rating"] = "Cafe rating must be a valid number."
         else:
-            cafe_review_data["rating"] = cafe_rating
+            if not (1 <= cafe_rating <= 5):
+                errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
+            else:
+                cafe_review_data["rating"] = cafe_rating
 
     # =================== CAFE-REVIEW ======================
     cafe_review = cafe_review_data.get("text")
