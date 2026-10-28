@@ -80,12 +80,10 @@ class WeekDay(PythonEnum):
     SATURDAY = "saturday"
     SUNDAY = "sunday"
 
-class Rating(PythonEnum):
-    ONE = "one"
-    TWO = "two"
-    THREE = "three"
-    FOUR = "four"
-    FIVE = "five"
+class CafeStatus(PythonEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+
 
 
 
