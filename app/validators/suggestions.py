@@ -125,15 +125,15 @@ def validate_coordinate(coordinate, data, min_limit, max_limit):
 
     if text is None:
         errors[coordinate] = f"{coordinate.capitalize()} is required."
-
+    elif not isinstance(text, str):
+        errors[coordinate] = f"{coordinate.capitalize()} must be a text."
     else:
         text = text.strip()
+
         try:
             text = float(text)
-
         except (TypeError, ValueError):
             errors[coordinate] = "Invalid data type"
-
         else:
             if min_limit <= text <= max_limit:
                 data[coordinate] = text
@@ -315,8 +315,8 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     # =================== LONGITUDE ======================
     errors |= validate_coordinate("longitude", cafe_basic_info_data, -180, 180)
 
-    latitude = cafe_basic_info_data["latitude"]
-    longitude = cafe_basic_info_data["longitude"]
+    latitude = cafe_basic_info_data.get("latitude")
+    longitude = cafe_basic_info_data.get("longitude")
 
     if "latitude" not in errors and "longitude" not in errors:
         if latitude is None or longitude is None:
@@ -491,7 +491,7 @@ def validate_cafe_review_data(cafe_review_data):
     else:
         try:
             cafe_rating = int(cafe_rating)
-            except (ValueError, TypeError):
+        except (ValueError, TypeError):
             errors["cafe_rating"] = "Cafe rating must be a valid number."
         else:
             if not (1 <= cafe_rating <= 5):

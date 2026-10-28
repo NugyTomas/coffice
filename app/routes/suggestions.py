@@ -5,7 +5,7 @@ import uuid
 from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import select
 
-from app.enums import OpeningDayStatus, CafeStatus
+from app.enums import OpeningDayStatus, CafeStatus, WeekDay
 from app.extensions import db
 from app.models import (Cafe,
                         CafeFeature,
@@ -59,7 +59,7 @@ def add_opening_hours(new_cafe, cafe_opening_hours_data):
             closing_time = interval.get("close")
 
             cafe_opening_hours = OpeningHours(
-                day_of_week=day,
+                day_of_week=WeekDay(day),
                 status=day_status,
                 open_time=opening_time,
                 close_time=closing_time,
