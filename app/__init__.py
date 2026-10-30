@@ -1,6 +1,6 @@
 from flask import Flask
 from app.extensions import db
-from app import models
+from app import models  # noqa: F401  (registers tables for create_all)
 from app.config import Config
 from app.routes.main import main_bp
 from app.routes.geoapify import geoapify_bp

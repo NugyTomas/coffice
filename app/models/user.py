@@ -1,9 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime
 
 from app.extensions import db
+
+if TYPE_CHECKING:
+    from app.models.cafe import Cafe
+    from app.models.review import Review
 
 class User(db.Model):
     __tablename__ = "users"

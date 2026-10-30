@@ -1,4 +1,5 @@
 from datetime import time, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Time, Float, ForeignKey, Boolean, DateTime
@@ -7,6 +8,10 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from app.enums import CafePrice, CoffeeQuality, WifiQuality, PowerOutlets, NoiseLevel, Seating, AirConditioning, \
     TypicalOccupancy, FoodOptions, VegetarianOptions, CardPayment, OpeningDayStatus, WeekDay, CafeStatus
 from app.extensions import db
+
+if TYPE_CHECKING:
+    from app.models.review import Review
+    from app.models.user import User
 
 class Cafe(db.Model):
     __tablename__ = "cafes"
@@ -34,6 +39,7 @@ class Cafe(db.Model):
     features: Mapped["CafeFeature"] = relationship(back_populates="cafe", uselist=False, cascade="all, delete-orphan")
     reviews: Mapped[list["Review"]] = relationship(back_populates="cafe", cascade="all, delete-orphan")
     user: Mapped["User"] = relationship(back_populates="submitted_cafes")
+
 
 class CafeFeature(db.Model):
     __tablename__ = "cafe_features"
