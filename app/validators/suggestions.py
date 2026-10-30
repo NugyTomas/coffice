@@ -21,7 +21,7 @@ from app.enums import (CafePrice,
                        CardPayment,
                        WeekDay,
                        OpeningDayStatus,
-                       Rating)
+                       )
 
 
 # =========================================
@@ -121,21 +121,16 @@ def validate_choice(field_name, data, field_label, enum_class):
 
 def validate_coordinate(coordinate, data, min_limit, max_limit):
     errors = {}
-    text = data.get(coordinate)
+    value = data.get(coordinate)
 
-    if text is not None:
-        try:
-            text = float(text)
-            if min_limit <= text <= max_limit:
-                data[coordinate] = text
-            else:
-                errors[coordinate] = f"{coordinate.capitalize()} is out of range."
-                data[coordinate] = None
-        except (TypeError, ValueError):
-            errors[coordinate] = "Invalid data type"
-            data[coordinate] = None
+    if value is None:
+        errors[coordinate] = f"{coordinate.capitalize()} is required."
+    elif isinstance(value, bool) or not isinstance(value, (int, float)):
+        errors[coordinate] = f"{coordinate.capitalize()} must be a number."
+    elif not (min_limit <= value <= max_limit):
+        errors[coordinate] = f"{coordinate.capitalize()} is out of range."
     else:
-        data[coordinate] = None
+        data[coordinate] = float(value)
 
     return errors
 
@@ -312,13 +307,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     # =================== LONGITUDE ======================
     errors |= validate_coordinate("longitude", cafe_basic_info_data, -180, 180)
 
-    latitude = cafe_basic_info_data["latitude"]
-    longitude = cafe_basic_info_data["longitude"]
-
-    if "latitude" not in errors and "longitude" not in errors and (latitude is None) != (longitude is None):
-        errors["coordinates"] = "Latitude and longitude must be provided together."
-
-    cafe_basic_info_data["user_id"] = 1
+    cafe_basic_info_data["submitted_by_id"] = 1
 
     return errors, cafe_basic_info_data
 
@@ -484,16 +473,16 @@ def validate_cafe_review_data(cafe_review_data):
     if cafe_rating is None:
         errors["cafe_rating"] = "Cafe rating is required."
 
-    elif not isinstance(cafe_rating, str):
-        errors["cafe_rating"] = "Cafe rating must be a text."
-
     else:
         try:
-            cafe_rating = Rating(cafe_rating)
-        except ValueError:
-            errors["cafe_rating"] = f"Invalid data! Please choose one of the options."
+            cafe_rating = int(cafe_rating)
+        except (ValueError, TypeError):
+            errors["cafe_rating"] = "Cafe rating must be a valid number."
         else:
-            cafe_review_data["rating"] = cafe_rating
+            if not (1 <= cafe_rating <= 5):
+                errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
+            else:
+                cafe_review_data["rating"] = cafe_rating
 
     # =================== CAFE-REVIEW ======================
     cafe_review = cafe_review_data.get("text")
