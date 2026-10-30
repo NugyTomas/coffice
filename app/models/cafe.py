@@ -1,13 +1,12 @@
 from datetime import time, datetime
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, Time, Float, ForeignKey, Boolean, DateTime, UniqueConstraint, CheckConstraint
+from sqlalchemy import Integer, String, Time, Float, ForeignKey, Boolean, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 
 from app.enums import CafePrice, CoffeeQuality, WifiQuality, PowerOutlets, NoiseLevel, Seating, AirConditioning, \
     TypicalOccupancy, FoodOptions, VegetarianOptions, CardPayment, OpeningDayStatus, WeekDay, CafeStatus
 from app.extensions import db
-
 
 class Cafe(db.Model):
     __tablename__ = "cafes"
@@ -76,31 +75,3 @@ class CafePhoto(db.Model):
     is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
     cafe: Mapped["Cafe"] = relationship(back_populates="photos")
-
-class Review(db.Model):
-    __tablename__ = "reviews"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    cafe_id: Mapped[int] = mapped_column(ForeignKey("cafes.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    rating: Mapped[int] = mapped_column(Integer, nullable=False)
-    text: Mapped[str | None] = mapped_column(String(2048))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-
-    cafe: Mapped["Cafe"] = relationship(back_populates="reviews")
-    user: Mapped["User"] = relationship(back_populates="reviews")
-
-    __table_args__ = (UniqueConstraint("user_id", "cafe_id", name="unique_user_cafe_review"),
-                      CheckConstraint("rating BETWEEN 1 AND 5", name="rating_between_1_and_5"),)
-
-class User(db.Model):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(30), unique=True)
-    email: Mapped[str] = mapped_column(String(100), unique=True)
-    password_hash: Mapped[str] = mapped_column(String(100))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-
-    submitted_cafes: Mapped[list["Cafe"]] = relationship(back_populates="user")
-    reviews: Mapped[list["Review"]] = relationship(back_populates="user")

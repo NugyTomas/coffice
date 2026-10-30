@@ -121,24 +121,16 @@ def validate_choice(field_name, data, field_label, enum_class):
 
 def validate_coordinate(coordinate, data, min_limit, max_limit):
     errors = {}
-    text = data.get(coordinate)
+    value = data.get(coordinate)
 
-    if text is None:
+    if value is None:
         errors[coordinate] = f"{coordinate.capitalize()} is required."
-    elif not isinstance(text, str):
-        errors[coordinate] = f"{coordinate.capitalize()} must be a text."
+    elif isinstance(value, bool) or not isinstance(value, (int, float)):
+        errors[coordinate] = f"{coordinate.capitalize()} must be a number."
+    elif not (min_limit <= value <= max_limit):
+        errors[coordinate] = f"{coordinate.capitalize()} is out of range."
     else:
-        text = text.strip()
-
-        try:
-            text = float(text)
-        except (TypeError, ValueError):
-            errors[coordinate] = "Invalid data type"
-        else:
-            if min_limit <= text <= max_limit:
-                data[coordinate] = text
-            else:
-                errors[coordinate] = f"{coordinate.capitalize()} is out of range."
+        data[coordinate] = float(value)
 
     return errors
 
@@ -314,13 +306,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
     # =================== LONGITUDE ======================
     errors |= validate_coordinate("longitude", cafe_basic_info_data, -180, 180)
-
-    latitude = cafe_basic_info_data.get("latitude")
-    longitude = cafe_basic_info_data.get("longitude")
-
-    if "latitude" not in errors and "longitude" not in errors:
-        if latitude is None or longitude is None:
-            errors["coordinates"] = "Latitude and longitude must be provided together."
 
     cafe_basic_info_data["submitted_by_id"] = 1
 
