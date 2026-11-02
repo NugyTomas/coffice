@@ -43,6 +43,7 @@ def test_status_of_created_cafe_suggestion(client, db_session, valid_suggestion)
     cafe = db_session.scalars(select(Cafe)).one()
     assert cafe.status == CafeStatus.PENDING
 
+
 def test_client_cannot_set_system_managed_cafe_fields(client, valid_suggestion, db_session):
     data = copy.deepcopy(valid_suggestion)
     data["cafe"]["id"] = 999
@@ -55,6 +56,7 @@ def test_client_cannot_set_system_managed_cafe_fields(client, valid_suggestion, 
     cafe = db_session.scalars(select(Cafe)).one()
     assert cafe.id != 999
 
+
 def test_client_cannot_set_submitter_id(client, valid_suggestion, db_session):
     data = copy.deepcopy(valid_suggestion)
     data["cafe"]["submitted_by_id"] = 42
@@ -64,3 +66,20 @@ def test_client_cannot_set_submitter_id(client, valid_suggestion, db_session):
 
     cafe = db_session.scalars(select(Cafe)).one()
     assert cafe.submitted_by_id != 42
+
+
+def test_invalid_opening_hours_intervals(client, valid_suggestion, db_session):
+    data = copy.deepcopy(valid_suggestion)
+    data["cafe_opening_hours"]["monday"]["intervals"] = [
+        {"open": "25:70", "close": "20:00"}
+    ]
+
+    before_count = db_session.query(Cafe).count()
+
+    response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(data)})
+    assert response.status_code == 400
+
+    after_count = db_session.query(Cafe).count()
+    assert after_count == before_count
+
+

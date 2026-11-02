@@ -419,6 +419,7 @@ def validate_cafe_features_data(cafe_features_data):
     return errors, cleaned
 
 def validate_cafe_opening_hours_data(cafe_opening_hours_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_opening_hours_data, dict):
@@ -432,6 +433,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}"] = f"Opening hours status for {day_name.capitalize()} is required."
             continue
 
+        cleaned[day_name] = {}
         day_data = cafe_opening_hours_data[day_name]
 
         if not isinstance(day_data, dict):
@@ -455,7 +457,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}_status"] = f"Invalid opening hours status for {day_name.capitalize()}."
             continue
 
-        day_data["status"] = cafe_day_status
+        cleaned[day_name]["status"] = cafe_day_status
 
         cafe_day_intervals = day_data.get("intervals")
         if cafe_day_intervals is None:
@@ -472,6 +474,8 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[
                 f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} must be empty when the café is not open."
             continue
+
+        cleaned[day_name]["intervals"] = []
 
         if cafe_day_status is not OpeningDayStatus.OPEN:
             continue
@@ -524,12 +528,15 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
                     errors[
                         f"opening_hours_{day_name}_interval"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
                     continue
-                interval['open'] = open_time
-                interval['close'] = close_time
+
+                cleaned[day_name]["intervals"].append({
+                    "open": open_time,
+                    "close": close_time
+                })
 
                 previous_close_time = close_time
 
-    return errors, cafe_opening_hours_data
+    return errors, cleaned
 
 def validate_cafe_review_data(cafe_review_data):
     errors = {}

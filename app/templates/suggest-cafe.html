@@ -50,9 +50,11 @@ Coffice
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2" >Address<span class="asterisk">*</span>  <span class="address-detail">(Format: <strong>Address, City</strong>. For example: <strong>U Letiste 2, Plzen</strong>.)</span></label>
+                    <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span> <span
+                            class="address-detail">(Format: <strong>Address, City</strong>. For example: <strong>U Letiste 2, Plzen</strong>.)</span></label>
                     <div class="search-wrapper">
-                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100" pattern=".*\p{L}.*">
+                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100"
+                               pattern=".*\p{L}.*">
                         <div class="cafe-address-suggestions"></div>
                     </div>
 
@@ -62,7 +64,8 @@ Coffice
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field disabled-input">
                     <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50" pattern=".*\p{L}.*" readonly>
+                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50"
+                           pattern=".*\p{L}.*" readonly>
                 </div>
 
                 <div class="col-12 col-md-6 form-field disabled-input">
@@ -86,19 +89,23 @@ Coffice
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-email" class="mb-2">Email</label>
-                    <input type="text" id="cafe-email" name="cafeEmail" maxlength="250" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" placeholder="email@example.com" >
+                    <input type="text" id="cafe-email" name="cafeEmail" maxlength="250"
+                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" placeholder="email@example.com">
                 </div>
             </div>
 
             <div class="row g-5">
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-website" class="mb-2">Website</label>
-                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048" pattern="(https?://)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}(/.*)?" placeholder="example.com">
+                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048"
+                           pattern="(https?://)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}(/.*)?"
+                           placeholder="example.com">
                 </div>
 
                 <div class="col-12 col-md-6 form-field">
                     <label for="cafe-instagram" class="mb-2">Instagram</label>
-                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31" pattern="@[a-z0-9_]+(\.[a-z0-9_]+)*" placeholder="We will add @ for you." />
+                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31"
+                           pattern="@[a-z0-9_]+(\.[a-z0-9_]+)*" placeholder="We will add @ for you."/>
                 </div>
             </div>
 
@@ -734,7 +741,8 @@ Coffice
 
             <div class="user-review">
                 <label for="review"> Your review</label>
-                <textarea id="review" name="userReview" placeholder="Tell us more about this café..." maxlength="2048"></textarea>
+                <textarea id="review" name="userReview" placeholder="Tell us more about this café..."
+                          maxlength="2048"></textarea>
             </div>
 
             <div class="cafe-photos">
@@ -776,6 +784,6 @@ Coffice
 {% endblock %}
 
 {% block scripts %}
-<script src="https://openingh.openstreetmap.de/opening_hours.js/opening_hours+deps.min.js"></script>
+<script src="{{ url_for('static', filename='js/vendor/opening_hours.js') }}"></script>
 <script src="{{ url_for('static', filename='js/suggest-cafe.js') }}"></script>
 {% endblock %}
