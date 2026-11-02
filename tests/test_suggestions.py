@@ -25,7 +25,7 @@ def test_missing_longitude_returns_400(client, valid_suggestion):
     assert "longitude" in response.get_json()["errors"]
 
 
-def test_create_duplicate_cafe_suggestion(client, valid_suggestion):
+def test_duplicated_cafe_suggestion_returns_409(client, valid_suggestion):
     response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(valid_suggestion)})
     assert response.status_code == 201
 
@@ -38,9 +38,29 @@ def test_status_of_created_cafe_suggestion(client, db_session, valid_suggestion)
     data["cafe"]["status"] = "approved"
 
     response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(data)})
+    assert response.status_code == 201
 
-    stmt = select(Cafe.status).where(Cafe.external_place_id == data["cafe"]["external_place_id"])
-    status_value = db_session.execute(stmt).scalar_one_or_none()
+    cafe = db_session.scalars(select(Cafe)).one()
+    assert cafe.status == CafeStatus.PENDING
+
+def test_client_cannot_set_system_managed_cafe_fields(client, valid_suggestion, db_session):
+    data = copy.deepcopy(valid_suggestion)
+    data["cafe"]["id"] = 999
+    data["cafe"]["created_at"] = "2000-01-01"
+
+    response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(data)})
 
     assert response.status_code == 201
-    assert status_value == CafeStatus.PENDING
+
+    cafe = db_session.scalars(select(Cafe)).one()
+    assert cafe.id != 999
+
+def test_client_cannot_set_submitter_id(client, valid_suggestion, db_session):
+    data = copy.deepcopy(valid_suggestion)
+    data["cafe"]["submitted_by_id"] = 42
+
+    response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(data)})
+    assert response.status_code == 201
+
+    cafe = db_session.scalars(select(Cafe)).one()
+    assert cafe.submitted_by_id != 42
