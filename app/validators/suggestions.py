@@ -3,7 +3,6 @@ import json
 import os
 import re
 
-
 from email_validator import validate_email, EmailNotValidError
 from flask import current_app
 from PIL import Image, UnidentifiedImageError
@@ -22,7 +21,6 @@ from app.enums import (CafePrice,
                        WeekDay,
                        OpeningDayStatus,
                        )
-
 
 # =========================================
 # CONSTANTS
@@ -99,6 +97,7 @@ def validate_text_field(field_name, data, min_length, max_length, require_letter
 
     return errors, value
 
+
 def validate_choice(field_name, data, field_label, enum_class):
     errors = {}
     value = None
@@ -123,6 +122,7 @@ def validate_choice(field_name, data, field_label, enum_class):
                 value = choice
 
     return errors, value
+
 
 def validate_coordinate(coordinate, data, min_limit, max_limit):
     errors = {}
@@ -149,7 +149,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     if not isinstance(cafe_basic_info_data, dict):
         errors["cafe"] = "Cafe data must be an object."
         return errors, None
-
 
     # =================== CAFE_EXTERNAL_ID ======================
     cafe_external_id = cafe_basic_info_data.get("external_place_id")
@@ -248,7 +247,8 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
                 else:
                     try:
-                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config["CHECK_EMAIL_DELIVERABILITY"])
+                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config[
+                            "CHECK_EMAIL_DELIVERABILITY"])
                         cleaned["email"] = email_validator.normalized
 
                     except EmailNotValidError:
@@ -342,9 +342,8 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
     if not coordinate_errors:
         cleaned["longitude"] = value
 
-    cleaned["submitted_by_id"] = 1
-
     return errors, cleaned
+
 
 def validate_cafe_features_data(cafe_features_data):
     cleaned = {}
@@ -355,7 +354,7 @@ def validate_cafe_features_data(cafe_features_data):
         return errors, None
 
     # =================== WIFI ======================
-    choice_errors, value =  validate_choice("wifi_quality", cafe_features_data, "wifi quality", WifiQuality)
+    choice_errors, value = validate_choice("wifi_quality", cafe_features_data, "wifi quality", WifiQuality)
     errors |= choice_errors
 
     if not choice_errors:
@@ -390,7 +389,8 @@ def validate_cafe_features_data(cafe_features_data):
         cleaned["air_conditioning"] = value
 
     # ================ TYPICAL_OCCUPANCY ================
-    choice_errors, value = validate_choice("typical_occupancy", cafe_features_data, "typical occupancy", TypicalOccupancy)
+    choice_errors, value = validate_choice("typical_occupancy", cafe_features_data, "typical occupancy",
+                                           TypicalOccupancy)
     errors |= choice_errors
 
     if not choice_errors:
@@ -404,7 +404,8 @@ def validate_cafe_features_data(cafe_features_data):
         cleaned["food_options"] = value
 
     # ================ VEGETARIAN-OPTIONS ================
-    choice_errors, value = validate_choice("vegetarian_options", cafe_features_data, "vegetarian options", VegetarianOptions)
+    choice_errors, value = validate_choice("vegetarian_options", cafe_features_data, "vegetarian options",
+                                           VegetarianOptions)
     errors |= choice_errors
 
     if not choice_errors:
@@ -418,6 +419,7 @@ def validate_cafe_features_data(cafe_features_data):
         cleaned["card_payment"] = value
 
     return errors, cleaned
+
 
 def validate_cafe_opening_hours_data(cafe_opening_hours_data):
     cleaned = {}
@@ -539,6 +541,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
 
     return errors, cleaned
 
+
 def validate_cafe_review_data(cafe_review_data):
     cleaned = {}
     errors = {}
@@ -588,9 +591,8 @@ def validate_cafe_review_data(cafe_review_data):
             else:
                 cleaned["text"] = None
 
-    cleaned["user_id"] = 1
-
     return errors, cleaned
+
 
 def validate_cafe_photos(cafe_photos):
     errors = {}
@@ -624,7 +626,8 @@ def validate_cafe_photos(cafe_photos):
                     OSError,
                     Image.DecompressionBombError,
                     SyntaxError,
-                    ValueError,): errors.setdefault(error_key, []).append("The uploaded file is not a valid image.")
+                    ValueError,):
+                errors.setdefault(error_key, []).append("The uploaded file is not a valid image.")
 
             finally:
                 photo.seek(0)

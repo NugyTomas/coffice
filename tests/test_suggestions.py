@@ -4,7 +4,7 @@ import copy
 from app.enums import CafeStatus
 from app.models import Cafe
 from sqlalchemy import select
-
+from app.routes.suggestions import ANONYMOUS_USER_ID
 
 def test_home_page(client):
     response = client.get('/')
@@ -65,7 +65,7 @@ def test_client_cannot_set_submitter_id(client, valid_suggestion, db_session):
     assert response.status_code == 201
 
     cafe = db_session.scalars(select(Cafe)).one()
-    assert cafe.submitted_by_id != 42
+    assert cafe.submitted_by_id == ANONYMOUS_USER_ID
 
 
 def test_invalid_opening_hours_intervals(client, valid_suggestion, db_session):

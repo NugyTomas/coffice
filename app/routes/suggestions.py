@@ -22,6 +22,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[2]
 UPLOADS_DIR = PROJECT_DIR / "app" / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
+ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
 
 def save_cafe_photo(photo, extension):
     unique_filename = f"{uuid.uuid4()}{extension}"
@@ -100,7 +101,7 @@ def create_cafe_suggestion():
                 "errors": {"cafe": "This café is already on Coffice or waiting for approval."}
             }), 409
 
-    new_cafe = Cafe(**cafe_basic_info_data)
+    new_cafe = Cafe(**cafe_basic_info_data, submitted_by_id=ANONYMOUS_USER_ID)
     new_cafe.status = CafeStatus.PENDING
 
     new_cafe_features = CafeFeature(**cafe_features_data)
@@ -108,7 +109,7 @@ def create_cafe_suggestion():
 
     add_opening_hours(new_cafe, cafe_opening_hours_data)
 
-    new_cafe_review = Review(**cafe_review_data)
+    new_cafe_review = Review(**cafe_review_data, submitted_by_id=ANONYMOUS_USER_ID)
     new_cafe.reviews.append(new_cafe_review)
 
     saved_photo_paths = []
