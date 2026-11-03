@@ -32,6 +32,7 @@ PHONE_PATTERN = re.compile(r"[0-9]{3} [0-9]{3} [0-9]{3}")
 WEBSITE_PATTERN = re.compile(r"https://[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(/.*)?")
 INSTAGRAM_PATTERN = re.compile(r"[a-z0-9_]+(\.[a-z0-9_]+)*")
 TIME_TEXT_PATTERN = re.compile(r"\d{2}:\d{2}")
+INTEGER_PATTERN = re.compile(r"[0-9]+")
 TIME_FORMAT = "%H:%M"
 MAX_ALLOWED_PHOTOS = 6
 ALLOWED_PHOTO_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
@@ -539,6 +540,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
     return errors, cleaned
 
 def validate_cafe_review_data(cafe_review_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_review_data, dict):
@@ -551,16 +553,23 @@ def validate_cafe_review_data(cafe_review_data):
     if cafe_rating is None:
         errors["cafe_rating"] = "Cafe rating is required."
 
+    elif isinstance(cafe_rating, bool):
+        errors["cafe_rating"] = "Cafe rating must be a whole number."
+
+    elif isinstance(cafe_rating, int):
+        pass
+
+    elif isinstance(cafe_rating, str) and INTEGER_PATTERN.fullmatch(cafe_rating):
+        cafe_rating = int(cafe_rating)
+
     else:
-        try:
-            cafe_rating = int(cafe_rating)
-        except (ValueError, TypeError):
-            errors["cafe_rating"] = "Cafe rating must be a valid number."
+        errors["cafe_rating"] = "Cafe rating must be a whole number."
+
+    if "cafe_rating" not in errors:
+        if not (1 <= cafe_rating <= 5):
+            errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
         else:
-            if not (1 <= cafe_rating <= 5):
-                errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
-            else:
-                cafe_review_data["rating"] = cafe_rating
+            cleaned["rating"] = cafe_rating
 
     # =================== CAFE-REVIEW ======================
     cafe_review = cafe_review_data.get("text")
@@ -575,13 +584,13 @@ def validate_cafe_review_data(cafe_review_data):
                 if len(cafe_review) > 2048:
                     errors["cafe_review"] = "Cafe review must contain at most 2048 characters."
                 else:
-                    cafe_review_data["text"] = cafe_review
+                    cleaned["text"] = cafe_review
             else:
-                cafe_review_data["text"] = None
+                cleaned["text"] = None
 
-    cafe_review_data["user_id"] = 1
+    cleaned["user_id"] = 1
 
-    return errors, cafe_review_data
+    return errors, cleaned
 
 def validate_cafe_photos(cafe_photos):
     errors = {}
