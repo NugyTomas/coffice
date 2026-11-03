@@ -59,7 +59,7 @@ def db_session(app):
     with app.app_context():
         yield db.session
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def user(db_session):
     user = User(username="tester", email="tester@example.com", password_hash="x")
     db_session.add(user)
