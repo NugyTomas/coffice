@@ -3,7 +3,6 @@ import json
 import os
 import re
 
-
 from email_validator import validate_email, EmailNotValidError
 from flask import current_app
 from PIL import Image, UnidentifiedImageError
@@ -23,7 +22,6 @@ from app.enums import (CafePrice,
                        OpeningDayStatus,
                        )
 
-
 # =========================================
 # CONSTANTS
 # =========================================
@@ -32,6 +30,7 @@ PHONE_PATTERN = re.compile(r"[0-9]{3} [0-9]{3} [0-9]{3}")
 WEBSITE_PATTERN = re.compile(r"https://[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(/.*)?")
 INSTAGRAM_PATTERN = re.compile(r"[a-z0-9_]+(\.[a-z0-9_]+)*")
 TIME_TEXT_PATTERN = re.compile(r"\d{2}:\d{2}")
+INTEGER_PATTERN = re.compile(r"[0-9]+")
 TIME_FORMAT = "%H:%M"
 MAX_ALLOWED_PHOTOS = 6
 ALLOWED_PHOTO_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
@@ -68,8 +67,10 @@ def parse_suggestion_data(suggestion_json):
 # =========== HELPER VALIDATORS ===========
 def validate_text_field(field_name, data, min_length, max_length, require_letter=False):
     errors = {}
+    value = None
 
     text = data.get(field_name)
+
     if text is None:
         errors[field_name] = f"{field_name.capitalize()} is required."
 
@@ -92,12 +93,15 @@ def validate_text_field(field_name, data, min_length, max_length, require_letter
             errors[field_name] = f"{field_name.capitalize()} must contain at least one letter."
 
         else:
-            data[field_name] = text
+            value = text
 
-    return errors
+    return errors, value
+
 
 def validate_choice(field_name, data, field_label, enum_class):
     errors = {}
+    value = None
+
     text = data.get(field_name)
 
     if text is None:
@@ -115,13 +119,15 @@ def validate_choice(field_name, data, field_label, enum_class):
             except ValueError:
                 errors[field_name] = f"Invalid data! Please choose one of the options."
             else:
-                data[field_name] = choice
+                value = choice
 
-    return errors
+    return errors, value
+
 
 def validate_coordinate(coordinate, data, min_limit, max_limit):
     errors = {}
     value = data.get(coordinate)
+    validated_value = None
 
     if value is None:
         errors[coordinate] = f"{coordinate.capitalize()} is required."
@@ -130,46 +136,58 @@ def validate_coordinate(coordinate, data, min_limit, max_limit):
     elif not (min_limit <= value <= max_limit):
         errors[coordinate] = f"{coordinate.capitalize()} is out of range."
     else:
-        data[coordinate] = float(value)
+        validated_value = float(value)
 
-    return errors
+    return errors, validated_value
 
 
 # ============== VALIDATORS ===============
 def validate_cafe_basic_info_data(cafe_basic_info_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_basic_info_data, dict):
         errors["cafe"] = "Cafe data must be an object."
         return errors, None
 
-
     # =================== CAFE_EXTERNAL_ID ======================
     cafe_external_id = cafe_basic_info_data.get("external_place_id")
 
     if cafe_external_id is not None:
         if not isinstance(cafe_external_id, str):
-            errors["cafe_external_id"] = "External ID of a cafe must be a text."
+            errors["external_place_id"] = "External ID of a cafe must be a text."
         else:
             cafe_external_id = cafe_external_id.strip()
 
             if cafe_external_id:
                 if len(cafe_external_id) > 255:
-                    errors["cafe_external_id"] = "External ID must contain at most 255 characters."
+                    errors["external_place_id"] = "External ID must contain at most 255 characters."
                 else:
-                    cafe_basic_info_data["external_place_id"] = cafe_external_id
+                    cleaned["external_place_id"] = cafe_external_id
 
             else:
-                cafe_basic_info_data["external_place_id"] = None
+                cleaned["external_place_id"] = None
 
     # =================== NAME ======================
-    errors |= validate_text_field("name", cafe_basic_info_data, 2, 50)
+    text_field_errors, value = validate_text_field("name", cafe_basic_info_data, 2, 50)
+    errors |= text_field_errors
+
+    if not text_field_errors:
+        cleaned["name"] = value
 
     # =================== ADDRESS ======================
-    errors |= validate_text_field("address", cafe_basic_info_data, 3, 100, require_letter=True)
+    text_field_errors, value = validate_text_field("address", cafe_basic_info_data, 3, 100, require_letter=True)
+    errors |= text_field_errors
+
+    if not text_field_errors:
+        cleaned["address"] = value
 
     # =================== CITY ======================
-    errors |= validate_text_field("city", cafe_basic_info_data, 2, 50, require_letter=True)
+    text_field_errors, value = validate_text_field("city", cafe_basic_info_data, 2, 50, require_letter=True)
+    errors |= text_field_errors
+
+    if not text_field_errors:
+        cleaned["city"] = value
 
     # =================== POSTAL CODE ======================
     cafe_postal_code = cafe_basic_info_data.get("postal_code")
@@ -190,7 +208,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
             errors["postal_code"] = "Postal code must be in format 'XXX XX'."
 
         else:
-            cafe_basic_info_data["postal_code"] = cafe_postal_code
+            cleaned["postal_code"] = cafe_postal_code
 
     # =================== PHONE ======================
     cafe_phone_number = cafe_basic_info_data.get("phone")
@@ -208,10 +226,10 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                     errors["phone"] = "Phone number must be in format 'XXX XXX XXX'. We will add +420 for you."
 
                 else:
-                    cafe_basic_info_data["phone"] = "+420 " + cafe_phone_number
+                    cleaned["phone"] = "+420 " + cafe_phone_number
 
             else:
-                cafe_basic_info_data["phone"] = None
+                cleaned["phone"] = None
 
     # =================== EMAIL ======================
     cafe_email = cafe_basic_info_data.get("email")
@@ -229,14 +247,15 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
                 else:
                     try:
-                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config["CHECK_EMAIL_DELIVERABILITY"])
-                        cafe_basic_info_data["email"] = email_validator.normalized
+                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config[
+                            "CHECK_EMAIL_DELIVERABILITY"])
+                        cleaned["email"] = email_validator.normalized
 
                     except EmailNotValidError:
                         errors["email"] = "Email is not valid."
 
             else:
-                cafe_basic_info_data["email"] = None
+                cleaned["email"] = None
 
     # =================== WEBSITE ======================
     cafe_website = cafe_basic_info_data.get("website")
@@ -267,10 +286,10 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                     errors["website"] = "Website is not valid."
 
                 else:
-                    cafe_basic_info_data["website"] = cafe_website
+                    cleaned["website"] = cafe_website
 
             else:
-                cafe_basic_info_data["website"] = None
+                cleaned["website"] = None
 
     # =================== INSTAGRAM ======================
     cafe_instagram = cafe_basic_info_data.get("instagram")
@@ -283,7 +302,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
             cafe_instagram = cafe_instagram.strip().lower().removeprefix("@")
 
             if not cafe_instagram:
-                cafe_basic_info_data["instagram"] = None
+                cleaned["instagram"] = None
 
             elif len(cafe_instagram) > 30:
                 errors["instagram"] = "Instagram username must contain at most 30 characters."
@@ -293,25 +312,41 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                     "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
 
             else:
-                cafe_basic_info_data["instagram"] = "@" + cafe_instagram
+                cleaned["instagram"] = "@" + cafe_instagram
 
     # =================== PRICE-LEVEL ======================
-    errors |= validate_choice("price_level", cafe_basic_info_data, "price level", CafePrice)
+    choice_errors, value = validate_choice("price_level", cafe_basic_info_data, "price level", CafePrice)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["price_level"] = value
 
     # =================== COFFEE-QUALITY ======================
-    errors |= validate_choice("coffee_quality", cafe_basic_info_data, "coffee quality", CoffeeQuality)
+    choice_errors, value = validate_choice("coffee_quality", cafe_basic_info_data, "coffee quality", CoffeeQuality)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["coffee_quality"] = value
 
     # =================== LATITUDE ======================
-    errors |= validate_coordinate("latitude", cafe_basic_info_data, -90, 90)
+    coordinate_errors, value = validate_coordinate("latitude", cafe_basic_info_data, -90, 90)
+    errors |= coordinate_errors
+
+    if not coordinate_errors:
+        cleaned["latitude"] = value
 
     # =================== LONGITUDE ======================
-    errors |= validate_coordinate("longitude", cafe_basic_info_data, -180, 180)
+    coordinate_errors, value = validate_coordinate("longitude", cafe_basic_info_data, -180, 180)
+    errors |= coordinate_errors
 
-    cafe_basic_info_data["submitted_by_id"] = 1
+    if not coordinate_errors:
+        cleaned["longitude"] = value
 
-    return errors, cafe_basic_info_data
+    return errors, cleaned
+
 
 def validate_cafe_features_data(cafe_features_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_features_data, dict):
@@ -319,35 +354,75 @@ def validate_cafe_features_data(cafe_features_data):
         return errors, None
 
     # =================== WIFI ======================
-    errors |= validate_choice("wifi_quality", cafe_features_data, "wifi quality", WifiQuality)
+    choice_errors, value = validate_choice("wifi_quality", cafe_features_data, "wifi quality", WifiQuality)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["wifi_quality"] = value
 
     # ================ POWER-OUTLETS ================
-    errors |= validate_choice("power_outlets", cafe_features_data, "power outlets", PowerOutlets)
+    choice_errors, value = validate_choice("power_outlets", cafe_features_data, "power outlets", PowerOutlets)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["power_outlets"] = value
 
     # ================ NOISE-LEVEL ================
-    errors |= validate_choice("noise_level", cafe_features_data, "noise level", NoiseLevel)
+    choice_errors, value = validate_choice("noise_level", cafe_features_data, "noise level", NoiseLevel)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["noise_level"] = value
 
     # ================ SEATING ================
-    errors |= validate_choice("seating_type", cafe_features_data, "seating type", Seating)
+    choice_errors, value = validate_choice("seating_type", cafe_features_data, "seating type", Seating)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["seating_type"] = value
 
     # ================ AIR-CONDITIONING ================
-    errors |= validate_choice("air_conditioning", cafe_features_data, "air conditioning", AirConditioning)
+    choice_errors, value = validate_choice("air_conditioning", cafe_features_data, "air conditioning", AirConditioning)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["air_conditioning"] = value
 
     # ================ TYPICAL_OCCUPANCY ================
-    errors |= validate_choice("typical_occupancy", cafe_features_data, "typical occupancy", TypicalOccupancy)
+    choice_errors, value = validate_choice("typical_occupancy", cafe_features_data, "typical occupancy",
+                                           TypicalOccupancy)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["typical_occupancy"] = value
 
     # ================ FOOD-OPTIONS ================
-    errors |= validate_choice("food_options", cafe_features_data, "food options", FoodOptions)
+    choice_errors, value = validate_choice("food_options", cafe_features_data, "food options", FoodOptions)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["food_options"] = value
 
     # ================ VEGETARIAN-OPTIONS ================
-    errors |= validate_choice("vegetarian_options", cafe_features_data, "vegetarian options", VegetarianOptions)
+    choice_errors, value = validate_choice("vegetarian_options", cafe_features_data, "vegetarian options",
+                                           VegetarianOptions)
+    errors |= choice_errors
+
+    if not choice_errors:
+        cleaned["vegetarian_options"] = value
 
     # ================ CARD-PAYMENT ================
-    errors |= validate_choice("card_payment", cafe_features_data, "card payment", CardPayment)
+    choice_errors, value = validate_choice("card_payment", cafe_features_data, "card payment", CardPayment)
+    errors |= choice_errors
 
-    return errors, cafe_features_data
+    if not choice_errors:
+        cleaned["card_payment"] = value
+
+    return errors, cleaned
+
 
 def validate_cafe_opening_hours_data(cafe_opening_hours_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_opening_hours_data, dict):
@@ -361,6 +436,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}"] = f"Opening hours status for {day_name.capitalize()} is required."
             continue
 
+        cleaned[day_name] = {}
         day_data = cafe_opening_hours_data[day_name]
 
         if not isinstance(day_data, dict):
@@ -384,7 +460,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}_status"] = f"Invalid opening hours status for {day_name.capitalize()}."
             continue
 
-        day_data["status"] = cafe_day_status
+        cleaned[day_name]["status"] = cafe_day_status
 
         cafe_day_intervals = day_data.get("intervals")
         if cafe_day_intervals is None:
@@ -401,6 +477,8 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[
                 f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} must be empty when the café is not open."
             continue
+
+        cleaned[day_name]["intervals"] = []
 
         if cafe_day_status is not OpeningDayStatus.OPEN:
             continue
@@ -453,14 +531,19 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
                     errors[
                         f"opening_hours_{day_name}_interval"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
                     continue
-                interval['open'] = open_time
-                interval['close'] = close_time
+
+                cleaned[day_name]["intervals"].append({
+                    "open": open_time,
+                    "close": close_time
+                })
 
                 previous_close_time = close_time
 
-    return errors, cafe_opening_hours_data
+    return errors, cleaned
+
 
 def validate_cafe_review_data(cafe_review_data):
+    cleaned = {}
     errors = {}
 
     if not isinstance(cafe_review_data, dict):
@@ -473,16 +556,23 @@ def validate_cafe_review_data(cafe_review_data):
     if cafe_rating is None:
         errors["cafe_rating"] = "Cafe rating is required."
 
+    elif isinstance(cafe_rating, bool):
+        errors["cafe_rating"] = "Cafe rating must be a whole number."
+
+    elif isinstance(cafe_rating, int):
+        pass
+
+    elif isinstance(cafe_rating, str) and INTEGER_PATTERN.fullmatch(cafe_rating):
+        cafe_rating = int(cafe_rating)
+
     else:
-        try:
-            cafe_rating = int(cafe_rating)
-        except (ValueError, TypeError):
-            errors["cafe_rating"] = "Cafe rating must be a valid number."
+        errors["cafe_rating"] = "Cafe rating must be a whole number."
+
+    if "cafe_rating" not in errors:
+        if not (1 <= cafe_rating <= 5):
+            errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
         else:
-            if not (1 <= cafe_rating <= 5):
-                errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
-            else:
-                cafe_review_data["rating"] = cafe_rating
+            cleaned["rating"] = cafe_rating
 
     # =================== CAFE-REVIEW ======================
     cafe_review = cafe_review_data.get("text")
@@ -497,13 +587,12 @@ def validate_cafe_review_data(cafe_review_data):
                 if len(cafe_review) > 2048:
                     errors["cafe_review"] = "Cafe review must contain at most 2048 characters."
                 else:
-                    cafe_review_data["text"] = cafe_review
+                    cleaned["text"] = cafe_review
             else:
-                cafe_review_data["text"] = None
+                cleaned["text"] = None
 
-    cafe_review_data["user_id"] = 1
+    return errors, cleaned
 
-    return errors, cafe_review_data
 
 def validate_cafe_photos(cafe_photos):
     errors = {}
@@ -537,7 +626,8 @@ def validate_cafe_photos(cafe_photos):
                     OSError,
                     Image.DecompressionBombError,
                     SyntaxError,
-                    ValueError,): errors.setdefault(error_key, []).append("The uploaded file is not a valid image.")
+                    ValueError,):
+                errors.setdefault(error_key, []).append("The uploaded file is not a valid image.")
 
             finally:
                 photo.seek(0)
