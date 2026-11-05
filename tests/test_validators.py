@@ -1,7 +1,11 @@
 import copy
-from app.validators.suggestions import validate_cafe_basic_info_data
 
 import pytest
+
+
+from app.validators.suggestions import validate_cafe_basic_info_data
+
+
 
 TEXT_FIELD_LIMITS = {
     "name": (2, 50),
@@ -10,27 +14,14 @@ TEXT_FIELD_LIMITS = {
 }
 
 
-@pytest.mark.parametrize("field, raw, expected", [
-    ("name", "  My Cafe  ", "My Cafe"),
-    ("address", "  U Letiste 2  ", "U Letiste 2"),
-    ("city", "  Pilsen  ", "Pilsen"),
-    ("postal_code", "  123 45  ", "123 45"),
-])
-def test_cafe_fields_are_stripped(valid_suggestion, field, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field not in errors
-    assert cleaned[field] == expected
-
-
 def valid_text_cases():
     for field, (min_len, max_len) in TEXT_FIELD_LIMITS.items():
+        max_length_text = "a" * max_len
+
         yield from [
             (field, "a" * min_len, "a" * min_len),
-            (field, "a" * max_len, "a" * max_len)
+            (field, max_length_text, max_length_text),
+            (field, f"  {max_length_text}  ", max_length_text),
         ]
 
 
@@ -79,14 +70,18 @@ def test_address_and_city_require_letter(valid_suggestion, field):
     assert field not in cleaned
 
 
-def test_valid_postal_code_validation(valid_suggestion):
+@pytest.mark.parametrize("raw, expected", [
+    ("123 45", "123 45"),
+    ("  123 45  ", "123 45")
+])
+def test_valid_postal_code_validation(valid_suggestion, raw, expected):
     data = copy.deepcopy(valid_suggestion["cafe"])
-    data["postal_code"] = "123 45"
+    data["postal_code"] = raw
 
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "postal_code" not in errors
-    assert cleaned["postal_code"] == "123 45"
+    assert cleaned["postal_code"] == expected
 
 
 @pytest.mark.parametrize("raw", [
@@ -94,7 +89,8 @@ def test_valid_postal_code_validation(valid_suggestion):
     "",
     "  ",
     "12345",
-    12345])
+    12345
+])
 def test_invalid_postal_code_validation(valid_suggestion, raw):
     data = copy.deepcopy(valid_suggestion["cafe"])
     data["postal_code"] = raw
