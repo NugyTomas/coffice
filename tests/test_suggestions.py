@@ -63,7 +63,10 @@ def test_invalid_opening_hours_intervals(client, valid_suggestion, db_session):
     assert after_count == before_count
 
 
-@pytest.mark.parametrize("section", ["cafe", "cafe_features", "cafe_review"])
+@pytest.mark.parametrize("section", [
+    "cafe",
+    "cafe_features",
+    "cafe_review"])
 def test_client_cannot_set_id(client, valid_suggestion, db_session, section):
     data = copy.deepcopy(valid_suggestion)
     data[section]["id"] = 999
@@ -80,7 +83,9 @@ def test_client_cannot_set_id(client, valid_suggestion, db_session, section):
         assert cafe.reviews[0].id != 999
 
 
-@pytest.mark.parametrize("section", ["cafe", "cafe_review"])
+@pytest.mark.parametrize("section", [
+    "cafe",
+    "cafe_review"])
 def test_client_cannot_set_submitter_id(client, valid_suggestion, db_session, section):
     data = copy.deepcopy(valid_suggestion)
     data[section]["submitted_by_id"] = 42
@@ -106,3 +111,5 @@ def test_client_cannot_set_created_at(client, valid_suggestion, db_session):
 
     cafe = db_session.scalars(select(Cafe)).one()
     assert request_time <= cafe.created_at <= datetime.now()
+
+
