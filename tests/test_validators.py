@@ -2,10 +2,7 @@ import copy
 
 import pytest
 
-
 from app.validators.suggestions import validate_cafe_basic_info_data
-
-
 
 TEXT_FIELD_LIMITS = {
     "name": (2, 50),
@@ -38,13 +35,15 @@ def test_valid_text_fields_validation(valid_suggestion, field, raw, expected):
 
 def invalid_text_cases():
     for field, (min_len, max_len) in TEXT_FIELD_LIMITS.items():
+        min_length_text = "a" * (min_len - 1)
+        max_length_text = "a" * (max_len + 1)
         yield from [
             (field, None),
             (field, ""),
             (field, "  "),
             (field, 123),
-            (field, "a" * (min_len - 1)),
-            (field, "a" * (max_len + 1)),
+            (field, f"  {min_length_text}  "),
+            (field, f"  {max_length_text}  ")
         ]
 
 
