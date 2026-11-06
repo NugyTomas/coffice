@@ -1,11 +1,8 @@
 import copy
 
-
 import pytest
 
-
 from app.validators.suggestions import validate_cafe_basic_info_data
-
 
 TEXT_FIELD_LIMITS = {
     "name": (2, 50),
@@ -80,6 +77,8 @@ def invalid_text_cases():
             (field, None),
             (field, ""),
             (field, "  "),
+            (field, []),
+            (field, {}),
             (field, 123),
             (field, f"  {min_length_text}  "),
             (field, f"  {max_length_text}  ")
@@ -125,6 +124,8 @@ def test_valid_postal_code_validation(valid_suggestion, raw, expected):
 
 @pytest.mark.parametrize("raw", [
     None,
+    [],
+    {},
     "",
     "  ",
     "12345",
