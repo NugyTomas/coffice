@@ -150,7 +150,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
         errors["cafe"] = "Cafe data must be an object."
         return errors, None
 
-    # =================== CAFE_EXTERNAL_ID ======================
+    # =================== EXTERNAL_PLACE_ID ======================
     cafe_external_id = cafe_basic_info_data.get("external_place_id")
 
     if cafe_external_id is not None:

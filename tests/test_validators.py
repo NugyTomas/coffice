@@ -1,16 +1,55 @@
 import copy
 
+
 import pytest
 
+
 from app.validators.suggestions import validate_cafe_basic_info_data
+
 
 TEXT_FIELD_LIMITS = {
     "name": (2, 50),
     "address": (3, 100),
     "city": (2, 50),
 }
+EXTERNAL_ID_MAX_INPUT = 255 * "a"
 
 
+# =================== EXTERNAL_PLACE_ID ======================
+@pytest.mark.parametrize("raw, expected", [
+    (EXTERNAL_ID_MAX_INPUT, EXTERNAL_ID_MAX_INPUT),
+    (f"  {EXTERNAL_ID_MAX_INPUT}  ", EXTERNAL_ID_MAX_INPUT),
+    ("", None),
+    ("  ", None),
+    (None, None),
+])
+def test_valid_external_place_id(valid_suggestion, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["external_place_id"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "external_place_id" not in errors
+    assert cleaned.get("external_place_id") == expected
+
+
+@pytest.mark.parametrize("raw", [
+    {},
+    [],
+    f"a{EXTERNAL_ID_MAX_INPUT}",
+    123
+])
+def test_invalid_external_place_id(valid_suggestion, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["external_place_id"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "external_place_id" in errors
+    assert "external_place_id" not in cleaned
+
+
+# =================== NAME, ADDRESS, CITY ======================
 def valid_text_cases():
     for field, (min_len, max_len) in TEXT_FIELD_LIMITS.items():
         max_length_text = "a" * max_len
@@ -69,6 +108,7 @@ def test_address_and_city_require_letter(valid_suggestion, field):
     assert field not in cleaned
 
 
+# =================== POSTAL_CODE ======================
 @pytest.mark.parametrize("raw, expected", [
     ("123 45", "123 45"),
     ("  123 45  ", "123 45")
