@@ -139,3 +139,37 @@ def test_invalid_postal_code_validation(valid_suggestion, raw):
 
     assert "postal_code" in errors
     assert "postal_code" not in cleaned
+
+
+# =================== PHONE ======================
+@pytest.mark.parametrize("raw, expected", [
+    ("", None),
+    ("  ", None),
+    (None, None),
+    ("123 456 789", "+420 123 456 789"),
+    ("  123 456 789  ", "+420 123 456 789")
+])
+def test_valid_phone_validation(valid_suggestion, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["phone"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "phone" not in errors
+    assert cleaned.get("phone") == expected
+
+@pytest.mark.parametrize("raw", [
+    "+420 123 456 789",
+    "abc",
+    123456789,
+    [],
+    {}
+])
+def test_invalid_phone_validation(valid_suggestion, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["phone"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "phone" in errors
+    assert "phone" not in cleaned
