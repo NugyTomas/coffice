@@ -9,7 +9,14 @@ TEXT_FIELD_LIMITS = {
     "address": (3, 100),
     "city": (2, 50),
 }
+
 EXTERNAL_ID_MAX_INPUT = 255 * "a"
+
+EMAIL_MAX_INPUT = "a" * 64 + "@" + "b" * 63 + "." + "c" * 63 + "." + "d" * 53 + ".com"
+EMAIL_TOO_LONG_INPUT = "a" * 64 + "@" + "b" * 63 + "." + "c" * 63 + "." + "d" * 54 + ".com"
+
+assert len(EMAIL_MAX_INPUT) == 250
+assert len(EMAIL_TOO_LONG_INPUT) == 251
 
 
 # =================== EXTERNAL_PLACE_ID ======================
@@ -158,6 +165,7 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
     assert "phone" not in errors
     assert cleaned.get("phone") == expected
 
+
 @pytest.mark.parametrize("raw", [
     "+420 123 456 789",
     "abc",
@@ -173,3 +181,44 @@ def test_invalid_phone_validation(valid_suggestion, raw):
 
     assert "phone" in errors
     assert "phone" not in cleaned
+
+
+# =================== EMAIL ======================
+@pytest.mark.parametrize("raw, expected", [
+    ("", None),
+    ("  ", None),
+    (None, None),
+    ("test@example.com", "test@example.com"),
+    ("  test@example.com  ", "test@example.com"),
+    ("test@sub.example.com", "test@sub.example.com"),
+    ("test+coffee@example.com", "test+coffee@example.com"),
+    (EMAIL_MAX_INPUT, EMAIL_MAX_INPUT),
+])
+def test_valid_email_validation(valid_suggestion, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["email"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "email" not in errors
+    assert cleaned.get("email") == expected
+
+
+@pytest.mark.parametrize("raw", [
+    "invalid-email",
+    "test@",
+    "test@example",
+    "@example.com",
+    EMAIL_TOO_LONG_INPUT,
+    123,
+    [],
+    {},
+])
+def test_invalid_email_validation(valid_suggestion, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["email"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "email" in errors
+    assert "email" not in cleaned
