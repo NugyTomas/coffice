@@ -2,6 +2,7 @@ import copy
 
 import pytest
 
+from app.enums import CoffeeQuality, CafePrice
 from app.validators.suggestions import validate_cafe_basic_info_data
 
 TEXT_FIELD_LIMITS = {
@@ -29,6 +30,11 @@ COORDINATE_LIMITS = {
     "latitude": (-90, 90),
     "longitude": (-180, 180),
 }
+
+CHOICE_FIELDS = [
+    ("price_level", CafePrice),
+    ("coffee_quality", CoffeeQuality),
+]
 
 
 # =================== EXTERNAL_PLACE_ID ======================
@@ -73,6 +79,7 @@ def valid_text_cases():
         max_length_text = "a" * max_len
 
         yield from [
+            (field, "Test", "Test"),
             (field, "a" * min_len, "a" * min_len),
             (field, max_length_text, max_length_text),
             (field, f"  {max_length_text}  ", max_length_text),
@@ -343,9 +350,6 @@ def test_invalid_instagram_validation(valid_suggestion, raw):
     assert "instagram" not in cleaned
 
 
-# =================== PRICE-LEVEL, COFFEE-QUALITY ======================
-
-
 # =================== LATITUDE, LONGITUDE ======================
 def valid_coordinate_cases():
     for field, (min_limit, max_limit) in COORDINATE_LIMITS.items():
@@ -393,5 +397,48 @@ def test_invalid_coordinates_validation(valid_suggestion, field, raw):
 
     errors, cleaned = validate_cafe_basic_info_data(data)
 
+    assert field in errors
+    assert field not in cleaned
+
+
+# =================== PRICE-LEVEL, COFFEE-QUALITY ======================
+@pytest.mark.parametrize("raw, expected", [
+    ("low", "low"),
+    ("  low  ", "low"),
+    ("medium", "medium"),
+    ("high", "high"),
+])
+@pytest.mark.parametrize("field, enum_class", CHOICE_FIELDS)
+def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data[field] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert field not in errors
+    assert cleaned[field] == enum_class(expected)
+
+
+@pytest.mark.parametrize("raw", [
+    "",
+    "  ",
+    None,
+    "invalid",
+    "LOW",
+    123,
+    [],
+    {},
+    True,
+    False
+])
+@pytest.mark.parametrize("field", [
+    "price_level",
+    "coffee_quality"
+])
+def test_invalid_choices_validation(valid_suggestion, raw, field):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data[field] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
     assert field in errors
     assert field not in cleaned
