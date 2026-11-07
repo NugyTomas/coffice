@@ -52,6 +52,8 @@ def test_valid_external_place_id(valid_suggestion, raw, expected):
 @pytest.mark.parametrize("raw", [
     {},
     [],
+    True,
+    False,
     f"a{EXTERNAL_ID_MAX_INPUT}",
     123
 ])
@@ -98,6 +100,8 @@ def invalid_text_cases():
             (field, "  "),
             (field, []),
             (field, {}),
+            (field, True),
+            (field, False),
             (field, 123),
             (field, f"  {min_length_text}  "),
             (field, f"  {max_length_text}  ")
@@ -145,6 +149,8 @@ def test_valid_postal_code_validation(valid_suggestion, raw, expected):
     None,
     [],
     {},
+    True,
+    False,
     "",
     "  ",
     "12345",
@@ -184,7 +190,9 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
     "abc",
     123456789,
     [],
-    {}
+    {},
+    True,
+    False
 ])
 def test_invalid_phone_validation(valid_suggestion, raw):
     data = copy.deepcopy(valid_suggestion["cafe"])
@@ -227,6 +235,8 @@ def test_valid_email_validation(valid_suggestion, raw, expected):
     123,
     [],
     {},
+    True,
+    False
 ])
 def test_invalid_email_validation(valid_suggestion, raw):
     data = copy.deepcopy(valid_suggestion["cafe"])
@@ -270,7 +280,9 @@ def test_valid_website_validation(valid_suggestion, raw, expected):
     WEBSITE_TOO_LONG_INPUT,
     123,
     [],
-    {}
+    {},
+    True,
+    False
 ])
 def test_invalid_website_validation(valid_suggestion, raw):
     data = copy.deepcopy(valid_suggestion["cafe"])
@@ -318,6 +330,8 @@ def test_valid_instagram_validation(valid_suggestion, raw, expected):
     123,
     [],
     {},
+    True,
+    False
 ])
 def test_invalid_instagram_validation(valid_suggestion, raw):
     data = copy.deepcopy(valid_suggestion["cafe"])
@@ -353,6 +367,7 @@ def test_valid_coordinates_validation(valid_suggestion, field, raw, expected):
 
     assert field not in errors
     assert cleaned[field] == expected
+    assert isinstance(cleaned[field], float)
 
 
 def invalid_coordinate_cases():
