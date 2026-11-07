@@ -22,6 +22,9 @@ WEBSITE_TOO_LONG_INPUT = "https://" + "a" * 2037 + ".com"
 assert len(WEBSITE_MAX_INPUT) == 2048
 assert len(WEBSITE_TOO_LONG_INPUT) == 2049
 
+INSTAGRAM_MAX_INPUT = "a" * 30
+INSTAGRAM_TOO_LONG_INPUT = "a" * 31
+
 
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
@@ -172,6 +175,7 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
 
 @pytest.mark.parametrize("raw", [
     "+420 123 456 789",
+    "123 465 789 7",
     "abc",
     123456789,
     [],
@@ -271,3 +275,55 @@ def test_invalid_website_validation(valid_suggestion, raw):
 
     assert "website" in errors
     assert "website" not in cleaned
+
+
+# =================== INSTAGRAM ======================
+@pytest.mark.parametrize("raw, expected", [
+    ("", None),
+    ("  ", None),
+    (None, None),
+    ("example", "@example"),
+    ("@example", "@example"),
+    ("  @example  ", "@example"),
+    ("Cafe", "@cafe"),
+    ("@Example_cafe123", "@example_cafe123"),
+    ("example.cafe", "@example.cafe"),
+    ("example.cafe_123", "@example.cafe_123"),
+    (INSTAGRAM_MAX_INPUT, "@" + INSTAGRAM_MAX_INPUT),
+])
+def test_valid_instagram_validation(valid_suggestion, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["instagram"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "instagram" not in errors
+    assert cleaned.get("instagram") == expected
+
+
+@pytest.mark.parametrize("raw", [
+    "@@cafe",
+    ".cafe",
+    "cafe.",
+    "cafe..name",
+    "cafe-name",
+    "cafe name",
+    "cafe/name",
+    INSTAGRAM_TOO_LONG_INPUT,
+    123,
+    [],
+    {},
+])
+def test_invalid_instagram_validation(valid_suggestion, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["instagram"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "instagram" in errors
+    assert "instagram" not in cleaned
+
+# =================== PRICE-LEVEL, COFFEE-QUALITY ======================
+
+
+# =================== LATITUDE, LONGITUDE ======================
