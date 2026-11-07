@@ -37,6 +37,13 @@ CHOICE_FIELDS = [
 ]
 
 
+def prepare_cafe_data(valid_suggestion, field, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data[field] = raw
+
+    return data
+
+
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
     (EXTERNAL_ID_MAX_INPUT, EXTERNAL_ID_MAX_INPUT),
@@ -46,9 +53,7 @@ CHOICE_FIELDS = [
     (None, None),
 ])
 def test_valid_external_place_id(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["external_place_id"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "external_place_id", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "external_place_id" not in errors
@@ -64,9 +69,7 @@ def test_valid_external_place_id(valid_suggestion, raw, expected):
     123
 ])
 def test_invalid_external_place_id(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["external_place_id"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "external_place_id", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "external_place_id" in errors
@@ -88,9 +91,7 @@ def valid_text_cases():
 
 @pytest.mark.parametrize("field, raw, expected", list(valid_text_cases()))
 def test_valid_text_fields_validation(valid_suggestion, field, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field not in errors
@@ -117,9 +118,7 @@ def invalid_text_cases():
 
 @pytest.mark.parametrize("field, raw", list(invalid_text_cases()))
 def test_invalid_text_fields_validation(valid_suggestion, field, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field in errors
@@ -128,9 +127,7 @@ def test_invalid_text_fields_validation(valid_suggestion, field, raw):
 
 @pytest.mark.parametrize("field", ["address", "city"])
 def test_address_and_city_require_letter(valid_suggestion, field):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = "12345"
-
+    data = prepare_cafe_data(valid_suggestion, field, "12345")
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field in errors
@@ -143,9 +140,7 @@ def test_address_and_city_require_letter(valid_suggestion, field):
     ("  123 45  ", "123 45")
 ])
 def test_valid_postal_code_validation(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["postal_code"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "postal_code", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "postal_code" not in errors
@@ -164,9 +159,7 @@ def test_valid_postal_code_validation(valid_suggestion, raw, expected):
     12345
 ])
 def test_invalid_postal_code_validation(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["postal_code"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "postal_code", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "postal_code" in errors
@@ -182,9 +175,7 @@ def test_invalid_postal_code_validation(valid_suggestion, raw):
     ("  123 456 789  ", "+420 123 456 789")
 ])
 def test_valid_phone_validation(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["phone"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "phone", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "phone" not in errors
@@ -202,9 +193,7 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_phone_validation(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["phone"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "phone", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "phone" in errors
@@ -224,9 +213,7 @@ def test_invalid_phone_validation(valid_suggestion, raw):
     (f"  {EMAIL_MAX_INPUT}  ", EMAIL_MAX_INPUT),
 ])
 def test_valid_email_validation(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["email"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "email", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "email" not in errors
@@ -246,9 +233,7 @@ def test_valid_email_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_email_validation(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["email"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "email", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "email" in errors
@@ -271,9 +256,7 @@ def test_invalid_email_validation(valid_suggestion, raw):
     (f"  {WEBSITE_MAX_INPUT}  ", WEBSITE_MAX_INPUT),
 ])
 def test_valid_website_validation(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["website"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "website", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "website" not in errors
@@ -292,9 +275,7 @@ def test_valid_website_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_website_validation(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["website"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "website", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "website" in errors
@@ -316,9 +297,7 @@ def test_invalid_website_validation(valid_suggestion, raw):
     (INSTAGRAM_MAX_INPUT, "@" + INSTAGRAM_MAX_INPUT),
 ])
 def test_valid_instagram_validation(valid_suggestion, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["instagram"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "instagram", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "instagram" not in errors
@@ -341,9 +320,7 @@ def test_valid_instagram_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_instagram_validation(valid_suggestion, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data["instagram"] = raw
-
+    data = prepare_cafe_data(valid_suggestion, "instagram", raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert "instagram" in errors
@@ -364,9 +341,7 @@ def valid_coordinate_cases():
 
 @pytest.mark.parametrize("field, raw, expected", list(valid_coordinate_cases()))
 def test_valid_coordinates_validation(valid_suggestion, field, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field not in errors
@@ -392,9 +367,7 @@ def invalid_coordinate_cases():
 
 @pytest.mark.parametrize("field, raw", list(invalid_coordinate_cases()))
 def test_invalid_coordinates_validation(valid_suggestion, field, raw):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field in errors
@@ -403,6 +376,7 @@ def test_invalid_coordinates_validation(valid_suggestion, field, raw):
 
 # =================== PRICE-LEVEL, COFFEE-QUALITY ======================
 @pytest.mark.parametrize("raw, expected", [
+    ("unknown", "unknown"),
     ("low", "low"),
     ("  low  ", "low"),
     ("medium", "medium"),
@@ -410,9 +384,7 @@ def test_invalid_coordinates_validation(valid_suggestion, field, raw):
 ])
 @pytest.mark.parametrize("field, enum_class", CHOICE_FIELDS)
 def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expected):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
 
     assert field not in errors
@@ -436,9 +408,8 @@ def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expe
     "coffee_quality"
 ])
 def test_invalid_choices_validation(valid_suggestion, raw, field):
-    data = copy.deepcopy(valid_suggestion["cafe"])
-    data[field] = raw
-
+    data = prepare_cafe_data(valid_suggestion, field, raw)
     errors, cleaned = validate_cafe_basic_info_data(data)
+
     assert field in errors
     assert field not in cleaned
