@@ -25,6 +25,11 @@ assert len(WEBSITE_TOO_LONG_INPUT) == 2049
 INSTAGRAM_MAX_INPUT = "a" * 30
 INSTAGRAM_TOO_LONG_INPUT = "a" * 31
 
+COORDINATE_LIMITS = {
+    "latitude": (-90, 90),
+    "longitude": (-180, 180),
+}
+
 
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
@@ -323,7 +328,55 @@ def test_invalid_instagram_validation(valid_suggestion, raw):
     assert "instagram" in errors
     assert "instagram" not in cleaned
 
+
 # =================== PRICE-LEVEL, COFFEE-QUALITY ======================
 
 
 # =================== LATITUDE, LONGITUDE ======================
+def valid_coordinate_cases():
+    for field, (min_limit, max_limit) in COORDINATE_LIMITS.items():
+        valid_value = 49.74 if field == "latitude" else 13.37
+        yield from [
+            (field, min_limit, float(min_limit)),
+            (field, max_limit, float(max_limit)),
+            (field, 0, 0.0),
+            (field, valid_value, valid_value),
+        ]
+
+
+@pytest.mark.parametrize("field, raw, expected", list(valid_coordinate_cases()))
+def test_valid_coordinates_validation(valid_suggestion, field, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data[field] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert field not in errors
+    assert cleaned[field] == expected
+
+
+def invalid_coordinate_cases():
+    for field, (min_limit, max_limit) in COORDINATE_LIMITS.items():
+        yield from [
+            (field, ""),
+            (field, "  "),
+            (field, None),
+            (field, True),
+            (field, False),
+            (field, "49.74"),
+            (field, []),
+            (field, {}),
+            (field, min_limit - 0.01),
+            (field, max_limit + 0.01),
+        ]
+
+
+@pytest.mark.parametrize("field, raw", list(invalid_coordinate_cases()))
+def test_invalid_coordinates_validation(valid_suggestion, field, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data[field] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert field in errors
+    assert field not in cleaned
