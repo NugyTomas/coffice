@@ -14,9 +14,13 @@ EXTERNAL_ID_MAX_INPUT = 255 * "a"
 
 EMAIL_MAX_INPUT = "a" * 64 + "@" + "b" * 63 + "." + "c" * 63 + "." + "d" * 53 + ".com"
 EMAIL_TOO_LONG_INPUT = "a" * 64 + "@" + "b" * 63 + "." + "c" * 63 + "." + "d" * 54 + ".com"
-
 assert len(EMAIL_MAX_INPUT) == 250
 assert len(EMAIL_TOO_LONG_INPUT) == 251
+
+WEBSITE_MAX_INPUT = "https://" + "a" * 2036 + ".com"
+WEBSITE_TOO_LONG_INPUT = "https://" + "a" * 2037 + ".com"
+assert len(WEBSITE_MAX_INPUT) == 2048
+assert len(WEBSITE_TOO_LONG_INPUT) == 2049
 
 
 # =================== EXTERNAL_PLACE_ID ======================
@@ -193,6 +197,7 @@ def test_invalid_phone_validation(valid_suggestion, raw):
     ("test@sub.example.com", "test@sub.example.com"),
     ("test+coffee@example.com", "test+coffee@example.com"),
     (EMAIL_MAX_INPUT, EMAIL_MAX_INPUT),
+    (f"  {EMAIL_MAX_INPUT}  ", EMAIL_MAX_INPUT),
 ])
 def test_valid_email_validation(valid_suggestion, raw, expected):
     data = copy.deepcopy(valid_suggestion["cafe"])
@@ -222,3 +227,47 @@ def test_invalid_email_validation(valid_suggestion, raw):
 
     assert "email" in errors
     assert "email" not in cleaned
+
+
+# =================== WEBSITE ======================
+@pytest.mark.parametrize("raw, expected", [
+    ("", None),
+    ("  ", None),
+    (None, None),
+    ("example.com", "https://example.com"),
+    ("  example.com  ", "https://example.com"),
+    ("http://example.com", "https://example.com"),
+    ("https://example.com", "https://example.com"),
+    ("example.com/about", "https://example.com/about"),
+    ("example.co.uk", "https://example.co.uk"),
+    ("HTTPS://EXAMPLE.COM", "https://EXAMPLE.COM"),
+    (WEBSITE_MAX_INPUT, WEBSITE_MAX_INPUT),
+    (f"  {WEBSITE_MAX_INPUT}  ", WEBSITE_MAX_INPUT),
+])
+def test_valid_website_validation(valid_suggestion, raw, expected):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["website"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "website" not in errors
+    assert cleaned.get("website") == expected
+
+
+@pytest.mark.parametrize("raw", [
+    "not-a-website",
+    "example",
+    "https://",
+    WEBSITE_TOO_LONG_INPUT,
+    123,
+    [],
+    {}
+])
+def test_invalid_website_validation(valid_suggestion, raw):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data["website"] = raw
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert "website" in errors
+    assert "website" not in cleaned
