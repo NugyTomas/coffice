@@ -82,6 +82,38 @@ def assert_invalid_field(valid_suggestion, field, raw):
     assert field not in cleaned
 
 
+# =================== VALIDATION_TESTS ======================
+def test_valid_cafe_has_no_errors(valid_suggestion):
+    errors, cleaned = validate_cafe_basic_info_data(copy.deepcopy(valid_suggestion["cafe"]))
+    assert errors == {}
+
+
+def test_unknown_fields_are_not_in_cleaned(valid_suggestion):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data.update({"id": 999, "status": "approved", "submitted_by_id": 42})
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert not {"id", "status", "submitted_by_id"} & cleaned.keys()
+
+
+def test_invalid_cafe_data_type():
+    errors, cleaned = validate_cafe_basic_info_data("text")
+
+    assert "cafe" in errors
+    assert cleaned is None
+
+
+def test_missing_optional_field(valid_suggestion):
+    data = copy.deepcopy(valid_suggestion["cafe"])
+    data.pop("website")
+
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert errors == {}
+    assert "website" not in cleaned
+
+
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
     (EXTERNAL_ID_MAX_INPUT, EXTERNAL_ID_MAX_INPUT),
@@ -93,7 +125,7 @@ def test_valid_external_place_id(valid_suggestion, raw, expected):
 
 
 @pytest.mark.parametrize("raw", [
-    f"a{EXTERNAL_ID_MAX_INPUT}",
+    pytest.param(f"a{EXTERNAL_ID_MAX_INPUT}", id="external-id-too-long"),
     *INVALID_DATA_TYPES
 ])
 def test_invalid_external_place_id(valid_suggestion, raw):
@@ -106,10 +138,21 @@ def valid_text_cases():
         max_length_text = "a" * max_len
 
         yield from [
+            (field, "Kavárna Šnek", "Kavárna Šnek"),
             (field, "Test", "Test"),
             (field, "a" * min_len, "a" * min_len),
-            (field, max_length_text, max_length_text),
-            (field, f"  {max_length_text}  ", max_length_text),
+            pytest.param(
+                field,
+                max_length_text,
+                max_length_text,
+                id=f"{field}-max-length"
+            ),
+            pytest.param(
+                field,
+                f"  {max_length_text}  ",
+                max_length_text,
+                id=f"{field}-max-length-with-whitespace"
+            ),
         ]
 
 
@@ -122,9 +165,18 @@ def invalid_text_cases():
     for field, (min_len, max_len) in TEXT_FIELD_LIMITS.items():
         min_length_text = "a" * (min_len - 1)
         max_length_text = "a" * (max_len + 1)
+
         yield from [
-            (field, f"  {min_length_text}  "),
-            (field, f"  {max_length_text}  "),
+            pytest.param(
+                field,
+                f"  {min_length_text}  ",
+                id=f"{field}-below-min-length"
+            ),
+            pytest.param(
+                field,
+                f"  {max_length_text}  ",
+                id=f"{field}-above-max-length"
+            ),
             *((field, value) for value in INVALID_VALUES_FOR_REQUIRED_FIELDS)
         ]
 
@@ -169,6 +221,7 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
 @pytest.mark.parametrize("raw", [
     "+420 123 456 789",
     "123 465 789 7",
+    "123456789",
     "abc",
     *INVALID_DATA_TYPES
 ])
@@ -182,6 +235,7 @@ def test_invalid_phone_validation(valid_suggestion, raw):
     ("  test@example.com  ", "test@example.com"),
     ("test@sub.example.com", "test@sub.example.com"),
     ("test+coffee@example.com", "test+coffee@example.com"),
+    ("TEST@EXAMPLE.COM", "TEST@example.com"),
     (EMAIL_MAX_INPUT, EMAIL_MAX_INPUT),
     (f"  {EMAIL_MAX_INPUT}  ", EMAIL_MAX_INPUT),
     *VALID_VALUES_FOR_OPTIONAL_FIELDS
@@ -195,7 +249,7 @@ def test_valid_email_validation(valid_suggestion, raw, expected):
     "test@",
     "test@example",
     "@example.com",
-    EMAIL_TOO_LONG_INPUT,
+    pytest.param(EMAIL_TOO_LONG_INPUT, id="email-too-long"),
     *INVALID_DATA_TYPES
 ])
 def test_invalid_email_validation(valid_suggestion, raw):
@@ -223,7 +277,7 @@ def test_valid_website_validation(valid_suggestion, raw, expected):
     "not-a-website",
     "example",
     "https://",
-    WEBSITE_TOO_LONG_INPUT,
+    pytest.param(WEBSITE_TOO_LONG_INPUT, id="website-too-long"),
     *INVALID_DATA_TYPES
 ])
 def test_invalid_website_validation(valid_suggestion, raw):
@@ -254,7 +308,7 @@ def test_valid_instagram_validation(valid_suggestion, raw, expected):
     "cafe-name",
     "cafe name",
     "cafe/name",
-    INSTAGRAM_TOO_LONG_INPUT,
+    pytest.param(INSTAGRAM_TOO_LONG_INPUT, id="username-too-long"),
     *INVALID_DATA_TYPES
 ])
 def test_invalid_instagram_validation(valid_suggestion, raw):
@@ -285,6 +339,9 @@ def invalid_coordinate_cases():
             (field, min_limit - 0.01),
             (field, max_limit + 0.01),
             *((field, value) for value in INVALID_DATA_TYPES),
+            (field, float("nan")),
+            (field, float("inf")),
+            (field, float("-inf"))
         ]
 
 
