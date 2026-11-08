@@ -44,6 +44,22 @@ def prepare_cafe_data(valid_suggestion, field, raw):
     return data
 
 
+def assert_valid_field(valid_suggestion, field, raw, expected):
+    data = prepare_cafe_data(valid_suggestion, field, raw)
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert field not in errors
+    assert cleaned.get(field) == expected
+
+
+def assert_invalid_field(valid_suggestion, field, raw):
+    data = prepare_cafe_data(valid_suggestion, field, raw)
+    errors, cleaned = validate_cafe_basic_info_data(data)
+
+    assert field in errors
+    assert field not in cleaned
+
+
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
     (EXTERNAL_ID_MAX_INPUT, EXTERNAL_ID_MAX_INPUT),
@@ -53,11 +69,7 @@ def prepare_cafe_data(valid_suggestion, field, raw):
     (None, None),
 ])
 def test_valid_external_place_id(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "external_place_id", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "external_place_id" not in errors
-    assert cleaned.get("external_place_id") == expected
+    assert_valid_field(valid_suggestion, "external_place_id", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -69,11 +81,7 @@ def test_valid_external_place_id(valid_suggestion, raw, expected):
     123
 ])
 def test_invalid_external_place_id(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "external_place_id", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "external_place_id" in errors
-    assert "external_place_id" not in cleaned
+    assert_invalid_field(valid_suggestion, "external_place_id", raw)
 
 
 # =================== NAME, ADDRESS, CITY ======================
@@ -91,11 +99,7 @@ def valid_text_cases():
 
 @pytest.mark.parametrize("field, raw, expected", list(valid_text_cases()))
 def test_valid_text_fields_validation(valid_suggestion, field, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field not in errors
-    assert cleaned[field] == expected
+    assert_valid_field(valid_suggestion, field, raw, expected)
 
 
 def invalid_text_cases():
@@ -118,20 +122,12 @@ def invalid_text_cases():
 
 @pytest.mark.parametrize("field, raw", list(invalid_text_cases()))
 def test_invalid_text_fields_validation(valid_suggestion, field, raw):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field in errors
-    assert field not in cleaned
+    assert_invalid_field(valid_suggestion, field, raw)
 
 
 @pytest.mark.parametrize("field", ["address", "city"])
 def test_address_and_city_require_letter(valid_suggestion, field):
-    data = prepare_cafe_data(valid_suggestion, field, "12345")
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field in errors
-    assert field not in cleaned
+    assert_invalid_field(valid_suggestion, field, "12345")
 
 
 # =================== POSTAL_CODE ======================
@@ -140,11 +136,7 @@ def test_address_and_city_require_letter(valid_suggestion, field):
     ("  123 45  ", "123 45")
 ])
 def test_valid_postal_code_validation(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "postal_code", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "postal_code" not in errors
-    assert cleaned["postal_code"] == expected
+    assert_valid_field(valid_suggestion, "postal_code", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -159,11 +151,7 @@ def test_valid_postal_code_validation(valid_suggestion, raw, expected):
     12345
 ])
 def test_invalid_postal_code_validation(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "postal_code", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "postal_code" in errors
-    assert "postal_code" not in cleaned
+    assert_invalid_field(valid_suggestion, "postal_code", raw)
 
 
 # =================== PHONE ======================
@@ -175,11 +163,7 @@ def test_invalid_postal_code_validation(valid_suggestion, raw):
     ("  123 456 789  ", "+420 123 456 789")
 ])
 def test_valid_phone_validation(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "phone", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "phone" not in errors
-    assert cleaned.get("phone") == expected
+    assert_valid_field(valid_suggestion, "phone", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -193,11 +177,7 @@ def test_valid_phone_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_phone_validation(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "phone", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "phone" in errors
-    assert "phone" not in cleaned
+    assert_invalid_field(valid_suggestion, "phone", raw)
 
 
 # =================== EMAIL ======================
@@ -213,11 +193,7 @@ def test_invalid_phone_validation(valid_suggestion, raw):
     (f"  {EMAIL_MAX_INPUT}  ", EMAIL_MAX_INPUT),
 ])
 def test_valid_email_validation(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "email", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "email" not in errors
-    assert cleaned.get("email") == expected
+    assert_valid_field(valid_suggestion, "email", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -233,11 +209,7 @@ def test_valid_email_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_email_validation(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "email", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "email" in errors
-    assert "email" not in cleaned
+    assert_invalid_field(valid_suggestion, "email", raw)
 
 
 # =================== WEBSITE ======================
@@ -256,11 +228,7 @@ def test_invalid_email_validation(valid_suggestion, raw):
     (f"  {WEBSITE_MAX_INPUT}  ", WEBSITE_MAX_INPUT),
 ])
 def test_valid_website_validation(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "website", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "website" not in errors
-    assert cleaned.get("website") == expected
+    assert_valid_field(valid_suggestion, "website", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -275,11 +243,7 @@ def test_valid_website_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_website_validation(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "website", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "website" in errors
-    assert "website" not in cleaned
+    assert_invalid_field(valid_suggestion, "website", raw)
 
 
 # =================== INSTAGRAM ======================
@@ -297,11 +261,7 @@ def test_invalid_website_validation(valid_suggestion, raw):
     (INSTAGRAM_MAX_INPUT, "@" + INSTAGRAM_MAX_INPUT),
 ])
 def test_valid_instagram_validation(valid_suggestion, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, "instagram", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "instagram" not in errors
-    assert cleaned.get("instagram") == expected
+    assert_valid_field(valid_suggestion, "instagram", raw, expected)
 
 
 @pytest.mark.parametrize("raw", [
@@ -320,11 +280,7 @@ def test_valid_instagram_validation(valid_suggestion, raw, expected):
     False
 ])
 def test_invalid_instagram_validation(valid_suggestion, raw):
-    data = prepare_cafe_data(valid_suggestion, "instagram", raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert "instagram" in errors
-    assert "instagram" not in cleaned
+    assert_invalid_field(valid_suggestion, "instagram", raw)
 
 
 # =================== LATITUDE, LONGITUDE ======================
@@ -341,12 +297,7 @@ def valid_coordinate_cases():
 
 @pytest.mark.parametrize("field, raw, expected", list(valid_coordinate_cases()))
 def test_valid_coordinates_validation(valid_suggestion, field, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field not in errors
-    assert cleaned[field] == expected
-    assert isinstance(cleaned[field], float)
+    assert_valid_field(valid_suggestion, field, raw, expected)
 
 
 def invalid_coordinate_cases():
@@ -367,11 +318,7 @@ def invalid_coordinate_cases():
 
 @pytest.mark.parametrize("field, raw", list(invalid_coordinate_cases()))
 def test_invalid_coordinates_validation(valid_suggestion, field, raw):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field in errors
-    assert field not in cleaned
+    assert_invalid_field(valid_suggestion, field, raw)
 
 
 # =================== PRICE-LEVEL, COFFEE-QUALITY ======================
@@ -384,11 +331,7 @@ def test_invalid_coordinates_validation(valid_suggestion, field, raw):
 ])
 @pytest.mark.parametrize("field, enum_class", CHOICE_FIELDS)
 def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expected):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field not in errors
-    assert cleaned[field] == enum_class(expected)
+    assert_valid_field(valid_suggestion, field, raw, enum_class(expected))
 
 
 @pytest.mark.parametrize("raw", [
@@ -408,8 +351,4 @@ def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expe
     "coffee_quality"
 ])
 def test_invalid_choices_validation(valid_suggestion, raw, field):
-    data = prepare_cafe_data(valid_suggestion, field, raw)
-    errors, cleaned = validate_cafe_basic_info_data(data)
-
-    assert field in errors
-    assert field not in cleaned
+    assert_invalid_field(valid_suggestion, field, raw)
