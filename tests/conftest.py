@@ -6,6 +6,7 @@ from app.extensions import db
 from app.models import User
 from app.routes.suggestions import ANONYMOUS_USER_ID
 
+
 @pytest.fixture
 def app():
     app = create_app(TestConfig)
@@ -60,11 +61,10 @@ def db_session(app):
     with app.app_context():
         yield db.session
 
+
 @pytest.fixture(autouse=True)
 def user(db_session):
     user = User(id=ANONYMOUS_USER_ID, username="tester", email="tester@example.com", password_hash="x")
     db_session.add(user)
     db_session.commit()
     return user
-
-

@@ -104,6 +104,7 @@ def test_invalid_cafe_data_type():
     assert cleaned is None
 
 
+# depends on the optional-fields rule
 def test_missing_optional_field(valid_suggestion):
     data = copy.deepcopy(valid_suggestion["cafe"])
     data.pop("website")
@@ -116,8 +117,16 @@ def test_missing_optional_field(valid_suggestion):
 
 # =================== EXTERNAL_PLACE_ID ======================
 @pytest.mark.parametrize("raw, expected", [
-    (EXTERNAL_ID_MAX_INPUT, EXTERNAL_ID_MAX_INPUT),
-    (f"  {EXTERNAL_ID_MAX_INPUT}  ", EXTERNAL_ID_MAX_INPUT),
+    pytest.param(
+        EXTERNAL_ID_MAX_INPUT,
+        EXTERNAL_ID_MAX_INPUT,
+        id="external-id-max-length"
+    ),
+    pytest.param(
+        f"  {EXTERNAL_ID_MAX_INPUT}  ",
+        EXTERNAL_ID_MAX_INPUT,
+        id="external-id-max-length-with-whitespace"
+    ),
     *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_external_place_id(valid_suggestion, raw, expected):
@@ -236,8 +245,16 @@ def test_invalid_phone_validation(valid_suggestion, raw):
     ("test@sub.example.com", "test@sub.example.com"),
     ("test+coffee@example.com", "test+coffee@example.com"),
     ("TEST@EXAMPLE.COM", "TEST@example.com"),
-    (EMAIL_MAX_INPUT, EMAIL_MAX_INPUT),
-    (f"  {EMAIL_MAX_INPUT}  ", EMAIL_MAX_INPUT),
+    pytest.param(
+        EMAIL_MAX_INPUT,
+        EMAIL_MAX_INPUT,
+        id="email-max-length"
+    ),
+    pytest.param(
+        f"  {EMAIL_MAX_INPUT}  ",
+        EMAIL_MAX_INPUT,
+        id="email-max-length-with-whitespace"
+    ),
     *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_email_validation(valid_suggestion, raw, expected):
@@ -265,8 +282,16 @@ def test_invalid_email_validation(valid_suggestion, raw):
     ("example.com/about", "https://example.com/about"),
     ("example.co.uk", "https://example.co.uk"),
     ("HTTPS://EXAMPLE.COM", "https://EXAMPLE.COM"),
-    (WEBSITE_MAX_INPUT, WEBSITE_MAX_INPUT),
-    (f"  {WEBSITE_MAX_INPUT}  ", WEBSITE_MAX_INPUT),
+    pytest.param(
+        WEBSITE_MAX_INPUT,
+        WEBSITE_MAX_INPUT,
+        id="website-max-length"
+    ),
+    pytest.param(
+        f"  {WEBSITE_MAX_INPUT}  ",
+        WEBSITE_MAX_INPUT,
+        id="website-max-length-with-whitespace"
+    ),
     *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_website_validation(valid_suggestion, raw, expected):

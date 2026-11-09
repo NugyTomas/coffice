@@ -554,10 +554,10 @@ def validate_cafe_review_data(cafe_review_data):
     cafe_rating = cafe_review_data.get("rating")
 
     if cafe_rating is None:
-        errors["cafe_rating"] = "Cafe rating is required."
+        errors["rating"] = "Cafe rating is required."
 
     elif isinstance(cafe_rating, bool):
-        errors["cafe_rating"] = "Cafe rating must be a whole number."
+        errors["rating"] = "Cafe rating must be a whole number."
 
     elif isinstance(cafe_rating, int):
         pass
@@ -566,11 +566,11 @@ def validate_cafe_review_data(cafe_review_data):
         cafe_rating = int(cafe_rating)
 
     else:
-        errors["cafe_rating"] = "Cafe rating must be a whole number."
+        errors["rating"] = "Cafe rating must be a whole number."
 
     if "cafe_rating" not in errors:
         if not (1 <= cafe_rating <= 5):
-            errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
+            errors["rating"] = "Invalid data! Please choose a rating between 1 and 5."
         else:
             cleaned["rating"] = cafe_rating
 
@@ -579,13 +579,13 @@ def validate_cafe_review_data(cafe_review_data):
 
     if cafe_review is not None:
         if not isinstance(cafe_review, str):
-            errors["cafe_review"] = "Cafe review must be a text."
+            errors["text"] = "Cafe review must be a text."
         else:
             cafe_review = cafe_review.strip()
 
             if cafe_review:
                 if len(cafe_review) > 2048:
-                    errors["cafe_review"] = "Cafe review must contain at most 2048 characters."
+                    errors["text"] = "Cafe review must contain at most 2048 characters."
                 else:
                     cleaned["text"] = cafe_review
             else:
