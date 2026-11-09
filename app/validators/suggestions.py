@@ -568,7 +568,7 @@ def validate_cafe_review_data(cafe_review_data):
     else:
         errors["rating"] = "Cafe rating must be a whole number."
 
-    if "cafe_rating" not in errors:
+    if "rating" not in errors:
         if not (1 <= cafe_rating <= 5):
             errors["rating"] = "Invalid data! Please choose a rating between 1 and 5."
         else:
