@@ -1,5 +1,19 @@
 import copy
 
+INVALID_DATA_TYPES = [
+    {},
+    [],
+    True,
+    123456789
+]
+
+INVALID_VALUES_FOR_REQUIRED_FIELDS = [
+    "",
+    "  ",
+    None,
+    *INVALID_DATA_TYPES
+]
+
 
 def assert_valid_field(validator, base, field, raw, expected):
     data = copy.deepcopy(base)

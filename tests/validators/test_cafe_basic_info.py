@@ -6,27 +6,14 @@ from app.enums import CoffeeQuality, CafePrice
 from app.validators.suggestions import validate_cafe_basic_info_data
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
+                                      INVALID_DATA_TYPES,
+                                      INVALID_VALUES_FOR_REQUIRED_FIELDS
                                       )
 
 VALID_VALUES_FOR_OPTIONAL_FIELDS = [
     ("", None),
     ("  ", None),
     (None, None)
-]
-
-INVALID_DATA_TYPES = [
-    {},
-    [],
-    True,
-    False,
-    123456789
-]
-
-INVALID_VALUES_FOR_REQUIRED_FIELDS = [
-    "",
-    "  ",
-    None,
-    *INVALID_DATA_TYPES
 ]
 
 INVALID_CHOICE_VALUES = [

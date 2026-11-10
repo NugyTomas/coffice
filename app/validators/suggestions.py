@@ -562,8 +562,15 @@ def validate_cafe_review_data(cafe_review_data):
     elif isinstance(cafe_rating, int):
         pass
 
-    elif isinstance(cafe_rating, str) and INTEGER_PATTERN.fullmatch(cafe_rating):
-        cafe_rating = int(cafe_rating)
+
+    elif isinstance(cafe_rating, str):
+        cafe_rating = cafe_rating.strip()
+
+        if INTEGER_PATTERN.fullmatch(cafe_rating):
+            cafe_rating = int(cafe_rating)
+
+        else:
+            errors["rating"] = "Cafe rating must be a whole number."
 
     else:
         errors["rating"] = "Cafe rating must be a whole number."
