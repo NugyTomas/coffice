@@ -83,7 +83,7 @@ CARD_PAYMENT_VALUES = [
 # because all choice fields use the same validate_choice() helper.
 
 # =================== VALIDATION_TESTS ======================
-def test_valid_features_has_no_errors(valid_suggestion):
+def test_valid_cafe_features_has_no_errors(valid_suggestion):
     errors, cleaned = validate_cafe_features_data(copy.deepcopy(valid_suggestion["cafe_features"]))
 
     assert errors == {}

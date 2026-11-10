@@ -6,15 +6,10 @@ from app.enums import CoffeeQuality, CafePrice
 from app.validators.suggestions import validate_cafe_basic_info_data
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
+                                      VALID_VALUES_FOR_OPTIONAL_FIELDS,
                                       INVALID_DATA_TYPES,
                                       INVALID_VALUES_FOR_REQUIRED_FIELDS
                                       )
-
-VALID_VALUES_FOR_OPTIONAL_FIELDS = [
-    ("", None),
-    ("  ", None),
-    (None, None)
-]
 
 INVALID_CHOICE_VALUES = [
     "invalid",
@@ -59,6 +54,7 @@ CHOICE_FIELD_NAMES = [field for field, _ in CHOICE_FIELDS]
 def test_valid_cafe_has_no_errors(valid_suggestion):
     errors, cleaned = validate_cafe_basic_info_data(copy.deepcopy(valid_suggestion["cafe"]))
     assert errors == {}
+    assert cleaned is not None
 
 
 def test_unknown_fields_are_not_in_cleaned(valid_suggestion):
@@ -107,7 +103,7 @@ def test_valid_external_place_id(valid_suggestion, raw, expected):
 
 
 @pytest.mark.parametrize("raw", [
-    pytest.param(f"a{EXTERNAL_ID_MAX_INPUT}", id="external-id-too-long"),
+    pytest.param({EXTERNAL_ID_MAX_INPUT}, id="external-id-too-long"),
     *INVALID_DATA_TYPES
 ])
 def test_invalid_external_place_id(valid_suggestion, raw):

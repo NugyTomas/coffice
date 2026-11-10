@@ -1,5 +1,11 @@
 import copy
 
+VALID_VALUES_FOR_OPTIONAL_FIELDS = [
+    ("", None),
+    ("  ", None),
+    (None, None)
+]
+
 INVALID_DATA_TYPES = [
     {},
     [],
