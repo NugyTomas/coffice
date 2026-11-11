@@ -7,8 +7,10 @@ from app.validators.suggestions import validate_cafe_review_data
 from tests.conftest import valid_suggestion
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
-                                      VALID_VALUES_FOR_OPTIONAL_FIELDS,
-                                      INVALID_VALUES_FOR_REQUIRED_FIELDS, INVALID_DATA_TYPES)
+                                      assert_optional_field_omitted,
+                                      INVALID_VALUES_FOR_REQUIRED_FIELDS,
+                                      INVALID_DATA_TYPES,
+                                      OPTIONAL_EMPTY_VALUES)
 
 REVIEW_TEXT_MAX_INPUT = "a" * 2048
 REVIEW_TOO_LONG_INPUT = "a" * 2049
@@ -78,7 +80,6 @@ def test_invalid_cafe_rating_validation(valid_suggestion, raw):
         f"  {REVIEW_TEXT_MAX_INPUT}  ",
         REVIEW_TEXT_MAX_INPUT,
         id="review-text-max-length-with-whitespace"),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_review_text_validation(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_review_data, valid_suggestion["cafe_review"], "text", raw, expected)
@@ -90,3 +91,14 @@ def test_valid_review_text_validation(valid_suggestion, raw, expected):
 ])
 def test_invalid_review_text_validation(valid_suggestion, raw):
     assert_invalid_field(validate_cafe_review_data, valid_suggestion["cafe_review"], "text", raw)
+
+
+# =================== OPTIONAL-FIELD: EMPTY-VALUE-HANDLING ======================
+@pytest.mark.parametrize("raw", OPTIONAL_EMPTY_VALUES)
+def test_empty_optional_review_text_is_omitted(valid_suggestion, raw):
+    assert_optional_field_omitted(
+        validate_cafe_review_data,
+        valid_suggestion["cafe_review"],
+        "text",
+        raw
+    )

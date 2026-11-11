@@ -6,9 +6,10 @@ from app.enums import CoffeeQuality, CafePrice
 from app.validators.suggestions import validate_cafe_basic_info_data
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
-                                      VALID_VALUES_FOR_OPTIONAL_FIELDS,
+                                      assert_optional_field_omitted,
                                       INVALID_DATA_TYPES,
-                                      INVALID_VALUES_FOR_REQUIRED_FIELDS
+                                      INVALID_VALUES_FOR_REQUIRED_FIELDS,
+                                      OPTIONAL_EMPTY_VALUES
                                       )
 
 INVALID_CHOICE_VALUES = [
@@ -22,6 +23,14 @@ TEXT_FIELD_LIMITS = {
     "address": (3, 100),
     "city": (2, 50),
 }
+
+OPTIONAL_BASIC_FIELDS = [
+    "external_place_id",
+    "phone",
+    "email",
+    "website",
+    "instagram"
+]
 
 EXTERNAL_ID_MAX_INPUT = 255 * "a"
 
@@ -96,7 +105,6 @@ def test_missing_optional_field(valid_suggestion):
         EXTERNAL_ID_MAX_INPUT,
         id="external-id-max-length-with-whitespace"
     ),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_external_place_id(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], "external_place_id", raw, expected)
@@ -190,7 +198,6 @@ def test_invalid_postal_code_validation(valid_suggestion, raw):
 @pytest.mark.parametrize("raw, expected", [
     ("123 456 789", "+420 123 456 789"),
     ("  123 456 789  ", "+420 123 456 789"),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_phone_validation(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], "phone", raw, expected)
@@ -224,7 +231,6 @@ def test_invalid_phone_validation(valid_suggestion, raw):
         EMAIL_MAX_INPUT,
         id="email-max-length-with-whitespace"
     ),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_email_validation(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], "email", raw, expected)
@@ -261,7 +267,6 @@ def test_invalid_email_validation(valid_suggestion, raw):
         WEBSITE_MAX_INPUT,
         id="website-max-length-with-whitespace"
     ),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_website_validation(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], "website", raw, expected)
@@ -288,7 +293,6 @@ def test_invalid_website_validation(valid_suggestion, raw):
     ("example.cafe", "@example.cafe"),
     ("example.cafe_123", "@example.cafe_123"),
     (INSTAGRAM_MAX_INPUT, "@" + INSTAGRAM_MAX_INPUT),
-    *VALID_VALUES_FOR_OPTIONAL_FIELDS
 ])
 def test_valid_instagram_validation(valid_suggestion, raw, expected):
     assert_valid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], "instagram", raw, expected)
@@ -361,3 +365,15 @@ def test_valid_choices_validation(valid_suggestion, field, enum_class, raw, expe
 @pytest.mark.parametrize("field", CHOICE_FIELD_NAMES)
 def test_invalid_choices_validation(valid_suggestion, raw, field):
     assert_invalid_field(validate_cafe_basic_info_data, valid_suggestion["cafe"], field, raw)
+
+
+# =================== OPTIONAL-FIELDS: EMPTY-VALUES-HANDLING ======================
+@pytest.mark.parametrize("field", OPTIONAL_BASIC_FIELDS)
+@pytest.mark.parametrize("raw", OPTIONAL_EMPTY_VALUES)
+def test_empty_optional_fields_are_omitted(valid_suggestion, field, raw):
+    assert_optional_field_omitted(
+        validate_cafe_basic_info_data,
+        valid_suggestion["cafe"],
+        field,
+        raw
+    )

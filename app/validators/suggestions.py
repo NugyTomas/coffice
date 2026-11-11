@@ -165,9 +165,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["external_place_id"] = cafe_external_id
 
-            else:
-                cleaned["external_place_id"] = None
-
     # =================== NAME ======================
     text_field_errors, value = validate_text_field("name", cafe_basic_info_data, 2, 50)
     errors |= text_field_errors
@@ -228,9 +225,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["phone"] = "+420 " + cafe_phone_number
 
-            else:
-                cleaned["phone"] = None
-
     # =================== EMAIL ======================
     cafe_email = cafe_basic_info_data.get("email")
 
@@ -253,9 +247,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
                     except EmailNotValidError:
                         errors["email"] = "Email is not valid."
-
-            else:
-                cleaned["email"] = None
 
     # =================== WEBSITE ======================
     cafe_website = cafe_basic_info_data.get("website")
@@ -288,9 +279,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["website"] = cafe_website
 
-            else:
-                cleaned["website"] = None
-
     # =================== INSTAGRAM ======================
     cafe_instagram = cafe_basic_info_data.get("instagram")
 
@@ -301,18 +289,17 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
         else:
             cafe_instagram = cafe_instagram.strip().lower().removeprefix("@")
 
-            if not cafe_instagram:
-                cleaned["instagram"] = None
+            if cafe_instagram:
 
-            elif len(cafe_instagram) > 30:
-                errors["instagram"] = "Instagram username must contain at most 30 characters."
+                if len(cafe_instagram) > 30:
+                    errors["instagram"] = "Instagram username must contain at most 30 characters."
 
-            elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
-                errors[
-                    "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
+                elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
+                    errors[
+                        "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
 
-            else:
-                cleaned["instagram"] = "@" + cafe_instagram
+                else:
+                    cleaned["instagram"] = "@" + cafe_instagram
 
     # =================== PRICE-LEVEL ======================
     choice_errors, value = validate_choice("price_level", cafe_basic_info_data, "price level", CafePrice)
@@ -595,8 +582,6 @@ def validate_cafe_review_data(cafe_review_data):
                     errors["text"] = "Cafe review must contain at most 2048 characters."
                 else:
                     cleaned["text"] = cafe_review
-            else:
-                cleaned["text"] = None
 
     return errors, cleaned
 
