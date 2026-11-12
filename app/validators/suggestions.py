@@ -423,7 +423,6 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}"] = f"Opening hours status for {day_name.capitalize()} is required."
             continue
 
-        cleaned[day_name] = {}
         day_data = cafe_opening_hours_data[day_name]
 
         if not isinstance(day_data, dict):
@@ -447,12 +446,13 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}_status"] = f"Invalid opening hours status for {day_name.capitalize()}."
             continue
 
+        cleaned[day_name] = {}
         cleaned[day_name]["status"] = cafe_day_status
 
         cafe_day_intervals = day_data.get("intervals")
         if cafe_day_intervals is None:
             errors[
-                f"opening_hours_{day_name}_interval"] = f"Opening hours intervals for {day_name.capitalize()} are required (use an empty list [] if closed)."
+                f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} are required (use an empty list [] if closed)."
             continue
 
         if not isinstance(cafe_day_intervals, list):
@@ -472,7 +472,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
 
         if not cafe_day_intervals:
             errors[
-                f"opening_hours_{day_name}_interval"] = f"Opening hours intervals for {day_name.capitalize()} are required when the café is open."
+                f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} are required when the café is open."
             continue
 
         if len(cafe_day_intervals) > 2:
@@ -485,12 +485,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
         for interval in cafe_day_intervals:
             if not isinstance(interval, dict):
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours interval for {day_name.capitalize()} must be an object."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours interval for {day_name.capitalize()} must be an object."
                 continue
 
             if set(interval.keys()) != {"open", "close"}:
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours interval for {day_name.capitalize()} must contain only 'open' and 'close'."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours interval for {day_name.capitalize()} must contain only 'open' and 'close'."
                 continue
 
             open_time_text = interval["open"]
@@ -498,12 +498,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
 
             if not isinstance(open_time_text, str) or not isinstance(close_time_text, str):
                 errors[
-                    f"opening_hours_{day_name}_time_interval"] = f"Opening and closing times for {day_name.capitalize()} must be strings."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening and closing times for {day_name.capitalize()} must be strings."
                 continue
 
             if not TIME_TEXT_PATTERN.fullmatch(open_time_text) or not TIME_TEXT_PATTERN.fullmatch(close_time_text):
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
                 continue
 
             try:
@@ -511,12 +511,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
                 close_time = datetime.strptime(close_time_text, TIME_FORMAT).time()
             except ValueError:
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
                 continue
             else:
                 if previous_close_time is not None and open_time < previous_close_time:
                     errors[
-                        f"opening_hours_{day_name}_interval"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
+                        f"opening_hours_{day_name}_intervals"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
                     continue
 
                 cleaned[day_name]["intervals"].append({

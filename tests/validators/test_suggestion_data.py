@@ -41,7 +41,6 @@ def test_valid_check_suggestion_data_validation(valid_suggestion):
     assert errors == {}
 
 
-
 def test_invalid_check_suggestion_data_validation(valid_suggestion):
     data = copy.deepcopy(valid_suggestion)
 

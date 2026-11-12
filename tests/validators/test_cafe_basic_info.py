@@ -85,7 +85,7 @@ def test_invalid_cafe_data_type():
 # depends on the optional-fields rule
 def test_missing_optional_field(valid_suggestion):
     data = copy.deepcopy(valid_suggestion["cafe"])
-    data.pop("website")
+    del data["website"]
 
     errors, cleaned = validate_cafe_basic_info_data(data)
 
