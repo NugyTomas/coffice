@@ -589,6 +589,10 @@ def validate_cafe_review_data(cafe_review_data):
 def validate_cafe_photos(cafe_photos):
     errors = {}
 
+    if not isinstance(cafe_photos, list):
+        errors["cafe_photos"] = "Cafe photos must be a list."
+        return errors
+
     if len(cafe_photos) > MAX_ALLOWED_PHOTOS:
         errors["cafe_photos"] = "Cafe photos must contain at most 6 photos."
         return errors
