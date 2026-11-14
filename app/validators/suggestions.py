@@ -165,26 +165,24 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["external_place_id"] = cafe_external_id
 
-    # =================== NAME ======================
-    text_field_errors, value = validate_text_field("name", cafe_basic_info_data, 2, 50)
-    errors |= text_field_errors
+    # =================== NAME, ADDRESS, CITY ======================
+    required_text_fields = [
+        ("name", 2, 50, False),
+        ("address", 3, 100, True),
+        ("city", 2, 50, True)
+    ]
 
-    if not text_field_errors:
-        cleaned["name"] = value
+    for field, min_length, max_length, require_letter in required_text_fields:
+        text_field_errors, value = validate_text_field(field,
+                                                       cafe_basic_info_data,
+                                                       min_length,
+                                                       max_length,
+                                                       require_letter=require_letter)
 
-    # =================== ADDRESS ======================
-    text_field_errors, value = validate_text_field("address", cafe_basic_info_data, 3, 100, require_letter=True)
-    errors |= text_field_errors
+        errors |= text_field_errors
 
-    if not text_field_errors:
-        cleaned["address"] = value
-
-    # =================== CITY ======================
-    text_field_errors, value = validate_text_field("city", cafe_basic_info_data, 2, 50, require_letter=True)
-    errors |= text_field_errors
-
-    if not text_field_errors:
-        cleaned["city"] = value
+        if not text_field_errors:
+            cleaned[field] = value
 
     # =================== POSTAL CODE ======================
     cafe_postal_code = cafe_basic_info_data.get("postal_code")
@@ -351,7 +349,7 @@ def validate_cafe_features_data(cafe_features_data):
         ("card_payment", "card payment", CardPayment),
     ]
 
-    for (name, label, enum) in feature_fields:
+    for name, label, enum in feature_fields:
         choice_errors, value = validate_choice(name, cafe_features_data, label, enum)
         errors |= choice_errors
 
