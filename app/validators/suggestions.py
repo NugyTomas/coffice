@@ -150,7 +150,7 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
         errors["cafe"] = "Cafe data must be an object."
         return errors, None
 
-    # =================== CAFE_EXTERNAL_ID ======================
+    # =================== EXTERNAL_PLACE_ID ======================
     cafe_external_id = cafe_basic_info_data.get("external_place_id")
 
     if cafe_external_id is not None:
@@ -164,9 +164,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                     errors["external_place_id"] = "External ID must contain at most 255 characters."
                 else:
                     cleaned["external_place_id"] = cafe_external_id
-
-            else:
-                cleaned["external_place_id"] = None
 
     # =================== NAME ======================
     text_field_errors, value = validate_text_field("name", cafe_basic_info_data, 2, 50)
@@ -228,9 +225,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["phone"] = "+420 " + cafe_phone_number
 
-            else:
-                cleaned["phone"] = None
-
     # =================== EMAIL ======================
     cafe_email = cafe_basic_info_data.get("email")
 
@@ -253,9 +247,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
 
                     except EmailNotValidError:
                         errors["email"] = "Email is not valid."
-
-            else:
-                cleaned["email"] = None
 
     # =================== WEBSITE ======================
     cafe_website = cafe_basic_info_data.get("website")
@@ -288,9 +279,6 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["website"] = cafe_website
 
-            else:
-                cleaned["website"] = None
-
     # =================== INSTAGRAM ======================
     cafe_instagram = cafe_basic_info_data.get("instagram")
 
@@ -301,18 +289,17 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
         else:
             cafe_instagram = cafe_instagram.strip().lower().removeprefix("@")
 
-            if not cafe_instagram:
-                cleaned["instagram"] = None
+            if cafe_instagram:
 
-            elif len(cafe_instagram) > 30:
-                errors["instagram"] = "Instagram username must contain at most 30 characters."
+                if len(cafe_instagram) > 30:
+                    errors["instagram"] = "Instagram username must contain at most 30 characters."
 
-            elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
-                errors[
-                    "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
+                elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
+                    errors[
+                        "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
 
-            else:
-                cleaned["instagram"] = "@" + cafe_instagram
+                else:
+                    cleaned["instagram"] = "@" + cafe_instagram
 
     # =================== PRICE-LEVEL ======================
     choice_errors, value = validate_choice("price_level", cafe_basic_info_data, "price level", CafePrice)
@@ -436,7 +423,6 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}"] = f"Opening hours status for {day_name.capitalize()} is required."
             continue
 
-        cleaned[day_name] = {}
         day_data = cafe_opening_hours_data[day_name]
 
         if not isinstance(day_data, dict):
@@ -460,12 +446,13 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
             errors[f"opening_hours_{day_name}_status"] = f"Invalid opening hours status for {day_name.capitalize()}."
             continue
 
+        cleaned[day_name] = {}
         cleaned[day_name]["status"] = cafe_day_status
 
         cafe_day_intervals = day_data.get("intervals")
         if cafe_day_intervals is None:
             errors[
-                f"opening_hours_{day_name}_interval"] = f"Opening hours intervals for {day_name.capitalize()} are required (use an empty list [] if closed)."
+                f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} are required (use an empty list [] if closed)."
             continue
 
         if not isinstance(cafe_day_intervals, list):
@@ -485,7 +472,7 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
 
         if not cafe_day_intervals:
             errors[
-                f"opening_hours_{day_name}_interval"] = f"Opening hours intervals for {day_name.capitalize()} are required when the café is open."
+                f"opening_hours_{day_name}_intervals"] = f"Opening hours intervals for {day_name.capitalize()} are required when the café is open."
             continue
 
         if len(cafe_day_intervals) > 2:
@@ -498,12 +485,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
         for interval in cafe_day_intervals:
             if not isinstance(interval, dict):
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours interval for {day_name.capitalize()} must be an object."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours interval for {day_name.capitalize()} must be an object."
                 continue
 
             if set(interval.keys()) != {"open", "close"}:
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours interval for {day_name.capitalize()} must contain only 'open' and 'close'."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours interval for {day_name.capitalize()} must contain only 'open' and 'close'."
                 continue
 
             open_time_text = interval["open"]
@@ -511,12 +498,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
 
             if not isinstance(open_time_text, str) or not isinstance(close_time_text, str):
                 errors[
-                    f"opening_hours_{day_name}_time_interval"] = f"Opening and closing times for {day_name.capitalize()} must be strings."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening and closing times for {day_name.capitalize()} must be strings."
                 continue
 
             if not TIME_TEXT_PATTERN.fullmatch(open_time_text) or not TIME_TEXT_PATTERN.fullmatch(close_time_text):
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
                 continue
 
             try:
@@ -524,12 +511,12 @@ def validate_cafe_opening_hours_data(cafe_opening_hours_data):
                 close_time = datetime.strptime(close_time_text, TIME_FORMAT).time()
             except ValueError:
                 errors[
-                    f"opening_hours_{day_name}_interval"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
+                    f"opening_hours_{day_name}_intervals"] = f"Opening hours for {day_name.capitalize()} must use the HH:MM format."
                 continue
             else:
                 if previous_close_time is not None and open_time < previous_close_time:
                     errors[
-                        f"opening_hours_{day_name}_interval"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
+                        f"opening_hours_{day_name}_intervals"] = f"Opening intervals for {day_name.capitalize()} must not overlap."
                     continue
 
                 cleaned[day_name]["intervals"].append({
@@ -554,23 +541,30 @@ def validate_cafe_review_data(cafe_review_data):
     cafe_rating = cafe_review_data.get("rating")
 
     if cafe_rating is None:
-        errors["cafe_rating"] = "Cafe rating is required."
+        errors["rating"] = "Cafe rating is required."
 
     elif isinstance(cafe_rating, bool):
-        errors["cafe_rating"] = "Cafe rating must be a whole number."
+        errors["rating"] = "Cafe rating must be a whole number."
 
     elif isinstance(cafe_rating, int):
         pass
 
-    elif isinstance(cafe_rating, str) and INTEGER_PATTERN.fullmatch(cafe_rating):
-        cafe_rating = int(cafe_rating)
+
+    elif isinstance(cafe_rating, str):
+        cafe_rating = cafe_rating.strip()
+
+        if INTEGER_PATTERN.fullmatch(cafe_rating):
+            cafe_rating = int(cafe_rating)
+
+        else:
+            errors["rating"] = "Cafe rating must be a whole number."
 
     else:
-        errors["cafe_rating"] = "Cafe rating must be a whole number."
+        errors["rating"] = "Cafe rating must be a whole number."
 
-    if "cafe_rating" not in errors:
+    if "rating" not in errors:
         if not (1 <= cafe_rating <= 5):
-            errors["cafe_rating"] = "Invalid data! Please choose a rating between 1 and 5."
+            errors["rating"] = "Invalid data! Please choose a rating between 1 and 5."
         else:
             cleaned["rating"] = cafe_rating
 
@@ -579,23 +573,25 @@ def validate_cafe_review_data(cafe_review_data):
 
     if cafe_review is not None:
         if not isinstance(cafe_review, str):
-            errors["cafe_review"] = "Cafe review must be a text."
+            errors["text"] = "Cafe review must be a text."
         else:
             cafe_review = cafe_review.strip()
 
             if cafe_review:
                 if len(cafe_review) > 2048:
-                    errors["cafe_review"] = "Cafe review must contain at most 2048 characters."
+                    errors["text"] = "Cafe review must contain at most 2048 characters."
                 else:
                     cleaned["text"] = cafe_review
-            else:
-                cleaned["text"] = None
 
     return errors, cleaned
 
 
 def validate_cafe_photos(cafe_photos):
     errors = {}
+
+    if not isinstance(cafe_photos, list):
+        errors["cafe_photos"] = "Cafe photos must be a list."
+        return errors
 
     if len(cafe_photos) > MAX_ALLOWED_PHOTOS:
         errors["cafe_photos"] = "Cafe photos must contain at most 6 photos."
