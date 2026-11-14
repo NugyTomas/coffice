@@ -70,7 +70,7 @@ def test_unknown_fields_are_not_in_cleaned(valid_suggestion):
     data = copy.deepcopy(valid_suggestion["cafe"])
     data.update({"id": 999, "status": "approved", "submitted_by_id": 42})
 
-    errors, cleaned = validate_cafe_basic_info_data(data)
+    _, cleaned = validate_cafe_basic_info_data(data)
 
     assert not {"id", "status", "submitted_by_id"} & cleaned.keys()
 

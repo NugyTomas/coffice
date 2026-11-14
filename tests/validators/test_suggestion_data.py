@@ -4,7 +4,6 @@ import json
 import pytest
 
 from app.validators.suggestions import check_suggestion_data, parse_suggestion_data
-from tests.conftest import valid_suggestion
 
 
 @pytest.mark.parametrize("raw, expected", [

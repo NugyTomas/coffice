@@ -39,6 +39,7 @@ def test_valid_number_of_photos():
     errors = validate_cafe_photos(photos)
 
     assert "cafe_photos" not in errors
+    assert errors == {}
 
 
 def test_invalid_number_of_photos():
@@ -53,7 +54,8 @@ def test_invalid_number_of_photos():
     ("photo.jpg", "JPEG"),
     ("photo.jpeg", "JPEG"),
     ("photo.png", "PNG"),
-    ("photo.webp", "WEBP")
+    ("photo.webp", "WEBP"),
+    ("PHOTO.JPG", "JPEG")
 ])
 def test_valid_photo_formats(filename, fmt):
     photo = [make_photo(filename, fmt)]
@@ -61,12 +63,14 @@ def test_valid_photo_formats(filename, fmt):
     errors = validate_cafe_photos(photo)
 
     assert f"cafe_photos_{filename}" not in errors
+    assert errors == {}
 
 
 @pytest.mark.parametrize("filename, fmt", [
     ("photo.gif", "GIF"),
     ("photo.bmp", "BMP"),
     ("photo.tiff", "TIFF"),
+    ("photo", "JPEG")
 ])
 def test_invalid_photo_format(filename, fmt):
     photo = [make_photo(filename, fmt)]
@@ -114,6 +118,19 @@ def test_photo_too_large(monkeypatch):
 def test_corrupted_photo():
     photo = FileStorage(
         stream=BytesIO(b"This is not a valid image."),
+        filename="photo.jpg"
+    )
+
+    errors = validate_cafe_photos([photo])
+
+    assert errors["cafe_photos_photo.jpg"] == [
+        "The uploaded file is not a valid image."
+    ]
+
+
+def test_empty_photo_file():
+    photo = FileStorage(
+        stream=BytesIO(b""),
         filename="photo.jpg"
     )
 
