@@ -301,19 +301,18 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
                 else:
                     cleaned["instagram"] = "@" + cafe_instagram
 
-    # =================== PRICE-LEVEL ======================
-    choice_errors, value = validate_choice("price_level", cafe_basic_info_data, "price level", CafePrice)
-    errors |= choice_errors
+    # =================== PRICE-LEVEL, COFFEE_QUALITY ======================
+    option_fields = [
+        ("price_level", "price level", CafePrice),
+        ("coffee_quality", "coffee quality", CoffeeQuality),
+    ]
 
-    if not choice_errors:
-        cleaned["price_level"] = value
+    for (name, label, enum) in option_fields:
+        choice_errors, value = validate_choice(name, cafe_basic_info_data, label, enum)
+        errors |= choice_errors
 
-    # =================== COFFEE-QUALITY ======================
-    choice_errors, value = validate_choice("coffee_quality", cafe_basic_info_data, "coffee quality", CoffeeQuality)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["coffee_quality"] = value
+        if not choice_errors:
+            cleaned[name] = value
 
     # =================== LATITUDE ======================
     coordinate_errors, value = validate_coordinate("latitude", cafe_basic_info_data, -90, 90)
@@ -340,70 +339,24 @@ def validate_cafe_features_data(cafe_features_data):
         errors["features"] = "Cafe features data must be an object."
         return errors, None
 
-    # =================== WIFI ======================
-    choice_errors, value = validate_choice("wifi_quality", cafe_features_data, "wifi quality", WifiQuality)
-    errors |= choice_errors
+    feature_fields = [
+        ("wifi_quality", "wifi quality", WifiQuality),
+        ("power_outlets", "power outlets", PowerOutlets),
+        ("noise_level", "noise level", NoiseLevel),
+        ("seating_type", "seating type", Seating),
+        ("air_conditioning", "air conditioning", AirConditioning),
+        ("typical_occupancy", "typical occupancy", TypicalOccupancy),
+        ("food_options", "food options", FoodOptions),
+        ("vegetarian_options", "vegetarian options", VegetarianOptions),
+        ("card_payment", "card payment", CardPayment),
+    ]
 
-    if not choice_errors:
-        cleaned["wifi_quality"] = value
+    for (name, label, enum) in feature_fields:
+        choice_errors, value = validate_choice(name, cafe_features_data, label, enum)
+        errors |= choice_errors
 
-    # ================ POWER-OUTLETS ================
-    choice_errors, value = validate_choice("power_outlets", cafe_features_data, "power outlets", PowerOutlets)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["power_outlets"] = value
-
-    # ================ NOISE-LEVEL ================
-    choice_errors, value = validate_choice("noise_level", cafe_features_data, "noise level", NoiseLevel)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["noise_level"] = value
-
-    # ================ SEATING ================
-    choice_errors, value = validate_choice("seating_type", cafe_features_data, "seating type", Seating)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["seating_type"] = value
-
-    # ================ AIR-CONDITIONING ================
-    choice_errors, value = validate_choice("air_conditioning", cafe_features_data, "air conditioning", AirConditioning)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["air_conditioning"] = value
-
-    # ================ TYPICAL_OCCUPANCY ================
-    choice_errors, value = validate_choice("typical_occupancy", cafe_features_data, "typical occupancy",
-                                           TypicalOccupancy)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["typical_occupancy"] = value
-
-    # ================ FOOD-OPTIONS ================
-    choice_errors, value = validate_choice("food_options", cafe_features_data, "food options", FoodOptions)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["food_options"] = value
-
-    # ================ VEGETARIAN-OPTIONS ================
-    choice_errors, value = validate_choice("vegetarian_options", cafe_features_data, "vegetarian options",
-                                           VegetarianOptions)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["vegetarian_options"] = value
-
-    # ================ CARD-PAYMENT ================
-    choice_errors, value = validate_choice("card_payment", cafe_features_data, "card payment", CardPayment)
-    errors |= choice_errors
-
-    if not choice_errors:
-        cleaned["card_payment"] = value
+        if not choice_errors:
+            cleaned[name] = value
 
     return errors, cleaned
 
