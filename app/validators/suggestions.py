@@ -98,6 +98,36 @@ def validate_text_field(field_name, data, min_length, max_length, require_letter
     return errors, value
 
 
+def check_optional_value(field_name, data, error_name, maximum_length=None):
+    errors = {}
+
+    field_value = data.get(field_name)
+
+    if field_value is None:
+        return errors, None
+
+    if not isinstance(field_value, str):
+        errors[field_name] = f"{error_name} must be a text."
+        return errors, None
+
+    field_value = field_value.strip()
+
+    if not field_value:
+        return errors, None
+
+    if maximum_length is not None and len(field_value) > maximum_length:
+        errors[field_name] = f"{error_name} must contain at most {maximum_length} characters."
+        return errors, None
+    return errors, field_value
+
+
+def normalize_website_url(website):
+    if website.lower().startswith(("http://", "https://")):
+        website = website.split("://", 1)[1]
+
+    return "https://" + website
+
+
 def validate_choice(field_name, data, field_label, enum_class):
     errors = {}
     value = None
@@ -151,19 +181,14 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
         return errors, None
 
     # =================== EXTERNAL_PLACE_ID ======================
-    cafe_external_id = cafe_basic_info_data.get("external_place_id")
+    external_place_id_errors, cafe_external_id = check_optional_value("external_place_id",
+                                                                      cafe_basic_info_data,
+                                                                      "External ID",
+                                                                      255)
+    errors |= external_place_id_errors
 
-    if cafe_external_id is not None:
-        if not isinstance(cafe_external_id, str):
-            errors["external_place_id"] = "External ID of a cafe must be a text."
-        else:
-            cafe_external_id = cafe_external_id.strip()
-
-            if cafe_external_id:
-                if len(cafe_external_id) > 255:
-                    errors["external_place_id"] = "External ID must contain at most 255 characters."
-                else:
-                    cleaned["external_place_id"] = cafe_external_id
+    if not external_place_id_errors and cafe_external_id is not None:
+        cleaned["external_place_id"] = cafe_external_id
 
     # =================== NAME, ADDRESS, CITY ======================
     required_text_fields = [
@@ -206,98 +231,62 @@ def validate_cafe_basic_info_data(cafe_basic_info_data):
             cleaned["postal_code"] = cafe_postal_code
 
     # =================== PHONE ======================
-    cafe_phone_number = cafe_basic_info_data.get("phone")
+    phone_errors, cafe_phone_number = check_optional_value("phone", cafe_basic_info_data, "Phone number")
+    errors |= phone_errors
 
-    if cafe_phone_number is not None:
-
-        if not isinstance(cafe_phone_number, str):
-            errors["phone"] = "Phone number must be a text."
+    if not phone_errors and cafe_phone_number is not None:
+        if not PHONE_PATTERN.fullmatch(cafe_phone_number):
+            errors["phone"] = "Phone number must be in format 'XXX XXX XXX'. We will add +420 for you."
 
         else:
-            cafe_phone_number = cafe_phone_number.strip()
-
-            if cafe_phone_number:
-                if not PHONE_PATTERN.fullmatch(cafe_phone_number):
-                    errors["phone"] = "Phone number must be in format 'XXX XXX XXX'. We will add +420 for you."
-
-                else:
-                    cleaned["phone"] = "+420 " + cafe_phone_number
+            cleaned["phone"] = "+420 " + cafe_phone_number
 
     # =================== EMAIL ======================
-    cafe_email = cafe_basic_info_data.get("email")
+    email_errors, cafe_email = check_optional_value("email", cafe_basic_info_data, "Email", 250)
+    errors |= email_errors
 
-    if cafe_email is not None:
-        if not isinstance(cafe_email, str):
-            errors["email"] = "Email must be a text."
+    if not email_errors and cafe_email is not None:
+        try:
+            email_validator = validate_email(cafe_email, check_deliverability=current_app.config[
+                "CHECK_EMAIL_DELIVERABILITY"])
+            cleaned["email"] = email_validator.normalized
 
-        else:
-            cafe_email = cafe_email.strip()
-
-            if cafe_email:
-                if len(cafe_email) > 250:
-                    errors["email"] = "Email must contain at most 250 characters."
-
-                else:
-                    try:
-                        email_validator = validate_email(cafe_email, check_deliverability=current_app.config[
-                            "CHECK_EMAIL_DELIVERABILITY"])
-                        cleaned["email"] = email_validator.normalized
-
-                    except EmailNotValidError:
-                        errors["email"] = "Email is not valid."
+        except EmailNotValidError:
+            errors["email"] = "Email is not valid."
 
     # =================== WEBSITE ======================
-    cafe_website = cafe_basic_info_data.get("website")
+    website_errors, cafe_website = check_optional_value("website", cafe_basic_info_data, "Website")
+    errors |= website_errors
 
-    if cafe_website is not None:
-        if not isinstance(cafe_website, str):
-            errors["website"] = "Website must be a text."
+    if not website_errors and cafe_website is not None:
+        cafe_website = normalize_website_url(cafe_website)
+
+        if len(cafe_website) > 2048:
+            errors["website"] = "Website must contain at most 2048 characters."
+
+        elif not WEBSITE_PATTERN.fullmatch(cafe_website):
+            errors["website"] = "Website is not valid."
 
         else:
-            cafe_website = cafe_website.strip()
-
-            if cafe_website:
-                lowered_cafe_website = cafe_website.lower()
-
-                if lowered_cafe_website.startswith("http://"):
-                    cafe_website = "https://" + cafe_website[7:]
-
-                elif lowered_cafe_website.startswith("https://"):
-                    cafe_website = "https://" + cafe_website[8:]
-
-                else:
-                    cafe_website = "https://" + cafe_website
-
-                if len(cafe_website) > 2048:
-                    errors["website"] = "Website must contain at most 2048 characters."
-
-                elif not WEBSITE_PATTERN.fullmatch(cafe_website):
-                    errors["website"] = "Website is not valid."
-
-                else:
-                    cleaned["website"] = cafe_website
+            cleaned["website"] = cafe_website
 
     # =================== INSTAGRAM ======================
-    cafe_instagram = cafe_basic_info_data.get("instagram")
+    instagram_errors, cafe_instagram = check_optional_value("instagram", cafe_basic_info_data, "Instagram username")
+    errors |= instagram_errors
 
-    if cafe_instagram is not None:
-        if not isinstance(cafe_instagram, str):
-            errors["instagram"] = "Instagram username must be a text."
+    if not instagram_errors and cafe_instagram is not None:
+        cafe_instagram = cafe_instagram.lower().removeprefix("@")
 
-        else:
-            cafe_instagram = cafe_instagram.strip().lower().removeprefix("@")
+        if cafe_instagram:
+            if len(cafe_instagram) > 30:
+                errors["instagram"] = "Instagram username must contain at most 30 characters."
 
-            if cafe_instagram:
+            elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
+                errors[
+                    "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
 
-                if len(cafe_instagram) > 30:
-                    errors["instagram"] = "Instagram username must contain at most 30 characters."
-
-                elif not INSTAGRAM_PATTERN.fullmatch(cafe_instagram):
-                    errors[
-                        "instagram"] = "Instagram username can contain only letters, numbers, dots and underscores. A dot cannot be first, last or doubled."
-
-                else:
-                    cleaned["instagram"] = "@" + cafe_instagram
+            else:
+                cleaned["instagram"] = "@" + cafe_instagram
 
     # =================== PRICE-LEVEL, COFFEE_QUALITY ======================
     option_fields = [
@@ -520,19 +509,11 @@ def validate_cafe_review_data(cafe_review_data):
             cleaned["rating"] = cafe_rating
 
     # =================== CAFE-REVIEW ======================
-    cafe_review = cafe_review_data.get("text")
+    review_errors, cafe_review = check_optional_value("text", cafe_review_data, "Cafe review", 2048)
+    errors |= review_errors
 
-    if cafe_review is not None:
-        if not isinstance(cafe_review, str):
-            errors["text"] = "Cafe review must be a text."
-        else:
-            cafe_review = cafe_review.strip()
-
-            if cafe_review:
-                if len(cafe_review) > 2048:
-                    errors["text"] = "Cafe review must contain at most 2048 characters."
-                else:
-                    cleaned["text"] = cafe_review
+    if not review_errors and cafe_review is not None:
+        cleaned["text"] = cafe_review
 
     return errors, cleaned
 
