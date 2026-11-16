@@ -31,7 +31,7 @@ def make_photo(filename="photo.jpg", fmt="JPEG"):
 def test_invalid_photos_data_type(raw):
     errors = validate_cafe_photos(raw)
 
-    assert errors == {"cafe_photos": "Cafe photos must be a list."}
+    assert errors == {"cafe_photos": PHOTO_LIST_ERROR}
 
 
 def test_empty_photo_list_is_valid():
