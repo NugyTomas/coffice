@@ -42,6 +42,13 @@ PHOTO_FORMATS_BY_EXTENSION = {
 }
 MAX_ALLOWED_PHOTO_SIZE = 5 * 1024 * 1024
 
+PHOTO_LIST_ERROR = "Cafe photos must be a list."
+PHOTO_COUNT_ERROR = "Cafe photos must contain at most 6 photos."
+PHOTO_TYPE_ERROR = "Only JPG, PNG and WebP photo types are allowed."
+PHOTO_EXTENSION_MISMATCH_ERROR = "The image content does not match its file extension."
+INVALID_PHOTO_ERROR = "The uploaded file is not a valid image."
+PHOTO_SIZE_ERROR = "Maximum size of a photo is 5 MB."
+
 
 # ============== DATA PARSING =============
 def parse_suggestion_data(suggestion_json):
@@ -522,11 +529,11 @@ def validate_cafe_photos(cafe_photos):
     errors = {}
 
     if not isinstance(cafe_photos, list):
-        errors["cafe_photos"] = "Cafe photos must be a list."
+        errors["cafe_photos"] = PHOTO_LIST_ERROR
         return errors
 
     if len(cafe_photos) > MAX_ALLOWED_PHOTOS:
-        errors["cafe_photos"] = "Cafe photos must contain at most 6 photos."
+        errors["cafe_photos"] = PHOTO_COUNT_ERROR
         return errors
 
     for photo in cafe_photos:
@@ -537,7 +544,7 @@ def validate_cafe_photos(cafe_photos):
         error_key = f"cafe_photos_{filename}"
 
         if extension not in ALLOWED_PHOTO_TYPES:
-            errors.setdefault(error_key, []).append("Only JPG, PNG and WebP photo types are allowed.")
+            errors.setdefault(error_key, []).append(PHOTO_TYPE_ERROR)
 
         else:
             try:
@@ -548,14 +555,14 @@ def validate_cafe_photos(cafe_photos):
                 expected_format = PHOTO_FORMATS_BY_EXTENSION[extension]
 
                 if actual_format != expected_format:
-                    errors.setdefault(error_key, []).append("The image content does not match its file extension.")
+                    errors.setdefault(error_key, []).append(PHOTO_EXTENSION_MISMATCH_ERROR)
 
             except (UnidentifiedImageError,
                     OSError,
                     Image.DecompressionBombError,
                     SyntaxError,
                     ValueError,):
-                errors.setdefault(error_key, []).append("The uploaded file is not a valid image.")
+                errors.setdefault(error_key, []).append(INVALID_PHOTO_ERROR)
 
             finally:
                 photo.seek(0)
@@ -565,7 +572,7 @@ def validate_cafe_photos(cafe_photos):
         photo.seek(0)
 
         if photo_size > MAX_ALLOWED_PHOTO_SIZE:
-            errors.setdefault(f"cafe_photos_{filename}", []).append("Maximum size of a photo is 5 MB.")
+            errors.setdefault(error_key, []).append(PHOTO_SIZE_ERROR)
 
     return errors
 
