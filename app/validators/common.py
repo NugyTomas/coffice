@@ -40,7 +40,7 @@ def validate_choice(field_name, data, field_label, enum_class):
             try:
                 choice = enum_class(text)
             except ValueError:
-                errors[field_name] = f"Invalid data! Please choose one of the options."
+                errors[field_name] = "Invalid data! Please choose one of the options."
             else:
                 value = choice
 
