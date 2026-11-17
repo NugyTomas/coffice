@@ -8,9 +8,14 @@ from app.routes.suggestions import ANONYMOUS_USER_ID
 
 
 @pytest.fixture
-def app():
-    app = create_app(TestConfig)
+def app(tmp_path):
+    class TestConfigWithUploads(TestConfig):
+        UPLOAD_FOLDER = str(tmp_path / "uploads")
+
+    app = create_app(TestConfigWithUploads)
+
     yield app
+
     with app.app_context():
         db.drop_all()
 

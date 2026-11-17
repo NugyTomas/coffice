@@ -16,6 +16,11 @@ class Config:
     CHECK_EMAIL_DELIVERABILITY = True
     MAX_CONTENT_LENGTH = 32 * 1024 * 1024
 
+    UPLOAD_FOLDER = os.environ.get(
+        "UPLOAD_FOLDER",
+        "app/static/uploads"
+    )
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite://"

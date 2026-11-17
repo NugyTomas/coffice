@@ -18,16 +18,16 @@ from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
 
-PROJECT_DIR = Path(__file__).resolve().parents[2]
-UPLOADS_DIR = PROJECT_DIR / "app" / "static" / "uploads"
-UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-
 ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
 
 
 def save_cafe_photo(photo, extension):
+    upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
+    upload_folder.mkdir(parents=True, exist_ok=True)
+
     unique_filename = f"{uuid.uuid4()}{extension}"
-    photo_path = UPLOADS_DIR / unique_filename
+    photo_path = upload_folder / unique_filename
+    image_url = f"uploads/{unique_filename}"
 
     try:
         photo.save(photo_path)
@@ -42,9 +42,7 @@ def save_cafe_photo(photo, extension):
             )
         raise
 
-    relative_path = photo_path.relative_to(PROJECT_DIR / "app" / "static")
-
-    return photo_path, relative_path.as_posix()
+    return photo_path, image_url
 
 
 def add_opening_hours(new_cafe, cafe_opening_hours_data):
