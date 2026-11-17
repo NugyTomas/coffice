@@ -3,7 +3,7 @@ import copy
 
 import pytest
 
-from app.validators.suggestions import validate_cafe_review_data
+from app.validators.review import validate_cafe_review_data
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
                                       assert_optional_field_omitted,
