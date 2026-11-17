@@ -3,6 +3,7 @@ from pathlib import Path
 
 from flask import current_app
 
+
 def save_cafe_photo(photo, extension):
     upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
     upload_folder.mkdir(parents=True, exist_ok=True)
@@ -25,3 +26,11 @@ def save_cafe_photo(photo, extension):
         raise
 
     return photo_path, image_url
+
+
+def delete_photo_files(paths):
+    for path in paths:
+        try:
+            Path(path).unlink(missing_ok=True)
+        except OSError:
+            current_app.logger.exception("Failed to delete photo file: %s", path)

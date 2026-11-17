@@ -13,7 +13,7 @@ from app.models import (Cafe,
                         CafePhoto,
                         Review,
                         )
-from app.services.photos import save_cafe_photo
+from app.services.photos import save_cafe_photo, delete_photo_files
 from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
@@ -105,12 +105,7 @@ def create_cafe_suggestion():
 
     except Exception:
         db.session.rollback()
-
-        for path in saved_photo_paths:
-            try:
-                Path(path).unlink(missing_ok=True)
-            except OSError:
-                current_app.logger.exception("Failed to remove uploaded photo: %s", path)
+        delete_photo_files(saved_photo_paths)
 
         raise
 
