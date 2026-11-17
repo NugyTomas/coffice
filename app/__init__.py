@@ -7,6 +7,7 @@ from app.routes.geoapify import geoapify_bp
 from app.routes.main import main_bp
 from app.routes.suggestions import suggestions_bp
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -19,5 +20,5 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
-        
+
     return app

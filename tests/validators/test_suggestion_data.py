@@ -31,7 +31,7 @@ def test_invalid_parse_suggestion_data_validation(raw):
     assert cafe_suggestion is None
 
 
-def test_valid_validate_suggestion_data_validation(valid_suggestion):
+def test_valid_suggestion_data_validation(valid_suggestion):
     data = copy.deepcopy(valid_suggestion)
     suggestion_json = json.dumps(data)
 
@@ -40,7 +40,7 @@ def test_valid_validate_suggestion_data_validation(valid_suggestion):
     assert errors == {}
 
 
-def test_invalid_validate_suggestion_data_validation(valid_suggestion):
+def test_invalid_suggestion_data_validation(valid_suggestion):
     data = copy.deepcopy(valid_suggestion)
 
     del data["cafe"]["name"]
