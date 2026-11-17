@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 import uuid
+from pathlib import Path
 
 from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import select

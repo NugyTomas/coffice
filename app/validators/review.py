@@ -29,7 +29,6 @@ def validate_cafe_review_data(cafe_review_data):
     elif isinstance(cafe_rating, int):
         pass
 
-
     elif isinstance(cafe_rating, str):
         cafe_rating = cafe_rating.strip()
 

@@ -6,12 +6,12 @@ from werkzeug.datastructures import FileStorage
 
 from app.validators.photos import (validate_cafe_photos,
                                    PHOTO_LIST_ERROR,
-                                        PHOTO_COUNT_ERROR,
-                                        PHOTO_TYPE_ERROR,
-                                        PHOTO_EXTENSION_MISMATCH_ERROR,
-                                        INVALID_PHOTO_ERROR,
-                                        PHOTO_SIZE_ERROR,
-                                        )
+                                   PHOTO_COUNT_ERROR,
+                                   PHOTO_TYPE_ERROR,
+                                   PHOTO_EXTENSION_MISMATCH_ERROR,
+                                   INVALID_PHOTO_ERROR,
+                                   PHOTO_SIZE_ERROR,
+                                   )
 
 
 def make_photo(filename="photo.jpg", fmt="JPEG"):

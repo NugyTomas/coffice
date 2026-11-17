@@ -1,9 +1,10 @@
 from flask import Flask
-from app.extensions import db
-from app import models  # noqa: F401  (registers tables for create_all)
+
+from app import models  # noqa: F401
 from app.config import Config
-from app.routes.main import main_bp
+from app.extensions import db
 from app.routes.geoapify import geoapify_bp
+from app.routes.main import main_bp
 from app.routes.suggestions import suggestions_bp
 
 def create_app(config_class=Config):

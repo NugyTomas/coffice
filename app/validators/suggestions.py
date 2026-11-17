@@ -3,8 +3,9 @@ import json
 from app.validators.cafe import validate_cafe_basic_info_data
 from app.validators.features import validate_cafe_features_data
 from app.validators.opening_hours import validate_cafe_opening_hours_data
-from app.validators.review import validate_cafe_review_data
 from app.validators.photos import validate_cafe_photos
+from app.validators.review import validate_cafe_review_data
+
 
 # ============== DATA PARSING =============
 def parse_suggestion_data(suggestion_json):
@@ -25,6 +26,7 @@ def parse_suggestion_data(suggestion_json):
         return errors, None
 
     return {}, cafe_suggestion
+
 
 # ============== DATA VALIDATION =============
 def validate_suggestion_data(suggestion_json, photos):
