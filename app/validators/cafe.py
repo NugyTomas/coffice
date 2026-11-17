@@ -3,9 +3,8 @@ import re
 from email_validator import validate_email, EmailNotValidError
 from flask import current_app
 
-from app.enums import (CafePrice,
-                       CoffeeQuality
-                       )
+from app.enums import CafePrice, CoffeeQuality
+
 from app.validators.common import check_optional_value, validate_choice
 
 # =========================================
