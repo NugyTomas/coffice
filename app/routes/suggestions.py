@@ -1,5 +1,5 @@
 import os
-import uuid
+
 from pathlib import Path
 
 from flask import Blueprint, current_app, jsonify, request
@@ -13,36 +13,12 @@ from app.models import (Cafe,
                         CafePhoto,
                         Review,
                         )
-
+from app.services.photos import save_cafe_photo
 from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
 
 ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
-
-
-def save_cafe_photo(photo, extension):
-    upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
-    upload_folder.mkdir(parents=True, exist_ok=True)
-
-    unique_filename = f"{uuid.uuid4()}{extension}"
-    photo_path = upload_folder / unique_filename
-    image_url = f"uploads/{unique_filename}"
-
-    try:
-        photo.save(photo_path)
-
-    except OSError:
-        try:
-            photo_path.unlink(missing_ok=True)
-        except OSError:
-            current_app.logger.exception(
-                "Failed to remove incomplete photo: %s",
-                photo_path,
-            )
-        raise
-
-    return photo_path, image_url
 
 
 def add_opening_hours(new_cafe, cafe_opening_hours_data):
