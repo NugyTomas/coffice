@@ -11,6 +11,7 @@ from app.enums import (WifiQuality,
 from app.validators.common import validate_choice
 
 
+# =================== MAIN FUNCTION ======================
 def validate_cafe_features_data(cafe_features_data):
     cleaned = {}
     errors = {}

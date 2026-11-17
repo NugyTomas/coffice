@@ -10,6 +10,7 @@ TIME_TEXT_PATTERN = re.compile(r"\d{2}:\d{2}")
 TIME_FORMAT = "%H:%M"
 
 
+# =================== MAIN FUNCTION ======================
 def validate_cafe_opening_hours_data(cafe_opening_hours_data):
     cleaned = {}
     errors = {}

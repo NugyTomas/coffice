@@ -4,8 +4,8 @@ import pytest
 from PIL import Image
 from werkzeug.datastructures import FileStorage
 
-from app.validators.suggestions import (validate_cafe_photos,
-                                        PHOTO_LIST_ERROR,
+from app.validators.photos import (validate_cafe_photos,
+                                   PHOTO_LIST_ERROR,
                                         PHOTO_COUNT_ERROR,
                                         PHOTO_TYPE_ERROR,
                                         PHOTO_EXTENSION_MISMATCH_ERROR,
@@ -103,7 +103,7 @@ def test_photo_format_does_not_match_name(filename, fmt):
 
 def test_photo_too_large(monkeypatch):
     monkeypatch.setattr(
-        "app.validators.suggestions.MAX_ALLOWED_PHOTO_SIZE",
+        "app.validators.photos.MAX_ALLOWED_PHOTO_SIZE",
         100
     )
 
