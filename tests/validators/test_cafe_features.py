@@ -12,7 +12,7 @@ from app.enums import (WifiQuality,
                        VegetarianOptions,
                        CardPayment)
 
-from app.validators.suggestions import validate_cafe_features_data
+from app.validators.features import validate_cafe_features_data
 from tests.validators.helpers import assert_valid_field
 
 WIFI_QUALITY_VALUES = [

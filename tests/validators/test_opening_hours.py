@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 
 from app.enums import WeekDay, OpeningDayStatus
-from app.validators.suggestions import validate_cafe_opening_hours_data
+from app.validators.opening_hours import validate_cafe_opening_hours_data
 
 DAY_NAMES = [day.value for day in WeekDay]
 

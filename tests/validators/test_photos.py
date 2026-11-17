@@ -4,7 +4,14 @@ import pytest
 from PIL import Image
 from werkzeug.datastructures import FileStorage
 
-from app.validators.suggestions import validate_cafe_photos
+from app.validators.photos import (validate_cafe_photos,
+                                   PHOTO_LIST_ERROR,
+                                   PHOTO_COUNT_ERROR,
+                                   PHOTO_TYPE_ERROR,
+                                   PHOTO_EXTENSION_MISMATCH_ERROR,
+                                   INVALID_PHOTO_ERROR,
+                                   PHOTO_SIZE_ERROR,
+                                   )
 
 
 def make_photo(filename="photo.jpg", fmt="JPEG"):
@@ -24,7 +31,7 @@ def make_photo(filename="photo.jpg", fmt="JPEG"):
 def test_invalid_photos_data_type(raw):
     errors = validate_cafe_photos(raw)
 
-    assert "cafe_photos" in errors
+    assert errors == {"cafe_photos": PHOTO_LIST_ERROR}
 
 
 def test_empty_photo_list_is_valid():
@@ -47,7 +54,7 @@ def test_invalid_number_of_photos():
 
     errors = validate_cafe_photos(photos)
 
-    assert "cafe_photos" in errors
+    assert errors == {"cafe_photos": PHOTO_COUNT_ERROR}
 
 
 @pytest.mark.parametrize("filename, fmt", [
@@ -77,7 +84,7 @@ def test_invalid_photo_format(filename, fmt):
 
     errors = validate_cafe_photos(photo)
 
-    assert errors[f"cafe_photos_{filename}"] == ["Only JPG, PNG and WebP photo types are allowed."]
+    assert errors[f"cafe_photos_{filename}"] == [PHOTO_TYPE_ERROR]
 
 
 @pytest.mark.parametrize("filename, fmt", [
@@ -91,12 +98,12 @@ def test_photo_format_does_not_match_name(filename, fmt):
 
     errors = validate_cafe_photos(photo)
 
-    assert errors[f"cafe_photos_{filename}"] == ["The image content does not match its file extension."]
+    assert errors[f"cafe_photos_{filename}"] == [PHOTO_EXTENSION_MISMATCH_ERROR]
 
 
 def test_photo_too_large(monkeypatch):
     monkeypatch.setattr(
-        "app.validators.suggestions.MAX_ALLOWED_PHOTO_SIZE",
+        "app.validators.photos.MAX_ALLOWED_PHOTO_SIZE",
         100
     )
 
@@ -110,9 +117,7 @@ def test_photo_too_large(monkeypatch):
 
     errors = validate_cafe_photos([photo])
 
-    assert errors["cafe_photos_photo.jpg"] == [
-        "Maximum size of a photo is 5 MB."
-    ]
+    assert errors["cafe_photos_photo.jpg"] == [PHOTO_SIZE_ERROR]
 
 
 def test_corrupted_photo():
@@ -123,9 +128,7 @@ def test_corrupted_photo():
 
     errors = validate_cafe_photos([photo])
 
-    assert errors["cafe_photos_photo.jpg"] == [
-        "The uploaded file is not a valid image."
-    ]
+    assert errors["cafe_photos_photo.jpg"] == [INVALID_PHOTO_ERROR]
 
 
 def test_empty_photo_file():
@@ -136,6 +139,4 @@ def test_empty_photo_file():
 
     errors = validate_cafe_photos([photo])
 
-    assert errors["cafe_photos_photo.jpg"] == [
-        "The uploaded file is not a valid image."
-    ]
+    assert errors["cafe_photos_photo.jpg"] == [INVALID_PHOTO_ERROR]

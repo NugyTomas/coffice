@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 import uuid
+from pathlib import Path
 
 from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import select
@@ -14,7 +14,7 @@ from app.models import (Cafe,
                         Review,
                         )
 
-from app.validators.suggestions import check_suggestion_data
+from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
 
@@ -23,6 +23,7 @@ UPLOADS_DIR = PROJECT_DIR / "app" / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
+
 
 def save_cafe_photo(photo, extension):
     unique_filename = f"{uuid.uuid4()}{extension}"
@@ -82,7 +83,7 @@ def create_cafe_suggestion():
      cafe_opening_hours_data,
      cafe_review_data,
      cafe_photos
-     ) = check_suggestion_data(suggestion_json, photos)
+     ) = validate_suggestion_data(suggestion_json, photos)
 
     if errors:
         return jsonify({
@@ -93,7 +94,7 @@ def create_cafe_suggestion():
 
     if external_id:
         exists = (db.session.scalar(
-                    select(Cafe.id).where(Cafe.external_place_id == external_id)))
+            select(Cafe.id).where(Cafe.external_place_id == external_id)))
 
         if exists:
             return jsonify({

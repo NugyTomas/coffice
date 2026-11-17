@@ -3,7 +3,7 @@ import copy
 import pytest
 
 from app.enums import CoffeeQuality, CafePrice
-from app.validators.suggestions import validate_cafe_basic_info_data
+from app.validators.cafe import validate_cafe_basic_info_data
 from tests.validators.helpers import (assert_valid_field,
                                       assert_invalid_field,
                                       assert_optional_field_omitted,
