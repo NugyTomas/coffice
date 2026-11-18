@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 
 from app.enums import OpeningDayStatus, CafeStatus, WeekDay

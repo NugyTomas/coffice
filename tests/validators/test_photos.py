@@ -14,8 +14,6 @@ from app.validators.photos import (validate_cafe_photos,
 from tests.helpers import make_photo
 
 
-
-
 @pytest.mark.parametrize("raw", [
     None,
     "photo.jpg",
