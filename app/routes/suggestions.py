@@ -28,12 +28,12 @@ def submit_cafe_suggestion():
 
     try:
         create_cafe_suggestion(
-            cafe_basic_info_data,
-            cafe_features_data,
-            cafe_opening_hours_data,
-            cafe_review_data,
-            cafe_photos,
-            ANONYMOUS_USER_ID,
+            basic_info=cafe_basic_info_data,
+            features=cafe_features_data,
+            opening_hours=cafe_opening_hours_data,
+            review=cafe_review_data,
+            photos=cafe_photos,
+            submitted_by_id=ANONYMOUS_USER_ID,
         )
     except DuplicateCafeError:
         return jsonify({

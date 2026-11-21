@@ -52,7 +52,7 @@ def check_for_duplicated_cafe(external_place_id):
     existing_cafe = db.session.scalar(database_selection)
 
     if existing_cafe is not None:
-        raise DuplicateCafeError
+        raise DuplicateCafeError(external_place_id)
 
 
 def build_cafe_suggestion(
@@ -82,7 +82,7 @@ def build_cafe_suggestion(
 def create_cafe_suggestion(basic_info, features, opening_hours, review, photos, submitted_by_id):
     saved_photo_paths = []
     try:
-        check_for_duplicated_cafe(basic_info["external_place_id"])
+        check_for_duplicated_cafe(basic_info.get("external_place_id"))
 
         new_cafe = build_cafe_suggestion(
             basic_info,

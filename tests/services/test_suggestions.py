@@ -1,3 +1,4 @@
+import copy
 import json
 from pathlib import Path
 
@@ -68,6 +69,31 @@ def test_cafe_external_place_id_is_not_duplicate(valid_suggestion):
     cafe_external_place_id = valid_suggestion['cafe']['external_place_id']
 
     check_for_duplicated_cafe(cafe_external_place_id)
+
+
+@pytest.mark.parametrize("external_place_id", [None, ""])
+def test_empty_external_place_id_is_not_checked(db_session, monkeypatch, external_place_id):
+    def mock_scalar(*args, **kwargs):
+        pytest.fail("Database query should not be executed.")
+
+    monkeypatch.setattr(
+        db_session,
+        "scalar",
+        mock_scalar
+    )
+
+    check_for_duplicated_cafe(external_place_id)
+
+
+def test_cafe_without_external_place_id(db_session, valid_suggestion):
+    data = copy.deepcopy(valid_suggestion)
+    del data["cafe"]["external_place_id"]
+
+    for loop in range(3):
+        create_and_save_test_cafe(data)
+
+    db_count = db_session.scalar(select(func.count()).select_from(Cafe))
+    assert db_count == 3
 
 
 def test_cafe_external_place_id_is_duplicated(db_session, valid_suggestion):
