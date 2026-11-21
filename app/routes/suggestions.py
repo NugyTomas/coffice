@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from app.constants import ANONYMOUS_USER_ID
-from app.services.suggestions import create_cafe_suggestion
+from app.services.suggestions import DuplicateCafeError, create_cafe_suggestion
 from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
@@ -26,14 +26,22 @@ def submit_cafe_suggestion():
             "errors": errors
         }), 400
 
-    create_cafe_suggestion(
-        cafe_basic_info_data,
-        cafe_features_data,
-        cafe_opening_hours_data,
-        cafe_review_data,
-        cafe_photos,
-        ANONYMOUS_USER_ID,
-    )
+    try:
+        create_cafe_suggestion(
+            cafe_basic_info_data,
+            cafe_features_data,
+            cafe_opening_hours_data,
+            cafe_review_data,
+            cafe_photos,
+            ANONYMOUS_USER_ID,
+        )
+    except DuplicateCafeError:
+        return jsonify({
+            "success": False,
+            "errors": {
+                "cafe": "The cafe is already submitted or waiting for approval."
+            }
+        }), 409
 
     return jsonify({
         "success": True
