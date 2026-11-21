@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy import select
 
 from app.enums import (CafeStatus,
@@ -6,9 +8,12 @@ from app.enums import (CafeStatus,
 from app.extensions import db
 from app.models import (Cafe,
                         CafeFeature,
+                        CafePhoto,
                         OpeningHours,
                         Review,
                         )
+from app.services.photos import save_cafe_photo, delete_photo_files
+
 
 class DuplicateCafeError(Exception):
     pass
@@ -38,6 +43,7 @@ def add_opening_hours(new_cafe, cafe_opening_hours_data):
                 cafe_opening_hours
             )
 
+
 def check_for_duplicated_cafe(external_place_id):
     if not external_place_id:
         return
@@ -47,6 +53,7 @@ def check_for_duplicated_cafe(external_place_id):
 
     if existing_cafe is not None:
         raise DuplicateCafeError
+
 
 def build_cafe_suggestion(
         basic_info,
@@ -68,5 +75,40 @@ def build_cafe_suggestion(
     new_cafe.reviews.append(
         Review(**review, submitted_by_id=submitted_by_id)
     )
+
+    return new_cafe
+
+
+def create_cafe_suggestion(basic_info, features, opening_hours, review, photos, submitted_by_id):
+    saved_photo_paths = []
+    try:
+        check_for_duplicated_cafe(basic_info["external_place_id"])
+
+        new_cafe = build_cafe_suggestion(
+            basic_info,
+            features,
+            opening_hours,
+            review,
+            submitted_by_id,
+        )
+
+        for photo in photos:
+            _, extension = os.path.splitext(photo.filename)
+            photo_path, image_url = save_cafe_photo(photo, extension)
+            saved_photo_paths.append(photo_path)
+
+            new_cafe_photo = CafePhoto(
+                image_url=image_url
+            )
+            new_cafe.photos.append(new_cafe_photo)
+
+        db.session.add(new_cafe)
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        delete_photo_files(saved_photo_paths)
+
+        raise
 
     return new_cafe
