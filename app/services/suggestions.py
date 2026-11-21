@@ -1,11 +1,17 @@
+from sqlalchemy import select
+
 from app.enums import (CafeStatus,
                        OpeningDayStatus,
                        WeekDay)
+from app.extensions import db
 from app.models import (Cafe,
                         CafeFeature,
                         OpeningHours,
                         Review,
                         )
+
+class DuplicateCafeError(Exception):
+    pass
 
 
 def add_opening_hours(new_cafe, cafe_opening_hours_data):
@@ -32,6 +38,15 @@ def add_opening_hours(new_cafe, cafe_opening_hours_data):
                 cafe_opening_hours
             )
 
+def check_for_duplicated_cafe(external_place_id):
+    if not external_place_id:
+        return
+
+    database_selection = select(Cafe.external_place_id).where(Cafe.external_place_id == external_place_id)
+    existing_cafe = db.session.scalar(database_selection)
+
+    if existing_cafe is not None:
+        raise DuplicateCafeError
 
 def build_cafe_suggestion(
         basic_info,
