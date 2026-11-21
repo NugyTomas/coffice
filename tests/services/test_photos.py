@@ -42,7 +42,7 @@ def test_delete_nonexistent_photo_file(app):
     assert not photo_path.exists()
 
 
-def test_delete_photo_file_handles_os_error(app, monkeypatch):
+def test_delete_photo_file_handles_os_error(app, monkeypatch, caplog):
     photo_path = Path(app.config["UPLOAD_FOLDER"]) / "photo.jpg"
 
     def fail_unlink(self, missing_ok=False):
@@ -52,6 +52,7 @@ def test_delete_photo_file_handles_os_error(app, monkeypatch):
 
     with app.app_context():
         delete_photo_files([photo_path])
+        assert "Failed to delete photo file" in caplog.text
 
 
 def test_save_cafe_photo_cleans_partial_file_on_error(app, monkeypatch):

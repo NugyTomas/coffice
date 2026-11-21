@@ -3,45 +3,16 @@ import os
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 
-from app.enums import OpeningDayStatus, CafeStatus, WeekDay
+from app.constants import ANONYMOUS_USER_ID
 from app.extensions import db
 from app.models import (Cafe,
-                        CafeFeature,
-                        OpeningHours,
                         CafePhoto,
-                        Review,
                         )
 from app.services.photos import save_cafe_photo, delete_photo_files
+from app.services.suggestions import build_cafe_suggestion
 from app.validators.suggestions import validate_suggestion_data
 
 suggestions_bp = Blueprint('suggestions', __name__)
-
-ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
-
-
-def add_opening_hours(new_cafe, cafe_opening_hours_data):
-    for day, data in cafe_opening_hours_data.items():
-        day_status = data["status"]
-        intervals = (
-            data["intervals"]
-            if day_status == OpeningDayStatus.OPEN
-            else [{}]
-        )
-
-        for interval in intervals:
-            opening_time = interval.get("open")
-            closing_time = interval.get("close")
-
-            cafe_opening_hours = OpeningHours(
-                day_of_week=WeekDay(day),
-                status=day_status,
-                open_time=opening_time,
-                close_time=closing_time,
-            )
-
-            new_cafe.opening_hours.append(
-                cafe_opening_hours
-            )
 
 
 @suggestions_bp.route("/api/cafe-suggestions", methods=['POST'])
@@ -74,16 +45,13 @@ def create_cafe_suggestion():
                 "errors": {"cafe": "This café is already on Coffice or waiting for approval."}
             }), 409
 
-    new_cafe = Cafe(**cafe_basic_info_data, submitted_by_id=ANONYMOUS_USER_ID)
-    new_cafe.status = CafeStatus.PENDING
-
-    new_cafe_features = CafeFeature(**cafe_features_data)
-    new_cafe.features = new_cafe_features
-
-    add_opening_hours(new_cafe, cafe_opening_hours_data)
-
-    new_cafe_review = Review(**cafe_review_data, submitted_by_id=ANONYMOUS_USER_ID)
-    new_cafe.reviews.append(new_cafe_review)
+    new_cafe = build_cafe_suggestion(
+        cafe_basic_info_data,
+        cafe_features_data,
+        cafe_opening_hours_data,
+        cafe_review_data,
+        ANONYMOUS_USER_ID,
+    )
 
     saved_photo_paths = []
 

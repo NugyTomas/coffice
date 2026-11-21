@@ -5,9 +5,9 @@ from datetime import datetime
 import pytest
 from sqlalchemy import func, select
 
+from app.constants import ANONYMOUS_USER_ID
 from app.enums import CafeStatus
 from app.models import Cafe
-from app.routes.suggestions import ANONYMOUS_USER_ID
 
 
 def test_home_page(client):
@@ -111,5 +111,3 @@ def test_client_cannot_set_created_at(client, valid_suggestion, db_session):
 
     cafe = db_session.scalars(select(Cafe)).one()
     assert request_time <= cafe.created_at <= datetime.now()
-
-

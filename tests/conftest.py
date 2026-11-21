@@ -4,7 +4,7 @@ from app import create_app
 from app.config import TestConfig
 from app.extensions import db
 from app.models import User
-from app.routes.suggestions import ANONYMOUS_USER_ID
+from app.constants import ANONYMOUS_USER_ID
 
 
 @pytest.fixture
