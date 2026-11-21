@@ -10,6 +10,7 @@ from app.enums import CafeStatus
 from app.models import Cafe
 
 
+
 def test_home_page(client):
     response = client.get('/')
     assert response.status_code == 200
@@ -111,3 +112,14 @@ def test_client_cannot_set_created_at(client, valid_suggestion, db_session):
 
     cafe = db_session.scalars(select(Cafe)).one()
     assert request_time <= cafe.created_at <= datetime.now()
+
+
+def test_cafe_suggestion_without_external_place_id_returns_201(client, valid_suggestion, db_session):
+    data = copy.deepcopy(valid_suggestion)
+    del data["cafe"]["external_place_id"]
+
+    response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(data)})
+    assert response.status_code == 201
+
+    cafe = db_session.scalars(select(Cafe)).one()
+    assert cafe.external_place_id is None

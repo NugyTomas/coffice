@@ -89,7 +89,7 @@ def test_cafe_without_external_place_id(db_session, valid_suggestion):
     data = copy.deepcopy(valid_suggestion)
     del data["cafe"]["external_place_id"]
 
-    for loop in range(3):
+    for _ in range(3):
         create_and_save_test_cafe(data)
 
     db_count = db_session.scalar(select(func.count()).select_from(Cafe))
