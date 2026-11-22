@@ -4,13 +4,11 @@ from app.constants import ANONYMOUS_USER_ID
 from app.services.suggestions import DuplicateCafeError, create_cafe_suggestion
 from app.validators.suggestions import validate_suggestion_data
 
-# =========================================
-# CONSTANTS
-# =========================================
+# =================== CONSTANT ======================
 DUPLICATE_CAFE_ERROR = "The cafe is already submitted or waiting for approval."
 
-
 suggestions_bp = Blueprint('suggestions', __name__)
+
 
 @suggestions_bp.route("/api/cafe-suggestions", methods=['POST'])
 def submit_cafe_suggestion():

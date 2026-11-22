@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from flask import current_app
 from sqlalchemy import select, func
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.constants import ANONYMOUS_USER_ID
 from app.enums import CafeStatus
@@ -165,5 +165,17 @@ def test_integrity_error_from_duplicate_becomes_duplicate_error(db_session, monk
     assert basic_info_db_count == 1
 
     upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
-    assert len(list(upload_folder.iterdir())) == 1
+    assert len(list(upload_folder.iterdir())) == 1  # photo from the first, successful cafe
 
+
+def test_other_integrity_error_is_not_reported_as_duplicate(db_session, monkeypatch, valid_suggestion):
+    def mock_commit():
+        raise IntegrityError("INSERT ...", {}, Exception("other constraint"))
+
+    monkeypatch.setattr(db_session, "commit", mock_commit)
+
+    with pytest.raises(IntegrityError):
+        create_and_save_test_cafe(valid_suggestion)
+
+    upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
+    assert list(upload_folder.iterdir()) == []
