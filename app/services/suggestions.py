@@ -1,6 +1,7 @@
 import os
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app.enums import (CafeStatus,
                        OpeningDayStatus,
@@ -104,6 +105,12 @@ def create_cafe_suggestion(basic_info, features, opening_hours, review, photos, 
 
         db.session.add(new_cafe)
         db.session.commit()
+
+    except IntegrityError:
+        db.session.rollback()
+        delete_photo_files(saved_photo_paths)
+        check_for_duplicated_cafe(basic_info.get("external_place_id"))
+        raise
 
     except Exception:
         db.session.rollback()

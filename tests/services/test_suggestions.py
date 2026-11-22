@@ -15,6 +15,7 @@ from app.models import (Cafe,
                         OpeningHours,
                         Review,
                         )
+from app.services import suggestions
 from app.services.suggestions import (create_cafe_suggestion,
                                       check_for_duplicated_cafe,
                                       DuplicateCafeError,
@@ -133,3 +134,36 @@ def test_error_while_committing_to_db(db_session, monkeypatch, valid_suggestion)
     assert opening_hours_db_count == 0
     assert review_db_count == 0
     assert photos_db_count == 0
+
+
+def test_integrity_error_from_duplicate_becomes_duplicate_error(db_session, monkeypatch, valid_suggestion):
+    create_and_save_test_cafe(valid_suggestion)
+
+    real_check = suggestions.check_for_duplicated_cafe
+    calls = []
+
+    def skip_first_check(external_place_id):
+        calls.append(external_place_id)
+        if len(calls) == 1:
+            return
+        real_check(external_place_id)
+
+    monkeypatch.setattr(
+        suggestions,
+        "check_for_duplicated_cafe",
+        skip_first_check,
+    )
+
+    with pytest.raises(DuplicateCafeError):
+        create_and_save_test_cafe(valid_suggestion)
+
+    assert len(calls) == 2
+
+    basic_info_db_count = db_session.scalar(
+        select(func.count()).select_from(Cafe)
+    )
+    assert basic_info_db_count == 1
+
+    upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
+    assert len(list(upload_folder.iterdir())) == 1
+

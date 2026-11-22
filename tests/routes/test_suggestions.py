@@ -1,14 +1,18 @@
 import copy
 import json
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 
 from app.constants import ANONYMOUS_USER_ID
 from app.enums import CafeStatus
 from app.models import Cafe
-
+from app.services import suggestions
+from app.routes.suggestions import DUPLICATE_CAFE_ERROR
+from tests.helpers import make_photo
 
 
 def test_home_page(client):
@@ -123,3 +127,51 @@ def test_cafe_suggestion_without_external_place_id_returns_201(client, valid_sug
 
     cafe = db_session.scalars(select(Cafe)).one()
     assert cafe.external_place_id is None
+
+
+def test_integrity_error_returns_409_and_cleans_uploads(app, client, monkeypatch, valid_suggestion, db_session):
+    response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(valid_suggestion)})
+    assert response.status_code == 201
+
+    real_check = suggestions.check_for_duplicated_cafe
+    calls = []
+
+    def skip_first_check(external_place_id):
+        calls.append(external_place_id)
+        if len(calls) == 1:
+            return
+        real_check(external_place_id)
+
+    monkeypatch.setattr(
+        suggestions,
+        "check_for_duplicated_cafe",
+        skip_first_check,
+    )
+
+    def mock_commit():
+        raise IntegrityError(
+            "INSERT INTO cafes ...",
+            {},
+            Exception("Simulated unique constraint violation"),
+        )
+
+    monkeypatch.setattr(
+        db_session,
+        "commit",
+        mock_commit
+    )
+
+    response = client.post("/api/cafe-suggestions",
+                           data={"suggestion": json.dumps(valid_suggestion), "photos": make_photo("test.jpg")})
+    upload_folder = Path(app.config["UPLOAD_FOLDER"])
+
+    assert response.status_code == 409
+    assert response.get_json()["success"] is False
+    assert response.get_json()["errors"]["cafe"] == DUPLICATE_CAFE_ERROR
+    assert len(calls) == 2
+    assert list(upload_folder.iterdir()) == []
+
+    cafe_count = db_session.scalar(
+        select(func.count()).select_from(Cafe)
+    )
+    assert cafe_count == 1
