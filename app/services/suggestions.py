@@ -106,11 +106,8 @@ def create_cafe_suggestion(basic_info, features, opening_hours, review, photos, 
         db.session.add(new_cafe)
         db.session.commit()
 
-
     except Exception as error:
-
         db.session.rollback()
-
         delete_photo_files(saved_photo_paths)
 
         if isinstance(error, IntegrityError):

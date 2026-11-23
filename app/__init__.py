@@ -2,8 +2,8 @@ from flask import Flask
 
 from app import models  # noqa: F401
 from app.config import Config
-from app.extensions import db
 from app.errors import register_error_handlers
+from app.extensions import db
 from app.routes.geoapify import geoapify_bp
 from app.routes.main import main_bp
 from app.routes.suggestions import suggestions_bp

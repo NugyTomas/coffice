@@ -1,7 +1,6 @@
 from flask import current_app, jsonify, request
 from werkzeug.exceptions import HTTPException, InternalServerError
 
-REQUEST_TOO_LARGE_ERROR = 'Request is too large.'
 SOMETHING_WENT_WRONG_ERROR = 'Something went wrong.'
 
 
@@ -10,17 +9,15 @@ def wants_json():
 
 
 def register_error_handlers(app):
-    @app.errorhandler(413)
-    def request_too_large(error):
+    @app.errorhandler(HTTPException)
+    def handle_exception(error):
         if not wants_json():
             return error
-        return jsonify({"success": False, "errors": {"request": REQUEST_TOO_LARGE_ERROR}}), 413
+
+        return jsonify({"success": False, "errors": {"request": error.description}}), error.code
 
     @app.errorhandler(Exception)
-    def handle_unexpected_error(error):
-        if isinstance(error, HTTPException):
-            return error
-
+    def handle_unexpected_error(_error):
         current_app.logger.exception("Unhandled exception")
 
         if not wants_json():
