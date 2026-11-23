@@ -3,7 +3,7 @@ import json
 from flask import request
 
 from app.routes import suggestions
-from app.errors import SOMETHING_WENT_WRONG_ERROR
+from app.errors import SOMETHING_WENT_WRONG_ERROR, REQUEST_TOO_LARGE_ERROR
 
 
 def test_get_nonexistent_url_returns_404_for_api(app, client):
@@ -46,20 +46,6 @@ def test_get_cafe_suggestions_returns_405_for_api(client):
     assert response.get_json()["errors"]["request"]
 
 
-def test_unexpected_python_exception_returns_500_for_web(app, client):
-    def raise_value_error(*args, **kwargs):
-        raise ValueError("Test error")
-
-    app.add_url_rule("/test/route", view_func=raise_value_error)
-
-    response = client.get('/test/route')
-
-    assert response.status_code == 500
-    assert response.mimetype == "text/html"
-    assert response.is_json is False
-    assert "Test error" not in response.get_data(as_text=True)
-
-
 def test_request_too_large_returns_413_for_api(app, client):
     app.config["MAX_CONTENT_LENGTH"] = 100
 
@@ -68,7 +54,7 @@ def test_request_too_large_returns_413_for_api(app, client):
     assert response.status_code == 413
     assert response.mimetype == "application/json"
     assert response.get_json()["success"] is False
-    assert response.get_json()["errors"]["request"]
+    assert response.get_json()["errors"]["request"] == REQUEST_TOO_LARGE_ERROR
 
 
 def test_request_too_large_returns_413_for_web(app, client):
@@ -84,3 +70,17 @@ def test_request_too_large_returns_413_for_web(app, client):
     assert response.status_code == 413
     assert response.mimetype == "text/html"
     assert response.is_json is False
+
+
+def test_unexpected_python_exception_returns_500_for_web(app, client):
+    def raise_value_error(*args, **kwargs):
+        raise ValueError("Test error")
+
+    app.add_url_rule("/test/route", view_func=raise_value_error)
+
+    response = client.get('/test/route')
+
+    assert response.status_code == 500
+    assert response.mimetype == "text/html"
+    assert response.is_json is False
+    assert "Test error" not in response.get_data(as_text=True)
