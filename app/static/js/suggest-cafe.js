@@ -41,7 +41,7 @@ let cafeLongitude = null;
 let cafeGeoapifyId = null;
 
 let selectedAddress = {
-    address : "",
+    address: "",
     city: "",
     postCode: "",
     latitude: null,
@@ -240,7 +240,7 @@ function fillAddressDetails(addressDetails) {
 
 function buildStreetAddress(addressDetails) {
     if (addressDetails.street) {
-        return addressDetails.housenumber? `${addressDetails.street} ${addressDetails.housenumber}` : addressDetails.street;
+        return addressDetails.housenumber ? `${addressDetails.street} ${addressDetails.housenumber}` : addressDetails.street;
     }
 
     if (addressDetails.housenumber) {
@@ -735,16 +735,25 @@ async function prepareCafeSuggestion() {
 }
 
 async function sendCafeSuggestion(completeFormData) {
-    const response = await fetch("/api/cafe-suggestions", {
-        method: "POST",
-        body: completeFormData
-    });
+    let response;
+    try {
+        response = await fetch("/api/cafe-suggestions", {
+            method: "POST",
+            body: completeFormData
+        });
+    } catch {
+        throw new Error("Could not reach the server. Please check your connection and try again.");
+    }
 
-    const contentType = response.headers.get("content-type");
     let result = null;
+    const contentType = response.headers.get("content-type");
 
     if (contentType && contentType.includes("application/json")) {
-        result = await response.json();
+        try {
+            result = await response.json();
+        } catch {
+            result = null;
+        }
     }
 
     if (!response.ok) {
@@ -905,7 +914,7 @@ cafeAddress.addEventListener("input", async () => {
         let cafeAddressFound = false;
 
         data.results.forEach(result => {
-            if(!result.postcode){
+            if (!result.postcode) {
                 return
             }
 
@@ -1038,7 +1047,7 @@ openingDays.forEach(dayElement => {
         if (!openRadio.checked) {
             openRadio.click();
         }
-});
+    });
 
     addIntervalButton.addEventListener("click", () => {
         const newInterval = openingIntervalTemplate.cloneNode(true);
