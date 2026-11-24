@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent
+
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -15,6 +19,9 @@ class Config:
 
     CHECK_EMAIL_DELIVERABILITY = True
     MAX_CONTENT_LENGTH = 32 * 1024 * 1024
+
+    UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", str(BASE_DIR / "static" / "uploads"))
+
 
 class TestConfig(Config):
     TESTING = True

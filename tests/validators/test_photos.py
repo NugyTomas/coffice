@@ -1,7 +1,6 @@
 from io import BytesIO
 
 import pytest
-from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 from app.validators.photos import (validate_cafe_photos,
@@ -12,13 +11,7 @@ from app.validators.photos import (validate_cafe_photos,
                                    INVALID_PHOTO_ERROR,
                                    PHOTO_SIZE_ERROR,
                                    )
-
-
-def make_photo(filename="photo.jpg", fmt="JPEG"):
-    buffer = BytesIO()
-    Image.new("RGB", (10, 10)).save(buffer, fmt)
-    buffer.seek(0)
-    return FileStorage(stream=buffer, filename=filename)
+from tests.helpers import make_photo
 
 
 @pytest.mark.parametrize("raw", [

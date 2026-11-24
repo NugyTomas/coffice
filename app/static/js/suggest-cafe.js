@@ -41,11 +41,7 @@ let cafeLongitude = null;
 let cafeGeoapifyId = null;
 
 let selectedAddress = {
-    address : "",
-    city: "",
-    postCode: "",
-    latitude: null,
-    longitude: null
+    address: "", city: "", postCode: "", latitude: null, longitude: null
 };
 
 const information = getSection(".basic-information");
@@ -58,13 +54,7 @@ const cardPayment = document.getElementById("card-yes");
 const openingHours = getSection(".opening-hours");
 const openingDays = document.querySelectorAll(".opening-day");
 let openingSchedule = {
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: []
+    monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: []
 };
 
 //================ FINAL-REVIEW ================
@@ -90,12 +80,7 @@ function getSection(sectionSelector) {
     const continueButton = section.querySelector(".continue-btn");
 
     return {
-        section,
-        sectionContent,
-        sectionButton,
-        status,
-        arrow,
-        continueButton
+        section, sectionContent, sectionButton, status, arrow, continueButton
     }
 }
 
@@ -203,10 +188,7 @@ function fillCafeDetails(cafeDetails) {
     cafeLatitude = cafeDetails.lat;
     cafeLongitude = cafeDetails.lon;
 
-    const cafeAcceptsCards = !!(
-        cafeDetails.payment_options?.debit_cards ||
-        cafeDetails.payment_options?.credit_cards
-    );
+    const cafeAcceptsCards = !!(cafeDetails.payment_options?.debit_cards || cafeDetails.payment_options?.credit_cards);
     cardPayment.checked = cafeAcceptsCards;
 }
 
@@ -240,7 +222,7 @@ function fillAddressDetails(addressDetails) {
 
 function buildStreetAddress(addressDetails) {
     if (addressDetails.street) {
-        return addressDetails.housenumber? `${addressDetails.street} ${addressDetails.housenumber}` : addressDetails.street;
+        return addressDetails.housenumber ? `${addressDetails.street} ${addressDetails.housenumber}` : addressDetails.street;
     }
 
     if (addressDetails.housenumber) {
@@ -267,9 +249,7 @@ function formatTime(date) {
 }
 
 function resetOpeningHours() {
-    openingSchedule = Object.fromEntries(
-        days.map(day => [day, []])
-    );
+    openingSchedule = Object.fromEntries(days.map(day => [day, []]));
 
     openingDays.forEach(day => {
         const openingInterval = day.querySelectorAll(".opening-interval");
@@ -341,8 +321,7 @@ function fillCafeOpeningHours(cafeOpeningHours) {
         const day = days[start.getDay()];
 
         openingSchedule[day].push({
-            open: formatTime(start),
-            close: formatTime(end)
+            open: formatTime(start), close: formatTime(end)
         });
     });
 
@@ -374,36 +353,26 @@ function updateOpeningScheduleData() {
     const scheduleData = {};
 
     days.forEach(day => {
-        const openingDayElement = document.querySelector(
-            `[data-day="${day}"]`
-        );
+        const openingDayElement = document.querySelector(`[data-day="${day}"]`);
 
-        const selectedStatus = openingDayElement.querySelector(
-            `input[name="${day}"]:checked`
-        );
+        const selectedStatus = openingDayElement.querySelector(`input[name="${day}"]:checked`);
 
         const intervals = [];
 
         if (selectedStatus?.value === "open") {
-            const openingTimeInputs = openingDayElement.querySelectorAll(
-                `input[name="${day}-open"]`
-            );
+            const openingTimeInputs = openingDayElement.querySelectorAll(`input[name="${day}-open"]`);
 
-            const closingTimeInputs = openingDayElement.querySelectorAll(
-                `input[name="${day}-close"]`
-            );
+            const closingTimeInputs = openingDayElement.querySelectorAll(`input[name="${day}-close"]`);
 
             for (let i = 0; i < openingTimeInputs.length; i++) {
                 intervals.push({
-                    open: openingTimeInputs[i].value,
-                    close: closingTimeInputs[i].value
+                    open: openingTimeInputs[i].value, close: closingTimeInputs[i].value
                 });
             }
         }
 
         scheduleData[day] = {
-            status: selectedStatus?.value,
-            intervals: intervals
+            status: selectedStatus?.value, intervals: intervals
         };
     });
 
@@ -433,12 +402,9 @@ function formatPhoneNumber(phoneNumber) {
     phoneNumber = phoneNumber.slice(0, 9);
 
     if (phoneNumber.length > 6) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " +
-            phoneNumber.slice(3, 6) + " " +
-            phoneNumber.slice(6);
+        phoneNumber = phoneNumber.slice(0, 3) + " " + phoneNumber.slice(3, 6) + " " + phoneNumber.slice(6);
     } else if (phoneNumber.length > 3) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " +
-            phoneNumber.slice(3);
+        phoneNumber = phoneNumber.slice(0, 3) + " " + phoneNumber.slice(3);
     }
 
     return phoneNumber;
@@ -459,9 +425,7 @@ function formatInstagramUsername(username) {
 }
 
 function validateInformationForm() {
-    const requiredFields = information.section.querySelectorAll(
-        "input[required], select[required]"
-    );
+    const requiredFields = information.section.querySelectorAll("input[required], select[required]");
 
     for (const field of requiredFields) {
         if (!field.checkValidity()) {
@@ -501,9 +465,7 @@ function validateInformationForm() {
 
 //================ FEATURES ================
 function validateFeaturesForm() {
-    const requiredFields = features.section.querySelectorAll(
-        "input[required]"
-    );
+    const requiredFields = features.section.querySelectorAll("input[required]");
 
     for (const field of requiredFields) {
         if (!field.checkValidity()) {
@@ -552,18 +514,14 @@ function validateOpeningHoursForm() {
                 const previousClosingTime = closingTimeInputs[i - 1].value;
 
                 if (openingTime === "") {
-                    openingTimeInputs[i].setCustomValidity(
-                        "Please enter valid interval"
-                    );
+                    openingTimeInputs[i].setCustomValidity("Please enter valid interval");
                     openingTimeInputs[i].reportValidity();
                     openingHours.status.textContent = "❌ ";
                     return false;
                 }
 
                 if (openingTime < previousClosingTime) {
-                    openingTimeInputs[i].setCustomValidity(
-                        "Opening intervals must not overlap."
-                    );
+                    openingTimeInputs[i].setCustomValidity("Opening intervals must not overlap.");
                     openingTimeInputs[i].reportValidity();
                     openingHours.status.textContent = "❌ ";
                     return false;
@@ -652,10 +610,7 @@ function validateSuggestionForm() {
     const openingHoursValid = validateOpeningHoursForm();
     const finalReviewValid = validateFinalReviewForm();
 
-    return informationValid &&
-        featuresValid &&
-        openingHoursValid &&
-        finalReviewValid;
+    return informationValid && featuresValid && openingHoursValid && finalReviewValid;
 }
 
 function collectCafeSuggestionData() {
@@ -695,8 +650,7 @@ function collectCafeSuggestionData() {
         cafe_opening_hours: scheduleData,
 
         cafe_review: {
-            rating: htmlFormData.get("userRating"),
-            text: htmlFormData.get("userReview"),
+            rating: htmlFormData.get("userRating"), text: htmlFormData.get("userReview"),
         }
 
     }
@@ -707,10 +661,7 @@ function collectCafeSuggestionData() {
 function createCafeSuggestionFormData(cafeSuggestion) {
     const completeFormData = new FormData();
 
-    completeFormData.append(
-        "suggestion",
-        JSON.stringify(cafeSuggestion)
-    );
+    completeFormData.append("suggestion", JSON.stringify(cafeSuggestion));
 
     for (const photo of selectedPhotos) {
         completeFormData.append("photos", photo);
@@ -735,24 +686,30 @@ async function prepareCafeSuggestion() {
 }
 
 async function sendCafeSuggestion(completeFormData) {
-    const response = await fetch("/api/cafe-suggestions", {
-        method: "POST",
-        body: completeFormData
-    });
+    let response;
+    try {
+        response = await fetch("/api/cafe-suggestions", {
+            method: "POST", body: completeFormData
+        });
+    } catch {
+        throw new Error("Could not reach the server. Please check your connection and try again.");
+    }
 
-    const contentType = response.headers.get("content-type");
     let result = null;
+    const contentType = response.headers.get("content-type");
 
     if (contentType && contentType.includes("application/json")) {
-        result = await response.json();
+        try {
+            result = await response.json();
+        } catch {
+            result = null;
+        }
     }
 
     if (!response.ok) {
-        const errorMessage = result?.errors
-            ? Object.values(result.errors)
-                .flat()
-                .join("\n")
-            : "Something went wrong while submitting the café suggestion.";
+        const errorMessage = result?.errors ? Object.values(result.errors)
+            .flat()
+            .join("\n") : "Something went wrong while submitting the café suggestion.";
 
         throw new Error(errorMessage);
     }
@@ -837,9 +794,7 @@ searchInput.addEventListener("input", async () => {
 
                     const badge = document.createElement("span");
                     badge.classList.add("suggestion-badge");
-                    badge.textContent = result.coffice_status === "approved"
-                        ? "Already on Coffice"
-                        : "Waiting for approval";
+                    badge.textContent = result.coffice_status === "approved" ? "Already on Coffice" : "Waiting for approval";
 
                     item.appendChild(badge);
                 } else {
@@ -860,8 +815,7 @@ searchInput.addEventListener("input", async () => {
 });
 
 searchInput.addEventListener("focus", () => {
-    if (searchInput.value.trim().length >= 3 && suggestions.children.length > 0
-    ) {
+    if (searchInput.value.trim().length >= 3 && suggestions.children.length > 0) {
         suggestions.style.display = "block";
     }
 });
@@ -905,7 +859,7 @@ cafeAddress.addEventListener("input", async () => {
         let cafeAddressFound = false;
 
         data.results.forEach(result => {
-            if(!result.postcode){
+            if (!result.postcode) {
                 return
             }
 
@@ -935,8 +889,7 @@ cafeAddress.addEventListener("input", async () => {
 });
 
 cafeAddress.addEventListener("focus", () => {
-    if (cafeAddress.value.trim().length >= 3 && cafeAddressSuggestions.children.length > 0
-    ) {
+    if (cafeAddress.value.trim().length >= 3 && cafeAddressSuggestions.children.length > 0) {
         cafeAddressSuggestions.style.display = "block";
     }
 });
@@ -1038,7 +991,7 @@ openingDays.forEach(dayElement => {
         if (!openRadio.checked) {
             openRadio.click();
         }
-});
+    });
 
     addIntervalButton.addEventListener("click", () => {
         const newInterval = openingIntervalTemplate.cloneNode(true);

@@ -4,13 +4,18 @@ from app import create_app
 from app.config import TestConfig
 from app.extensions import db
 from app.models import User
-from app.routes.suggestions import ANONYMOUS_USER_ID
+from app.constants import ANONYMOUS_USER_ID
 
 
 @pytest.fixture
-def app():
-    app = create_app(TestConfig)
+def app(tmp_path):
+    class TestConfigWithUploads(TestConfig):
+        UPLOAD_FOLDER = str(tmp_path / "uploads")
+
+    app = create_app(TestConfigWithUploads)
+
     yield app
+
     with app.app_context():
         db.drop_all()
 

@@ -1,0 +1,1 @@
+ANONYMOUS_USER_ID = 1  # temporary, will be replaced by login later
