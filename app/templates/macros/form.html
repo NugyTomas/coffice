@@ -1,0 +1,13 @@
+{% macro feature_group(label, name, prefix, options) %}
+<div class="feature">
+    <label>{{ label }}<span class="asterisk">*</span></label>
+    <div class="feature-options">
+        {% for suffix, value, text in options %}
+        <div class="feature-option">
+            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}"{% if loop.first %} required{% endif %}>
+            <label for="{{ prefix }}-{{ suffix }}">{{ text }}</label>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}

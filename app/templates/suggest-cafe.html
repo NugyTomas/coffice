@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/form.html" import feature_group %}
 
 {% block title %}
 Coffice
@@ -147,38 +148,13 @@ Coffice
 
         <div class="section-content">
             <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
-            <div class="feature">
-                <label>Wi-Fi<span class="asterisk">*</span></label>
-
-                <div class="feature-options">
-
-                    <div class="feature-option">
-                        <input type="radio" id="wifi-unknown" name="cafeWifi" value="unknown" required>
-                        <label for="wifi-unknown">Not sure</label>
-                    </div>
-
-                    <div class="feature-option">
-                        <input type="radio" id="wifi-no" name="cafeWifi" value="unavailable">
-                        <label for="wifi-no">Unavailable</label>
-                    </div>
-
-                    <div class="feature-option">
-                        <input type="radio" id="wifi-slow" name="cafeWifi" value="slow">
-                        <label for="wifi-slow">Slow</label>
-                    </div>
-
-                    <div class="feature-option">
-                        <input type="radio" id="wifi-stable" name="cafeWifi" value="stable">
-                        <label for="wifi-stable">Stable</label>
-                    </div>
-
-                    <div class="feature-option">
-                        <input type="radio" id="wifi-fast" name="cafeWifi" value="fast">
-                        <label for="wifi-fast">Fast</label>
-                    </div>
-
-                </div>
-            </div>
+            {{ feature_group("Wi-Fi", "cafeWifi", "wifi", [
+            ("unknown", "unknown", "Not sure"),
+            ("no", "unavailable", "Unavailable"),
+            ("slow", "slow", "Slow"),
+            ("stable", "stable", "Stable"),
+            ("fast", "fast", "Fast"),
+            ]) }}
 
             <div class="feature">
                 <label>Power outlets<span class="asterisk">*</span></label>
