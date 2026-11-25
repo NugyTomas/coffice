@@ -4,10 +4,54 @@
     <div class="feature-options">
         {% for suffix, value, text in options %}
         <div class="feature-option">
-            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}"{% if loop.first %} required{% endif %}>
+            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}" {% if loop.first %}
+                   required{% endif %}>
             <label for="{{ prefix }}-{{ suffix }}">{{ text }}</label>
         </div>
         {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro opening_day(day) %}
+<div class="opening-day row g-4 align-items-center" data-day="{{ day }}">
+    <div class="col-12 col-md-2">
+        <p class="opening-day-name">{{ day|capitalize }}<span class="asterisk">*</span></p>
+    </div>
+
+    <div class="col-12 col-md-10">
+
+        <div class="opening-day-content">
+
+            <div class="opening-status-options">
+
+                <div class="opening-status-option">
+                    <input type="radio" id="{{ day }}-unknown" name="{{ day }}" value="unknown" required>
+                    <label for="{{ day }}-unknown">Not sure</label>
+                </div>
+
+                <div class="opening-status-option">
+                    <input type="radio" id="{{ day }}-closed" name="{{ day }}" value="closed">
+                    <label for="{{ day }}-closed">Closed</label>
+                </div>
+
+                <div class="opening-status-option">
+                    <input type="radio" id="{{ day }}-open" name="{{ day }}" value="open">
+                    <label for="{{ day }}-open">Open</label>
+                </div>
+
+            </div>
+
+            <div class="opening-intervals">
+                <div class="opening-interval">
+                    <input type="time" name="{{ day }}-open">
+                    <span class="opening-time-separator">–</span>
+                    <input type="time" name="{{ day }}-close">
+                    <button type="button" class="opening-interval-add">+</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 {% endmacro %}
