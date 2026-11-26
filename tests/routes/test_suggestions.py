@@ -20,6 +20,16 @@ def test_home_page(client):
     assert response.status_code == 200
 
 
+def test_suggest_cafe_page(client):
+    response = client.get('/suggest-cafe')
+    assert response.status_code == 200
+
+    html = response.text
+    assert 'name="cafeWifi"' in html
+    assert 'data-day="monday"' in html
+    assert 'name="userRating"' in html
+
+
 def test_create_cafe_suggestion_success(client, valid_suggestion):
     response = client.post('/api/cafe-suggestions', data={"suggestion": json.dumps(valid_suggestion)})
     assert response.status_code == 201
