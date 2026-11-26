@@ -1,10 +1,28 @@
+{% macro form_section(name) %}
+<section class="{{ name }} section-form is-hidden">
+    {{ caller() }}
+</section>
+{% endmacro %}
+
+{% macro select_field(root, label, name, options) %}
+<div class="col-12 col-md-6 form-field">
+    <label for="{{ root }}" class="mb-2">{{ label }}<span class="asterisk">*</span></label>
+    <select id="{{ root }}" name="{{ name }}" required>
+        {% for value, option in options %}
+        <option value="{{ value }}" {% if loop.first %}disabled selected hidden{% endif %}>{{ option }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endmacro %}
+
 {% macro feature_group(label, name, prefix, options) %}
 <div class="feature">
     <label>{{ label }}<span class="asterisk">*</span></label>
     <div class="feature-options">
         {% for suffix, value, text in options %}
         <div class="feature-option">
-            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}" {% if loop.first %}
+            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}" {% if
+                   loop.first %}
                    required{% endif %}>
             <label for="{{ prefix }}-{{ suffix }}">{{ text }}</label>
         </div>
@@ -54,4 +72,10 @@
         </div>
     </div>
 </div>
+{% endmacro %}
+
+{% macro star_input(star_number) %}
+<input type="radio" id="{{ star_number }}-star" name="userRating" value="{{ star_number }}" {% if star_number== 1
+       %}required{% endif %}>
+<label for="{{ star_number }}-star">★</label>
 {% endmacro %}

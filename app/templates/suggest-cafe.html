@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros/form.html" import feature_group, opening_day %}
+{% from "macros/form.html" import feature_group, form_section, select_field, star_input, opening_day %}
 
 {% block title %}
 Coffice
@@ -36,270 +36,253 @@ Coffice
         </div>
     </section>
 
-    <section class="basic-information section-form is-hidden">
+    {% call form_section("basic-information") %}
 
-        <button type="button" class="section-toggle"><span class="section-status"></span>Basic information <span
-                class="section-arrow">▼</span></button>
+    <button type="button" class="section-toggle"><span class="section-status"></span>Basic information <span
+            class="section-arrow">▼</span></button>
 
 
-        <div class="section-content">
-            <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
-            <div class="row g-5">
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-name" class="mb-2">Name<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-name" name="cafeName" required minlength="2" maxlength="50">
-                </div>
-
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span> <span
-                            class="address-detail">(Format: <strong>Address, City</strong>. For example: <strong>U Letiste 2, Plzen</strong>.)</span></label>
-                    <div class="search-wrapper">
-                        <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100"
-                               pattern=".*\p{L}.*">
-                        <div class="cafe-address-suggestions"></div>
-                    </div>
-
-                </div>
+    <div class="section-content">
+        <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
+        <div class="row g-5">
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-name" class="mb-2">Name<span class="asterisk">*</span></label>
+                <input type="text" id="cafe-name" name="cafeName" required minlength="2" maxlength="50">
             </div>
 
-            <div class="row g-5">
-                <div class="col-12 col-md-6 form-field disabled-input">
-                    <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50"
-                           pattern=".*\p{L}.*" readonly>
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-address" class="mb-2">Address<span class="asterisk">*</span> <span
+                        class="address-detail">(Format: <strong>Address, City</strong>. For example: <strong>U Letiste 2, Plzen</strong>.)</span></label>
+                <div class="search-wrapper">
+                    <input type="text" id="cafe-address" name="cafeAddress" required minlength="3" maxlength="100"
+                           pattern=".*\p{L}.*">
+                    <div class="cafe-address-suggestions"></div>
                 </div>
 
-                <div class="col-12 col-md-6 form-field disabled-input">
-                    <label for="cafe-postal-code" class="mb-2">Postal code<span class="asterisk">*</span></label>
-                    <input type="text" id="cafe-postal-code" name="cafePostCode" required pattern="[0-9]{3} [0-9]{2}"
-                           placeholder="XXX XX" readonly>
-                </div>
             </div>
-
-            <div class="row g-5">
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-phone" class="mb-2">Phone</label>
-
-                    <div class="phone-input">
-                        <span class="phone-prefix">+420</span>
-                        <input type="tel" id="cafe-phone" name="cafePhone" placeholder="123 456 789"
-                               pattern="[0-9]{3} [0-9]{3} [0-9]{3}">
-                    </div>
-
-                </div>
-
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-email" class="mb-2">Email</label>
-                    <input type="text" id="cafe-email" name="cafeEmail" maxlength="250"
-                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" placeholder="email@example.com">
-                </div>
-            </div>
-
-            <div class="row g-5">
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-website" class="mb-2">Website</label>
-                    <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048"
-                           pattern="(https?://)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}(/.*)?"
-                           placeholder="example.com">
-                </div>
-
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-instagram" class="mb-2">Instagram</label>
-                    <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31"
-                           pattern="@[a-z0-9_]+(\.[a-z0-9_]+)*" placeholder="We will add @ for you."/>
-                </div>
-            </div>
-
-            <div class="row g-5">
-                <div class="col-12 col-md-6 form-field">
-                    <label for="cafe-price" class="mb-2">Price level<span class="asterisk">*</span></label>
-                    <select id="cafe-price" name="cafePrice" required>
-                        <option value="" disabled selected hidden>Select price level</option>
-                        <option value="unknown">Unknown</option>
-                        <option value="low">💵</option>
-                        <option value="medium">💵💵</option>
-                        <option value="high">💵💵💵</option>
-                    </select>
-                </div>
-
-                <div class="col-12 col-md-6 form-field">
-                    <label for="coffee-quality" class="mb-2">Coffee quality<span class="asterisk">*</span></label>
-                    <select id="coffee-quality" name="coffeeQuality" required>
-                        <option value="" disabled selected hidden>Select quality level</option>
-                        <option value="unknown">Unknown</option>
-                        <option value="low">🤎</option>
-                        <option value="medium">🤎🤎</option>
-                        <option value="high">🤎🤎🤎</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="button" class="continue-btn">Continue</button>
-
         </div>
 
-    </section>
+        <div class="row g-5">
+            <div class="col-12 col-md-6 form-field disabled-input">
+                <label for="cafe-city" class="mb-2">City<span class="asterisk">*</span></label>
+                <input type="text" id="cafe-city" name="cafeCity" required minlength="2" maxlength="50"
+                       pattern=".*\p{L}.*" readonly>
+            </div>
 
-    <section class="features section-form is-hidden">
-
-        <button type="button" class="section-toggle"><span class="section-status"></span>Work-friendly features <span
-                class="section-arrow">▼</span></button>
-
-
-        <div class="section-content">
-            <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
-            {{ feature_group("Wi-Fi", "cafeWifi", "wifi", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "unavailable", "Unavailable"),
-            ("slow", "slow", "Slow"),
-            ("stable", "stable", "Stable"),
-            ("fast", "fast", "Fast"),
-            ]) }}
-
-            {{ feature_group("Power outlets", "cafeOutlets", "outlets", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "unavailable", "Unavailable"),
-            ("limited", "limited", "Limited"),
-            ("everywhere", "everywhere", "At every table"),
-            ]) }}
-
-            {{ feature_group("Noise level", "cafeNoise", "noise", [
-            ("unknown", "unknown", "Not sure"),
-            ("noisy", "noisy", "Noisy"),
-            ("moderate", "moderate", "Moderate"),
-            ("quiet", "quiet", "Quiet"),
-            ]) }}
-
-
-            {{ feature_group("Seating", "cafeSeating", "seating", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "unavailable", "Unavailable"),
-            ("bar-like", "bar-like", "Bar-like"),
-            ("casual", "casual", "Casual"),
-            ("work-friendly", "work-friendly", "Work-friendly"),
-            ]) }}
-
-            {{ feature_group("Air-conditioning", "cafeAirConditioning", "air-conditioning", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "no", "No"),
-            ("yes", "yes", "Yes"),
-            ]) }}
-
-            {{ feature_group("Typical occupancy", "cafeOccupancy", "occupancy", [
-            ("unknown", "unknown", "Not sure"),
-            ("low", "low", "Low"),
-            ("moderate", "moderate", "Moderate"),
-            ("busy", "busy", "Busy"),
-            ]) }}
-
-            {{ feature_group("Food options", "cafeFood", "food", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "unavailable", "Unavailable"),
-            ("snacks", "snacks", "Snacks-only"),
-            ("variety", "good-variety", "Good variety"),
-            ]) }}
-
-            {{ feature_group("Vegetarian options", "cafeVegetarian", "vegetarian", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "unavailable", "Unavailable"),
-            ("snacks", "snacks", "Snacks-only"),
-            ("variety", "good-variety", "Good variety"),
-            ]) }}
-
-            {{ feature_group("Card payment", "cafeCard", "card", [
-            ("unknown", "unknown", "Not sure"),
-            ("no", "no", "No"),
-            ("yes", "yes", "Yes"),
-            ]) }}
-
-            <button type="button" class="continue-btn">
-                Continue
-            </button>
-
+            <div class="col-12 col-md-6 form-field disabled-input">
+                <label for="cafe-postal-code" class="mb-2">Postal code<span class="asterisk">*</span></label>
+                <input type="text" id="cafe-postal-code" name="cafePostCode" required pattern="[0-9]{3} [0-9]{2}"
+                       placeholder="XXX XX" readonly>
+            </div>
         </div>
 
-    </section>
+        <div class="row g-5">
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-phone" class="mb-2">Phone</label>
 
-    <section class="opening-hours section-form is-hidden">
+                <div class="phone-input">
+                    <span class="phone-prefix">+420</span>
+                    <input type="tel" id="cafe-phone" name="cafePhone" placeholder="123 456 789"
+                           pattern="[0-9]{3} [0-9]{3} [0-9]{3}">
+                </div>
 
-        <button type="button" class="section-toggle"><span class="section-status"></span>Opening hours <span
-                class="section-arrow">▼</span></button>
+            </div>
+
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-email" class="mb-2">Email</label>
+                <input type="text" id="cafe-email" name="cafeEmail" maxlength="250"
+                       pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" placeholder="email@example.com">
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-website" class="mb-2">Website</label>
+                <input type="text" id="cafe-website" name="cafeWebsite" maxlength="2048"
+                       pattern="(https?://)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}(/.*)?"
+                       placeholder="example.com">
+            </div>
+
+            <div class="col-12 col-md-6 form-field">
+                <label for="cafe-instagram" class="mb-2">Instagram</label>
+                <input type="text" id="cafe-instagram" name="cafeInstagram" maxlength="31"
+                       pattern="@[a-z0-9_]+(\.[a-z0-9_]+)*" placeholder="We will add @ for you."/>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            {{ select_field("cafe-price", "Price level", "cafePrice",[
+            ("", "Select price level"),
+            ("unknown", "Unknown"),
+            ("low", "💵"),
+            ("medium", "💵💵"),
+            ("high", "💵💵💵"),
+            ]) }}
+
+            {{ select_field("coffee-quality", "Coffee quality", "coffeeQuality",[
+            ("", "Select quality level"),
+            ("unknown", "Unknown"),
+            ("low", "🤎"),
+            ("medium", "🤎🤎"),
+            ("high", "🤎🤎🤎"),
+            ]) }}
+        </div>
+
+        <button type="button" class="continue-btn">Continue</button>
+
+    </div>
+
+    {% endcall %}
+
+    {% call form_section("features") %}
+
+    <button type="button" class="section-toggle"><span class="section-status"></span>Work-friendly features <span
+            class="section-arrow">▼</span></button>
 
 
-        <div class="section-content">
-            <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
+    <div class="section-content">
+        <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
+        {{ feature_group("Wi-Fi", "cafeWifi", "wifi", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "unavailable", "Unavailable"),
+        ("slow", "slow", "Slow"),
+        ("stable", "stable", "Stable"),
+        ("fast", "fast", "Fast"),
+        ]) }}
 
-            <div class="opening-hours-list">
-                {% for day in weekdays %}
-                {{ opening_day(day) }}
+        {{ feature_group("Power outlets", "cafeOutlets", "outlets", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "unavailable", "Unavailable"),
+        ("limited", "limited", "Limited"),
+        ("everywhere", "everywhere", "At every table"),
+        ]) }}
+
+        {{ feature_group("Noise level", "cafeNoise", "noise", [
+        ("unknown", "unknown", "Not sure"),
+        ("noisy", "noisy", "Noisy"),
+        ("moderate", "moderate", "Moderate"),
+        ("quiet", "quiet", "Quiet"),
+        ]) }}
+
+
+        {{ feature_group("Seating", "cafeSeating", "seating", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "unavailable", "Unavailable"),
+        ("bar-like", "bar-like", "Bar-like"),
+        ("casual", "casual", "Casual"),
+        ("work-friendly", "work-friendly", "Work-friendly"),
+        ]) }}
+
+        {{ feature_group("Air-conditioning", "cafeAirConditioning", "air-conditioning", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "no", "No"),
+        ("yes", "yes", "Yes"),
+        ]) }}
+
+        {{ feature_group("Typical occupancy", "cafeOccupancy", "occupancy", [
+        ("unknown", "unknown", "Not sure"),
+        ("low", "low", "Low"),
+        ("moderate", "moderate", "Moderate"),
+        ("busy", "busy", "Busy"),
+        ]) }}
+
+        {{ feature_group("Food options", "cafeFood", "food", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "unavailable", "Unavailable"),
+        ("snacks", "snacks", "Snacks-only"),
+        ("variety", "good-variety", "Good variety"),
+        ]) }}
+
+        {{ feature_group("Vegetarian options", "cafeVegetarian", "vegetarian", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "unavailable", "Unavailable"),
+        ("snacks", "snacks", "Snacks-only"),
+        ("variety", "good-variety", "Good variety"),
+        ]) }}
+
+        {{ feature_group("Card payment", "cafeCard", "card", [
+        ("unknown", "unknown", "Not sure"),
+        ("no", "no", "No"),
+        ("yes", "yes", "Yes"),
+        ]) }}
+
+        <button type="button" class="continue-btn">
+            Continue
+        </button>
+
+    </div>
+
+    {% endcall %}
+
+    {% call form_section("opening-hours") %}
+
+    <button type="button" class="section-toggle"><span class="section-status"></span>Opening hours <span
+            class="section-arrow">▼</span></button>
+
+
+    <div class="section-content">
+        <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
+
+        <div class="opening-hours-list">
+            {% for day in weekdays %}
+            {{ opening_day(day) }}
+            {% endfor %}
+        </div>
+
+        <button type="button" class="continue-btn">
+            Continue
+        </button>
+
+    </div>
+
+    {% endcall %}
+
+    {% call form_section("final-review") %}
+    <button type="button" class="section-toggle"><span class="section-status"></span>Final review <span
+            class="section-arrow">▼</span></button>
+
+    <div class="section-content ">
+        <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
+        <div class="star-rating-container">
+            <label>Your rating<span class="asterisk">*</span></label>
+            <p>How would you rate this café?</p>
+            <div class="star-rating">
+                {% for star_number in [5,4,3,2,1] %}
+                {{ star_input(star_number) }}
                 {% endfor %}
             </div>
-
-            <button type="button" class="continue-btn">
-                Continue
-            </button>
-
         </div>
 
-    </section>
-
-    <section class="final-review section-form is-hidden">
-        <button type="button" class="section-toggle"><span class="section-status"></span>Final review <span
-                class="section-arrow">▼</span></button>
-
-        <div class="section-content ">
-            <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
-            <div class="star-rating-container">
-                <label>Your rating<span class="asterisk">*</span></label>
-                <p>How would you rate this café?</p>
-                <div class="star-rating">
-                    <input type="radio" id="5-star" name="userRating" value="5">
-                    <label for="5-star">★</label>
-
-                    <input type="radio" id="4-star" name="userRating" value="4">
-                    <label for="4-star">★</label>
-
-                    <input type="radio" id="3-star" name="userRating" value="3">
-                    <label for="3-star">★</label>
-
-                    <input type="radio" id="2-star" name="userRating" value="2">
-                    <label for="2-star">★</label>
-
-                    <input type="radio" id="1-star" name="userRating" value="1" required>
-                    <label for="1-star">★</label>
-                </div>
-            </div>
-
-            <div class="user-review">
-                <label for="review"> Your review</label>
-                <textarea id="review" name="userReview" placeholder="Tell us more about this café..."
-                          maxlength="2048"></textarea>
-            </div>
-
-            <div class="cafe-photos">
-                <label>Café photos</label>
-                <p>Add up to 6 photos.</p>
-                <div id="photo-error" class="photo-error" role="alert"></div>
-                <div class="photo-upload-container">
-
-                    <label for="cafe-photo-input" class="add-photo">
-                        <span>+</span>
-                    </label>
-
-                    <input type="file" id="cafe-photo-input" accept="image/jpeg,image/png,image/webp" multiple/>
-
-                    <div class="photo-preview-container">
-
-                    </div>
-                </div>
-            </div>
-
-            <button type="button" class="continue-btn">
-                Continue
-            </button>
-
+        <div class="user-review">
+            <label for="review"> Your review</label>
+            <textarea id="review" name="userReview" placeholder="Tell us more about this café..."
+                      maxlength="2048"></textarea>
         </div>
-    </section>
+
+        <div class="cafe-photos">
+            <label>Café photos</label>
+            <p>Add up to 6 photos.</p>
+            <div id="photo-error" class="photo-error" role="alert"></div>
+            <div class="photo-upload-container">
+
+                <label for="cafe-photo-input" class="add-photo">
+                    <span>+</span>
+                </label>
+
+                <input type="file" id="cafe-photo-input" accept="image/jpeg,image/png,image/webp" multiple/>
+
+                <div class="photo-preview-container">
+
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="continue-btn">
+            Continue
+        </button>
+
+    </div>
+    {% endcall %}
 
     <div class="final-warning is-hidden">
         <p>By submitting this café, you confirm that the information you provided is accurate to the best of your
