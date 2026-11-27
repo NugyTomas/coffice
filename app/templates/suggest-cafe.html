@@ -280,7 +280,7 @@ Suggest a café | Coffice
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/geolocation.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/geolocation.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/opening_hours.js') }}"></script>
-<script src="{{ url_for('static', filename='js/suggest-cafe.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/suggest-cafe.js') }}"></script>
 {% endblock %}

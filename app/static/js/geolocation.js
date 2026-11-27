@@ -1,4 +1,4 @@
-function getUserLocation() {
+export function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
             reject(new Error("Geolocation is not supported."));
