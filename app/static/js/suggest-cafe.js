@@ -1,7 +1,7 @@
+import {apiRequest, sendCafeSuggestion} from "./api.js";
 import {allowedPhotoTypes, days, maxPhotoCount, maxPhotoSize} from "./config.js";
 import {formatInstagramUsername, formatPhoneNumber, formatPostalCode, formatTime} from "./format.js";
 import {getUserLocation} from "./geolocation.js";
-
 // =========================================
 // STATE
 // =========================================
@@ -104,7 +104,7 @@ async function initializeLocation() {
 }
 
 //================ CAFE-SUGGESTION ================
-async function getCafeData(text) {
+function getCafeData(text) {
     if (autocompleteController) {
         autocompleteController.abort();
     }
@@ -117,15 +117,13 @@ async function getCafeData(text) {
         url += `&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
-    const response = await fetch(url, {signal: autocompleteController.signal});
-    return response.json();
+    return apiRequest(url, autocompleteController.signal)
 }
 
-async function getPlaceDetails(placeId, signal) {
+function getPlaceDetails(placeId, signal) {
     const url = `/api/geoapify/place-details?id=${encodeURIComponent(placeId)}`;
 
-    const response = await fetch(url, {signal: signal});
-    return response.json();
+    return apiRequest(url, signal);
 }
 
 async function loadCafeDetails(placeId) {
@@ -188,7 +186,7 @@ function fillCafeDetails(cafeDetails) {
 }
 
 //================ ADDRESS ================
-async function getCafeAddress(text) {
+function getCafeAddress(text) {
     if (addressAutocompleteController) {
         addressAutocompleteController.abort();
     }
@@ -201,8 +199,7 @@ async function getCafeAddress(text) {
         url += `&bias=proximity:${userLocation.lon},${userLocation.lat}`;
     }
 
-    const response = await fetch(url, {signal: addressAutocompleteController.signal});
-    return response.json();
+    return apiRequest(url, addressAutocompleteController.signal);
 }
 
 function fillAddressDetails(addressDetails) {
@@ -639,37 +636,6 @@ async function prepareCafeSuggestion() {
     }
 }
 
-async function sendCafeSuggestion(completeFormData) {
-    let response;
-    try {
-        response = await fetch("/api/cafe-suggestions", {
-            method: "POST", body: completeFormData
-        });
-    } catch {
-        throw new Error("Could not reach the server. Please check your connection and try again.");
-    }
-
-    let result = null;
-    const contentType = response.headers.get("content-type");
-
-    if (contentType && contentType.includes("application/json")) {
-        try {
-            result = await response.json();
-        } catch {
-            result = null;
-        }
-    }
-
-    if (!response.ok) {
-        const errorMessage = result?.errors ? Object.values(result.errors)
-            .flat()
-            .join("\n") : "Something went wrong while submitting the café suggestion.";
-
-        throw new Error(errorMessage);
-    }
-
-    return result;
-}
 
 initializeLocation();
 
