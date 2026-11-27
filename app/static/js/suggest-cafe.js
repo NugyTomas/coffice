@@ -1,10 +1,6 @@
 import {allowedPhotoTypes, days, maxPhotoCount, maxPhotoSize} from "./config.js";
+import {formatInstagramUsername, formatPhoneNumber, formatPostalCode, formatTime} from "./format.js";
 import {getUserLocation} from "./geolocation.js";
-
-// =========================================
-// CONFIG
-// =========================================
-
 
 // =========================================
 // STATE
@@ -240,12 +236,7 @@ function saveAddressDetails(addressDetails) {
 }
 
 //================ OPENING-HOURS ================
-function formatTime(date) {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
 
-    return `${hours}:${minutes}`;
-}
 
 function resetOpeningHours() {
     openingSchedule = Object.fromEntries(days.map(day => [day, []]));
@@ -386,42 +377,6 @@ function showInformationForm() {
     information.arrow.textContent = "▼";
 }
 
-function formatPostalCode(value) {
-    const digits = (value || "").replace(/\D/g, "").slice(0, 5);
-    return digits.length > 3 ? digits.slice(0, 3) + " " + digits.slice(3) : digits;
-}
-
-function formatPhoneNumber(phoneNumber) {
-    if (!phoneNumber) {
-        return "";
-    }
-
-    phoneNumber = phoneNumber.replace("+420", "");
-    phoneNumber = phoneNumber.replace(/\D/g, "");
-    phoneNumber = phoneNumber.slice(0, 9);
-
-    if (phoneNumber.length > 6) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " + phoneNumber.slice(3, 6) + " " + phoneNumber.slice(6);
-    } else if (phoneNumber.length > 3) {
-        phoneNumber = phoneNumber.slice(0, 3) + " " + phoneNumber.slice(3);
-    }
-
-    return phoneNumber;
-}
-
-function formatInstagramUsername(username) {
-    if (!username) {
-        return "";
-    }
-
-    username = username.toLowerCase();
-    username = username.replace(/[^a-z0-9._]/g, "");
-    username = username.replace(/\.{2,}/g, ".");
-    username = username.slice(0, 30);
-    username = username.replace(/^\.+|\.+$/g, "");
-
-    return username ? "@" + username : "";
-}
 
 function validateInformationForm() {
     const requiredFields = information.section.querySelectorAll("input[required], select[required]");
