@@ -1,6 +1,6 @@
 {% macro form_section(name, title) %}
 <section class="{{ name }} section-form is-hidden">
-    <button type="button" class="section-toggle"><span class="section-status"></span>{{ title }}<span
+    <button type="button" class="section-toggle"><span class="section-status"></span>{{ title }} <span
             class="section-arrow">▼</span></button>
     {{ caller() }}
 </section>

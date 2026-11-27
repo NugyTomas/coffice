@@ -30,9 +30,17 @@ def test_home_page(client):
     'name="cafeWebsite"',
     'name="cafeInstagram"',
     'name="userReview"',
-
     'name="cafePrice"',
     'name="coffeeQuality"',
+    'name="cafeWifi"',
+    'name="cafeOutlets"',
+    'name="cafeNoise"',
+    'name="cafeSeating"',
+    'name="cafeAirConditioning"',
+    'name="cafeOccupancy"',
+    'name="cafeFood"',
+    'name="cafeVegetarian"',
+    'name="cafeCard"',
 
     'data-day="monday"',
     'data-day="tuesday"',
@@ -42,6 +50,7 @@ def test_home_page(client):
     'data-day="saturday"',
     'data-day="sunday"',
 
+    'name="userRating"',
     'id="cafe-photo-input"',
 ])
 def test_suggest_cafe_page_contains_form_fields(client, expected_element):
