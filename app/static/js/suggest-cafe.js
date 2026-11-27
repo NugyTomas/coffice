@@ -1,13 +1,10 @@
+import {allowedPhotoTypes, days, maxPhotoCount, maxPhotoSize} from "./config.js";
 import {getUserLocation} from "./geolocation.js";
 
 // =========================================
 // CONFIG
 // =========================================
-const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-const allowedPhotoTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-const maxPhotoSize = 5 * 1024 * 1024;
-const maxPhotoCount = 6;
 
 // =========================================
 // STATE
