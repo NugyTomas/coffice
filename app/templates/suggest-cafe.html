@@ -36,12 +36,7 @@ Suggest a café | Coffice
         </div>
     </section>
 
-    {% call form_section("basic-information") %}
-
-    <button type="button" class="section-toggle"><span class="section-status"></span>Basic information <span
-            class="section-arrow">▼</span></button>
-
-
+    {% call form_section("basic-information", "Basic information") %}
     <div class="section-content">
         <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
         <div class="row g-5">
@@ -134,12 +129,7 @@ Suggest a café | Coffice
 
     {% endcall %}
 
-    {% call form_section("features") %}
-
-    <button type="button" class="section-toggle"><span class="section-status"></span>Work-friendly features <span
-            class="section-arrow">▼</span></button>
-
-
+    {% call form_section("features", "Work-friendly features") %}
     <div class="section-content">
         <p class="required-info">Fields marked with <span class="asterisk">*</span> are required. </p>
         {{ feature_group("Wi-Fi", "cafeWifi", "wifi", [
@@ -214,12 +204,7 @@ Suggest a café | Coffice
 
     {% endcall %}
 
-    {% call form_section("opening-hours") %}
-
-    <button type="button" class="section-toggle"><span class="section-status"></span>Opening hours <span
-            class="section-arrow">▼</span></button>
-
-
+    {% call form_section("opening-hours", "Opening hours") %}
     <div class="section-content">
         <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
 
@@ -237,10 +222,7 @@ Suggest a café | Coffice
 
     {% endcall %}
 
-    {% call form_section("final-review") %}
-    <button type="button" class="section-toggle"><span class="section-status"></span>Final review <span
-            class="section-arrow">▼</span></button>
-
+    {% call form_section("final-review", "Final review") %}
     <div class="section-content ">
         <p class="required-info ">Fields marked with <span class="asterisk">*</span> are required. </p>
         <div class="star-rating-container">

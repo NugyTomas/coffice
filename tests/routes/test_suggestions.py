@@ -20,14 +20,37 @@ def test_home_page(client):
     assert response.status_code == 200
 
 
-def test_suggest_cafe_page(client):
-    response = client.get('/suggest-cafe')
-    assert response.status_code == 200
+@pytest.mark.parametrize("expected_element", [
+    'name="cafeName"',
+    'name="cafeAddress"',
+    'name="cafeCity"',
+    'name="cafePostCode"',
+    'name="cafePhone"',
+    'name="cafeEmail"',
+    'name="cafeWebsite"',
+    'name="cafeInstagram"',
+    'name="userReview"',
 
+    'name="cafePrice"',
+    'name="coffeeQuality"',
+
+    'data-day="monday"',
+    'data-day="tuesday"',
+    'data-day="wednesday"',
+    'data-day="thursday"',
+    'data-day="friday"',
+    'data-day="saturday"',
+    'data-day="sunday"',
+
+    'id="cafe-photo-input"',
+])
+def test_suggest_cafe_page_contains_form_fields(client, expected_element):
+    response = client.get("/suggest-cafe")
+
+    assert response.status_code == 200
     html = response.text
-    assert 'name="cafeWifi"' in html
-    assert 'data-day="monday"' in html
-    assert 'name="userRating"' in html
+
+    assert expected_element in html
 
 
 def test_create_cafe_suggestion_success(client, valid_suggestion):

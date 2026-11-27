@@ -1,5 +1,7 @@
-{% macro form_section(name) %}
+{% macro form_section(name, title) %}
 <section class="{{ name }} section-form is-hidden">
+    <button type="button" class="section-toggle"><span class="section-status"></span>{{ title }}<span
+            class="section-arrow">▼</span></button>
     {{ caller() }}
 </section>
 {% endmacro %}
@@ -21,8 +23,7 @@
     <div class="feature-options">
         {% for suffix, value, text in options %}
         <div class="feature-option">
-            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}" {% if
-                   loop.first %}
+            <input type="radio" id="{{ prefix }}-{{ suffix }}" name="{{ name }}" value="{{ value }}" {% if loop.first %}
                    required{% endif %}>
             <label for="{{ prefix }}-{{ suffix }}">{{ text }}</label>
         </div>
