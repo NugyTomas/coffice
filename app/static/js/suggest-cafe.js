@@ -1,7 +1,9 @@
 import {apiRequest, sendCafeSuggestion} from "./api.js";
-import {allowedPhotoTypes, days, maxPhotoCount, maxPhotoSize} from "./config.js";
+import {days, maxPhotoCount} from "./config.js";
 import {formatInstagramUsername, formatPhoneNumber, formatPostalCode, formatTime} from "./format.js";
 import {getUserLocation} from "./geolocation.js";
+import {renderPhotoPreviews, showPhotoError, validatePhoto} from "./photos.js";
+
 // =========================================
 // STATE
 // =========================================
@@ -497,48 +499,6 @@ function validateOpeningHoursForm() {
 }
 
 //================ FINAL-REVIEW ================
-function renderPhotoPreviews() {
-    photoPreviewContainer.textContent = "";
-
-    selectedPhotos.forEach((file, index) => {
-        const photoContainer = document.createElement("div");
-        photoContainer.classList.add("photo-preview");
-
-        const image = document.createElement("img");
-        image.src = URL.createObjectURL(file);
-
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.textContent = "x";
-
-        removeButton.addEventListener("click", () => {
-            selectedPhotos.splice(index, 1);
-            renderPhotoPreviews();
-        });
-
-        photoContainer.appendChild(image);
-        photoContainer.appendChild(removeButton);
-
-        photoPreviewContainer.appendChild(photoContainer);
-    });
-}
-
-function showPhotoError(message) {
-    photoError.textContent = message;
-}
-
-function validatePhoto(file) {
-    if (!allowedPhotoTypes.includes(file.type)) {
-        return "This file type is not allowed.";
-    }
-
-    if (file.size > maxPhotoSize) {
-        return "This file is too large. Maximum size is 5 MB.";
-    }
-
-    return null;
-}
-
 function validateFinalReviewForm() {
     const requiredFields = finalReview.section.querySelectorAll("input[required]")
 
@@ -956,7 +916,7 @@ photoInput.addEventListener("change", () => {
     const newFiles = photoInput.files;
 
     if (selectedPhotos.length + newFiles.length > maxPhotoCount) {
-        showPhotoError(`You can select a maximum of ${maxPhotoCount} photos.`);
+        showPhotoError(`You can select a maximum of ${maxPhotoCount} photos.`, photoError);
         return;
     }
 
@@ -964,14 +924,14 @@ photoInput.addEventListener("change", () => {
         const error = validatePhoto(file);
 
         if (error) {
-            showPhotoError(`${file.name}: ${error}`);
+            showPhotoError(`${file.name}: ${error}`, photoError);
             continue;
         }
 
         selectedPhotos.push(file);
     }
 
-    renderPhotoPreviews();
+    renderPhotoPreviews(selectedPhotos, photoPreviewContainer);
 });
 
 //================ SUBMIT ================
