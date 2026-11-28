@@ -4,6 +4,7 @@ import {formatInstagramUsername, formatPhoneNumber, formatPostalCode} from "./fo
 import {getUserLocation} from "./geolocation.js";
 import {fillCafeOpeningHours, resetOpeningHours, updateOpeningScheduleData} from "./opening-hours.js";
 import {renderPhotoPreviews, showPhotoError, validatePhoto} from "./photos.js";
+import {createCafeSuggestionFormData, collectCafeSuggestionData} from "./suggestion.js";
 import {
     validateFeaturesForm,
     validateFinalReviewForm,
@@ -259,67 +260,11 @@ function validateSuggestionForm() {
     return informationValid && featuresValid && openingHoursValid && finalReviewValid;
 }
 
-function collectCafeSuggestionData() {
-    const htmlFormData = new FormData(cafeSuggestionForm);
-
-    const scheduleData = updateOpeningScheduleData();
-
-    const cafeSuggestion = {
-        cafe: {
-            external_place_id: cafeGeoapifyId,
-            name: htmlFormData.get("cafeName"),
-            address: htmlFormData.get("cafeAddress"),
-            city: htmlFormData.get("cafeCity"),
-            postal_code: htmlFormData.get("cafePostCode"),
-            latitude: cafeLatitude,
-            longitude: cafeLongitude,
-            phone: htmlFormData.get("cafePhone"),
-            email: htmlFormData.get("cafeEmail"),
-            website: htmlFormData.get("cafeWebsite"),
-            instagram: htmlFormData.get("cafeInstagram"),
-            price_level: htmlFormData.get("cafePrice"),
-            coffee_quality: htmlFormData.get("coffeeQuality")
-        },
-
-        cafe_features: {
-            wifi_quality: htmlFormData.get("cafeWifi"),
-            power_outlets: htmlFormData.get("cafeOutlets"),
-            noise_level: htmlFormData.get("cafeNoise"),
-            seating_type: htmlFormData.get("cafeSeating"),
-            air_conditioning: htmlFormData.get("cafeAirConditioning"),
-            typical_occupancy: htmlFormData.get("cafeOccupancy"),
-            card_payment: htmlFormData.get("cafeCard"),
-            food_options: htmlFormData.get("cafeFood"),
-            vegetarian_options: htmlFormData.get("cafeVegetarian")
-        },
-
-        cafe_opening_hours: scheduleData,
-
-        cafe_review: {
-            rating: htmlFormData.get("userRating"), text: htmlFormData.get("userReview"),
-        }
-
-    }
-
-    return cafeSuggestion;
-}
-
-function createCafeSuggestionFormData(cafeSuggestion) {
-    const completeFormData = new FormData();
-
-    completeFormData.append("suggestion", JSON.stringify(cafeSuggestion));
-
-    for (const photo of selectedPhotos) {
-        completeFormData.append("photos", photo);
-    }
-
-    return completeFormData;
-}
-
 async function prepareCafeSuggestion() {
-    const cafeSuggestion = collectCafeSuggestionData();
+    const scheduleData = updateOpeningScheduleData();
+    const cafeSuggestion = collectCafeSuggestionData(cafeGeoapifyId, cafeLatitude, cafeLongitude, cafeSuggestionForm, scheduleData);
 
-    const completeFormData = createCafeSuggestionFormData(cafeSuggestion);
+    const completeFormData = createCafeSuggestionFormData(cafeSuggestion, selectedPhotos);
 
     submissionMessage.textContent = "";
 
