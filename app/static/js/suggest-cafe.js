@@ -4,6 +4,7 @@ import {formatInstagramUsername, formatPhoneNumber, formatPostalCode} from "./fo
 import {getUserLocation} from "./geolocation.js";
 import {fillCafeOpeningHours, resetOpeningHours, updateOpeningScheduleData} from "./opening-hours.js";
 import {renderPhotoPreviews, showPhotoError, validatePhoto} from "./photos.js";
+import {getSection, showInformationForm, showSectionForm, toggleSectionForm} from "./section.js";
 import {createCafeSuggestionFormData, collectCafeSuggestionData} from "./suggestion.js";
 import {
     validateFeaturesForm,
@@ -76,33 +77,7 @@ const submissionMessage = document.querySelector(".submission-message");
 // =========================================
 // FUNCTIONS
 // =========================================
-function getSection(sectionSelector) {
-    const section = document.querySelector(sectionSelector);
-    const sectionContent = section.querySelector(".section-content");
-    const sectionButton = section.querySelector(".section-toggle");
-    const status = section.querySelector(".section-status");
-    const arrow = section.querySelector(".section-arrow");
-    const continueButton = section.querySelector(".continue-btn");
 
-    return {
-        section, sectionContent, sectionButton, status, arrow, continueButton
-    }
-}
-
-function toggleSectionForm(section) {
-    section.sectionContent.classList.toggle("is-hidden");
-    section.section.classList.toggle("is-collapsed");
-
-    if (section.sectionContent.classList.contains("is-hidden")) {
-        section.arrow.textContent = "▶";
-    } else {
-        section.arrow.textContent = "▼";
-    }
-}
-
-function showSectionForm(section) {
-    section.section.classList.remove("is-hidden");
-}
 
 //================ LOCATION ================
 async function initializeLocation() {
@@ -177,7 +152,7 @@ async function selectCafe(result) {
         }
     }
 
-    showInformationForm();
+    showInformationForm(information);
 }
 
 function fillCafeDetails(cafeDetails) {
@@ -243,12 +218,7 @@ function saveAddressDetails(addressDetails) {
 }
 
 //================ BASIC-INFORMATION ================
-function showInformationForm() {
-    information.section.classList.remove("is-hidden");
-    information.section.classList.remove("is-collapsed");
-    information.sectionContent.classList.remove("is-hidden");
-    information.arrow.textContent = "▼";
-}
+
 
 //================ SUBMIT ================
 function validateSuggestionForm() {
@@ -380,7 +350,7 @@ searchInput.addEventListener("focus", () => {
     }
 });
 
-manualCafeButton.addEventListener("click", showInformationForm);
+manualCafeButton.addEventListener("click", () => showInformationForm(information));
 
 //================ BASIC-INFORMATION ================
 information.sectionButton.addEventListener("click", () => {
