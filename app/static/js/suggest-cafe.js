@@ -4,6 +4,12 @@ import {formatInstagramUsername, formatPhoneNumber, formatPostalCode} from "./fo
 import {getUserLocation} from "./geolocation.js";
 import {fillCafeOpeningHours, resetOpeningHours, updateOpeningScheduleData} from "./opening-hours.js";
 import {renderPhotoPreviews, showPhotoError, validatePhoto} from "./photos.js";
+import {
+    validateFeaturesForm,
+    validateFinalReviewForm,
+    validateInformationForm,
+    validateOpeningHoursForm
+} from "./validation.js";
 
 // =========================================
 // STATE
@@ -243,150 +249,12 @@ function showInformationForm() {
     information.arrow.textContent = "▼";
 }
 
-
-function validateInformationForm() {
-    const requiredFields = information.section.querySelectorAll("input[required], select[required]");
-
-    for (const field of requiredFields) {
-        if (!field.checkValidity()) {
-            field.reportValidity();
-            information.status.textContent = "❌ ";
-            return false;
-        }
-    }
-
-    if (cafePhone.value !== "" && !cafePhone.checkValidity()) {
-        cafePhone.reportValidity();
-        information.status.textContent = "❌ ";
-        return false;
-    }
-
-    if (cafeEmail.value !== "" && !cafeEmail.checkValidity()) {
-        cafeEmail.reportValidity();
-        information.status.textContent = "❌ ";
-        return false;
-    }
-
-    if (cafeWebsite.value !== "" && !cafeWebsite.checkValidity()) {
-        cafeWebsite.reportValidity();
-        information.status.textContent = "❌ ";
-        return false;
-    }
-
-    if (cafeInstagram.value !== "" && !cafeInstagram.checkValidity()) {
-        cafeInstagram.reportValidity();
-        information.status.textContent = "❌ ";
-        return false;
-    }
-
-    information.status.textContent = "✔️ ";
-    return true;
-}
-
-//================ FEATURES ================
-function validateFeaturesForm() {
-    const requiredFields = features.section.querySelectorAll("input[required]");
-
-    for (const field of requiredFields) {
-        if (!field.checkValidity()) {
-            field.reportValidity();
-            features.status.textContent = "❌ ";
-            return false;
-        }
-    }
-
-    features.status.textContent = "✔️ ";
-    return true;
-}
-
-//================ OPENING-HOURS ================.
-function validateOpeningHoursForm() {
-
-    for (const day of openingDays) {
-        const radioOpenButton = day.querySelector("input[value='open']");
-        const timeInputs = day.querySelectorAll(".opening-interval input");
-        const openingTimeInputs = day.querySelectorAll("input[name$='-open']");
-        const closingTimeInputs = day.querySelectorAll("input[name$='-close']");
-
-        if (radioOpenButton.checked) {
-            timeInputs.forEach(timeInput => {
-                timeInput.required = true;
-            });
-
-        } else {
-            timeInputs.forEach(timeInput => {
-                timeInput.required = false;
-            });
-        }
-
-        if (!radioOpenButton.checked) {
-            continue;
-        }
-
-        for (let i = 0; i < openingTimeInputs.length; i++) {
-            openingTimeInputs[i].setCustomValidity("");
-
-            const openingTime = openingTimeInputs[i].value;
-            const closingTime = closingTimeInputs[i].value;
-
-
-            if (i > 0) {
-                const previousClosingTime = closingTimeInputs[i - 1].value;
-
-                if (openingTime === "") {
-                    openingTimeInputs[i].setCustomValidity("Please enter valid interval");
-                    openingTimeInputs[i].reportValidity();
-                    openingHours.status.textContent = "❌ ";
-                    return false;
-                }
-
-                if (openingTime < previousClosingTime) {
-                    openingTimeInputs[i].setCustomValidity("Opening intervals must not overlap.");
-                    openingTimeInputs[i].reportValidity();
-                    openingHours.status.textContent = "❌ ";
-                    return false;
-                }
-            }
-        }
-    }
-
-    const requiredFields = openingHours.section.querySelectorAll("input[required]");
-
-    for (const field of requiredFields) {
-        if (!field.checkValidity()) {
-            field.reportValidity();
-            openingHours.status.textContent = "❌ ";
-            return false;
-        }
-    }
-
-    openingHours.status.textContent = "✔️ ";
-
-    return true;
-}
-
-//================ FINAL-REVIEW ================
-function validateFinalReviewForm() {
-    const requiredFields = finalReview.section.querySelectorAll("input[required]")
-
-    for (const field of requiredFields) {
-        if (!field.checkValidity()) {
-            field.reportValidity();
-            finalReview.status.textContent = "❌ ";
-            return false;
-        }
-    }
-
-    finalReview.status.textContent = "✔️ ";
-    return true;
-}
-
 //================ SUBMIT ================
 function validateSuggestionForm() {
-    const informationValid = validateInformationForm();
-    const featuresValid = validateFeaturesForm();
-    const openingHoursValid = validateOpeningHoursForm();
-    const finalReviewValid = validateFinalReviewForm();
+    const informationValid = validateInformationForm(information, cafePhone, cafeEmail, cafeWebsite, cafeInstagram);
+    const featuresValid = validateFeaturesForm(features);
+    const openingHoursValid = validateOpeningHoursForm(openingDays, openingHours);
+    const finalReviewValid = validateFinalReviewForm(finalReview);
 
     return informationValid && featuresValid && openingHoursValid && finalReviewValid;
 }
@@ -575,7 +443,7 @@ information.sectionButton.addEventListener("click", () => {
 });
 
 information.continueButton.addEventListener("click", () => {
-    if (!validateInformationForm()) {
+    if (!validateInformationForm(information, cafePhone, cafeEmail, cafeWebsite, cafeInstagram)) {
         return;
     }
 
@@ -683,7 +551,7 @@ features.sectionButton.addEventListener("click", () => {
 });
 
 features.continueButton.addEventListener("click", () => {
-    if (!validateFeaturesForm()) {
+    if (!validateFeaturesForm(features)) {
         return;
     }
 
@@ -697,7 +565,7 @@ openingHours.sectionButton.addEventListener("click", () => {
 });
 
 openingHours.continueButton.addEventListener("click", () => {
-    if (!validateOpeningHoursForm()) {
+    if (!validateOpeningHoursForm(openingDays, openingHours)) {
         return;
     }
 
@@ -770,7 +638,7 @@ finalReview.sectionButton.addEventListener("click", () => {
 })
 
 finalReview.continueButton.addEventListener("click", () => {
-    if (!validateFinalReviewForm()) {
+    if (!validateFinalReviewForm(finalReview)) {
         return
     }
     toggleSectionForm(finalReview);
