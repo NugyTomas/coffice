@@ -27,12 +27,15 @@ let addressAutocompleteController = null;
 // DOM REFERENCES
 // =========================================
 const cafeSuggestionForm = document.querySelector(".cafe-suggestion-form");
+
 //================ CAFE-SUGGESTION ================
 const searchInput = document.getElementById("cafe-search-input");
 const suggestions = document.querySelector(".cafe-suggestions");
 const manualCafeButton = document.querySelector(".manual-cafe-button");
 
 //================ BASIC-INFORMATION ================
+const information = getSection(".basic-information");
+
 const cafeName = document.getElementById("cafe-name");
 const cafeCity = document.getElementById("cafe-city");
 const cafeAddress = document.getElementById("cafe-address");
@@ -50,14 +53,14 @@ let selectedAddress = {
     address: "", city: "", postCode: "", latitude: null, longitude: null
 };
 
-const information = getSection(".basic-information");
-
 //================ FEATURES ================
 const features = getSection(".features");
+
 const cardPayment = document.getElementById("card-yes");
 
 //================ OPENING-HOURS ================
 const openingHours = getSection(".opening-hours");
+
 const openingDays = document.querySelectorAll(".opening-day");
 let openingSchedule = {
     monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: []
@@ -65,6 +68,7 @@ let openingSchedule = {
 
 //================ FINAL-REVIEW ================
 const finalReview = getSection(".final-review");
+
 const photoPreviewContainer = document.querySelector(".photo-preview-container");
 const photoInput = document.getElementById("cafe-photo-input");
 const photoError = document.getElementById("photo-error");
@@ -77,7 +81,6 @@ const submissionMessage = document.querySelector(".submission-message");
 // =========================================
 // FUNCTIONS
 // =========================================
-
 
 //================ LOCATION ================
 async function initializeLocation() {
@@ -216,9 +219,6 @@ function saveAddressDetails(addressDetails) {
     selectedAddress.latitude = addressDetails.lat;
     selectedAddress.longitude = addressDetails.lon;
 }
-
-//================ BASIC-INFORMATION ================
-
 
 //================ SUBMIT ================
 function validateSuggestionForm() {
